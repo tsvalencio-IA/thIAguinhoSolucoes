@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>thIAguinho LOG - Apresentação Master ERP Completo</title>
+    <title>thIAguinho LOG - Masterclass de Vendas (10/10)</title>
     
     <!-- Bibliotecas Oficiais -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,87 +12,91 @@
 
     <style>
         /* ==============================================================
-           ESTILOS REAIS DO ERP LOGÍSTICO (aed-test2-main.zip)
+           ESTILOS REAIS DO ERP LOGÍSTICO (Mobile-First 100% Fluido)
            ============================================================== */
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; overflow-x: hidden; height: 100dvh; margin: 0; display: flex; flex-direction: column; }
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; display: flex; justify-content: center; margin: 0; height: 100dvh; overflow: hidden; }
         
         .hidden-view { display: none !important; }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* Estrutura Base ERP Admin */
-        .layout-admin { display: flex; height: 100%; width: 100%; }
-        .sidebar { width: 280px; background: #0f172a; color: white; display: flex; flex-direction: column; flex-shrink: 0; z-index: 40; box-shadow: 4px 0 15px rgba(0,0,0,0.15); }
-        .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; background: #f8fafc; }
-        .topbar { height: 80px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; flex-shrink: 0; z-index: 30; }
-        .content-area { flex-grow: 1; padding: 32px; overflow-y: auto; scroll-behavior: smooth; }
-
-        /* Mapas Originais */
-        #map-rastreio, #map-motorista { height: 100%; min-height: 450px; border-radius: 1rem; z-index: 10; background-color: #e2e8f0; position: relative; overflow: hidden; border: 1px solid #cbd5e1; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        #map-motorista { min-height: 100%; border-radius: 1.5rem; border: none; }
-        .map-blocker { position: absolute; inset: 0; z-index: 20; background: transparent; }
         
-        /* GPS Pulso */
-        .gps-active-pulse { animation: pulse-blue 2s infinite; }
-        @keyframes pulse-blue { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(37, 99, 235, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
-        .map-marker { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 30; }
+        /* Remove a scrollbar nativa para uma gravação de tela limpa */
+        ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
 
-        /* Cards de Carga */
-        .delivery-card { background: white; border-radius: 12px; padding: 16px; border: 1px solid #e2e8f0; border-left: 6px solid #94a3b8; cursor: pointer; transition: all 0.2s; position: relative; margin-bottom: 12px; }
-        .delivery-card.simulated-hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 15px 25px -5px rgba(0,0,0,0.1); border-color: #2563eb; z-index: 20; }
-        .status-Em-Rota { border-left-color: #2563eb; }
-        .status-Entregue { border-left-color: #22c55e; background: #f0fdf4; opacity: 0.9; }
+        /* Simulador Mobile Container */
+        .mobile-simulator { width: 100%; max-width: 430px; height: 100%; background: #f1f5f9; position: relative; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
+        
+        /* Estrutura do App */
+        .topbar { height: 60px; background: #0f172a; color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; flex-shrink: 0; z-index: 30; }
+        .content-area { flex-grow: 1; overflow-y: auto; scroll-behavior: smooth; background: #f8fafc; padding-bottom: 30px; position: relative; }
+        
+        /* Painel de Planejamento */
+        .panel-header { background: white; border-bottom: 1px solid #e2e8f0; padding: 16px; position: sticky; top: 0; z-index: 20; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .config-box { background: white; border-radius: 12px; padding: 16px; border: 1px solid #e2e8f0; margin: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-t: 4px solid #f59e0b; }
+        
+        /* Stats (Distância, Tempo, Custo) */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: #0f172a; color: white; border-radius: 12px; margin: 0 16px 16px 16px; padding: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); }
+        .stat-item { text-align: center; border-right: 1px solid #334155; }
+        .stat-item:last-child { border-right: none; }
+        
+        /* Mapa de Roteirização */
+        .map-container { height: 350px; margin: 0 16px 16px 16px; border-radius: 12px; z-index: 10; background-color: #e2e8f0; position: relative; overflow: hidden; border: 2px solid #cbd5e1; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+        
+        /* Animações de Rota (A Mágica da IA) */
+        .route-path { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: drawRoute 2s ease-in-out forwards; }
+        @keyframes drawRoute { to { stroke-dashoffset: 0; } }
+        
+        .waypoint { position: absolute; transform: translate(-50%, -50%); z-index: 30; display: flex; flex-direction: column; align-items: center; }
+        .waypoint-dot { width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: white; }
+        .wp-base { background-color: #ef4444; } 
+        .wp-client { background-color: #22c55e; } 
+        .wp-potential { background-color: #f59e0b; animation: pulse-warning 2s infinite; } 
+        .wp-label { background: white; padding: 3px 6px; border-radius: 6px; font-size: 9px; font-weight: 900; color: #1e293b; margin-top: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); white-space: nowrap; border: 1px solid #cbd5e1;}
 
-        /* Modais Universais (O Segredo do ERP) */
-        .modal { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); z-index: 9990; position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: #ffffff; border-radius: 20px; display: flex; flex-direction: column; max-height: 92dvh; width: 100%; max-width: 650px; position: relative; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
-        .modal-content-lg { max-width: 900px; }
-        .modal-content-dark { background: #0f172a; border: 1px solid #334155; border-radius: 24px; max-width: 450px; padding: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.9); }
+        @keyframes pulse-warning { 0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.8); } 70% { box-shadow: 0 0 0 20px rgba(245, 158, 11, 0); } 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
 
-        /* App Motorista Mobile View */
-        .driver-device { max-width: 400px; margin: 0 auto; height: 100%; background: #0f172a; position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.8); display: flex; flex-direction: column; border-left: 2px solid #334155; border-right: 2px solid #334155; border-radius: 2.5rem; overflow: hidden; border: 8px solid #1e293b; }
-        .driver-map-area { flex-grow: 1; position: relative; }
+        /* Visão do Radar (IA) */
+        .radar-vision { background: white; margin: 0 16px 16px 16px; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; border-t: 4px solid #0f172a; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .radar-card { border: 1px solid #fcd34d; border-left: 4px solid #f59e0b; margin: 12px; padding: 12px; border-radius: 8px; background: #fffbeb; transition: all 0.3s; }
+        .radar-card.success { border-color: #86efac; border-left-color: #22c55e; background: #f0fdf4; }
 
-        /* GHOST CURSOR */
-        #ghost-cursor { position: fixed; top: 50%; left: 50%; width: 48px; height: 48px; z-index: 999999; pointer-events: none; transition: top 0.6s cubic-bezier(0.25, 1, 0.5, 1), left 0.6s cubic-bezier(0.25, 1, 0.5, 1); filter: drop-shadow(4px 8px 12px rgba(0,0,0,0.6)); opacity: 0; }
-        .cursor-click-effect { animation: cursorClick 0.4s ease-out; }
+        /* Modais Universais e App Motorista */
+        .modal { background: rgba(15, 23, 42, 0.90); backdrop-filter: blur(8px); z-index: 9990; position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; padding: 0; }
+        .modal-content { background: #ffffff; border-radius: 24px 24px 0 0; display: flex; flex-direction: column; max-height: 90%; width: 100%; position: relative; overflow: hidden; box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5); padding-bottom: env(safe-area-inset-bottom); }
+        .modal-content-dark { background: #0f172a; border-top: 1px solid #334155; }
+
+        /* GHOST CURSOR (Mãozinha da Automação) */
+        #ghost-cursor { position: absolute; top: 50%; left: 50%; width: 45px; height: 45px; z-index: 999999; pointer-events: none; transition: top 0.6s cubic-bezier(0.25, 1, 0.5, 1), left 0.6s cubic-bezier(0.25, 1, 0.5, 1); filter: drop-shadow(2px 6px 10px rgba(0,0,0,0.5)); opacity: 0; }
+        .cursor-click-effect { animation: cursorClick 0.3s ease-out; }
         @keyframes cursorClick { 0% { transform: scale(1); } 50% { transform: scale(0.6); } 100% { transform: scale(1); } }
 
         /* FOCO FALSO DA DIGITAÇÃO */
-        .typing-focus { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.4) !important; border-color: #2563eb !important; background: #fff !important;}
+        .typing-focus { box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.4) !important; border-color: #f59e0b !important; background: #fff !important;}
         .typing-focus-dark { box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.4) !important; border-color: #22c55e !important; }
 
-        /* LEGENDA DE VENDAS */
-        #tour-caption-container { position: fixed; bottom: 40px; left: 0; width: 100%; display: flex; justify-content: center; z-index: 99999; pointer-events: none; opacity: 0; transform: translateY(20px); transition: all 0.4s ease-in-out; padding: 0 20px; }
-        #tour-caption { background: rgba(15, 23, 42, 0.98); color: #fff; padding: 20px 32px; border-radius: 24px; font-size: 1.15rem; font-weight: 800; border: 2px solid #2563eb; box-shadow: 0 15px 40px rgba(0,0,0,0.6); display: flex; align-items: center; gap: 15px; max-width: 700px; text-align: center; justify-content: center; line-height: 1.4; }
+        /* LEGENDA DE VENDAS CINEMATOGRÁFICA */
+        #tour-caption-container { position: absolute; top: 20px; left: 0; width: 100%; display: flex; justify-content: center; z-index: 99999; pointer-events: none; opacity: 0; transform: translateY(-20px); transition: all 0.4s ease-in-out; padding: 0 16px; }
+        #tour-caption { background: rgba(255, 255, 255, 0.98); color: #0f172a; padding: 16px 20px; border-radius: 16px; font-size: 0.95rem; font-weight: 900; border-left: 6px solid #f59e0b; box-shadow: 0 15px 35px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; line-height: 1.3; }
 
-        /* ENGINE DE PDF INTERNA */
-        #pdf-preview-modal { z-index: 100000; }
-        #pdfScrollArea { overflow-y: hidden; }
-        .pdf-paper { background: white; width: 100%; max-width: 800px; margin: 0 auto; min-height: 1000px; padding: 50px; box-shadow: 0 15px 50px rgba(0,0,0,0.4); border-top: 16px solid #1e3a8a; position: relative; color: #1e293b; font-family: 'Arial', sans-serif; }
-        .pdf-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .pdf-table th { background: #f8fafc; text-align: left; padding: 12px; font-size: 11px; color: #64748b; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; }
-        .pdf-table td { padding: 12px; font-size: 13px; border-bottom: 1px solid #f1f5f9; font-weight: 600; }
+        /* TOAST NOTIFICATION (WhatsApp) */
+        #toast-notification { position: absolute; top: 100px; right: 16px; left: 16px; background: white; padding: 16px; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); border-left: 6px solid #22c55e; display: flex; align-items: center; gap: 15px; z-index: 99999; transform: translateX(120%); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #toast-notification.show { transform: translateX(0); }
 
         /* TELA FINAL CTA */
-        #final-screen { position: fixed; inset: 0; background: linear-gradient(180deg, #020617 0%, #1e3a8a 100%); z-index: 200000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 1s; text-align: center; padding: 30px; }
+        #final-screen { position: absolute; inset: 0; background: linear-gradient(180deg, #020617 0%, #1e3a8a 100%); z-index: 200000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 1s; text-align: center; padding: 24px; }
         #final-screen.active { opacity: 1; pointer-events: auto; }
-        .final-logo { width: 260px; height: auto; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); margin-bottom: 40px; border: 4px solid rgba(255,255,255,0.1); }
-        .cta-btn { background: #25D366; color: white; padding: 24px 60px; border-radius: 60px; font-size: 1.5rem; font-weight: 900; text-decoration: none; box-shadow: 0 20px 40px rgba(37, 211, 102, 0.4); margin-top: 30px; display: flex; align-items: center; gap: 15px; transition: transform 0.2s; }
+        .final-logo { width: 160px; height: auto; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); margin-bottom: 30px; border: 3px solid rgba(255,255,255,0.1); background: white; padding: 10px;}
     </style>
 </head>
-<body class="text-slate-800 flex h-screen overflow-hidden relative bg-slate-100">
+<body>
+
+<div class="mobile-simulator" id="simulator-container">
 
     <!-- START OVERLAY -->
-    <div id="start-screen" class="fixed inset-0 bg-slate-950 z-[1000000] flex flex-col items-center justify-center p-8 text-center">
-        <img src="image_f278e2.png" onerror="this.style.display='none'" class="w-32 h-32 mb-6 rounded-3xl shadow-2xl shadow-blue-600/50 animate-pulse object-cover bg-white p-2">
-        <h1 class="text-5xl font-black text-white mb-4 tracking-tighter">thIAguinho LOG</h1>
-        <p class="text-blue-200 mb-12 text-xl max-w-3xl font-medium leading-relaxed">Tour Integral. Demonstração de todos os módulos: Motoristas, Despesas, Despacho de NFe, App na Rua, Auditoria de Canhoto e Fechamento de Caixa. Prepare-se.</p>
-        <button onclick="this.disabled=true; iniciarTour();" class="bg-blue-600 text-white w-full max-w-md py-6 rounded-2xl font-black text-2xl uppercase shadow-2xl hover:bg-blue-500 transition-all tracking-widest active:scale-95">Iniciar Gravação Completa</button>
+    <div id="start-screen" class="absolute inset-0 bg-slate-950 z-[1000000] flex flex-col items-center justify-center p-6 text-center">
+        <!-- Imagem Real -->
+        <img src="image_f278e2.png" onerror="this.style.display='none'" class="w-24 h-24 mb-6 rounded-2xl shadow-2xl shadow-blue-600/50 bg-white p-2">
+        <h1 class="text-4xl font-black text-white mb-4 tracking-tighter">thIAguinho LOG</h1>
+        <p class="text-blue-200 mb-10 text-sm max-w-sm font-medium leading-relaxed">Sincronizado e Fluido (10/10). Prepare o seu gravador de tela de celular. A demonstração focará na cereja do bolo: <b>Roteirização IA, Pós-Venda Automático e Recálculo de Custo-Benefício.</b></p>
+        <button onclick="this.disabled=true; iniciarTour();" class="bg-blue-600 text-white w-full py-5 rounded-2xl font-black text-lg uppercase shadow-2xl hover:bg-blue-500 transition-all tracking-widest active:scale-95">Iniciar Demo Master</button>
     </div>
 
     <!-- CURSOR FANTASMA -->
@@ -104,256 +108,215 @@
 
     <!-- LEGENDA VENDEDOR (CAPTIONS) -->
     <div id="tour-caption-container">
-        <div id="tour-caption"><span id="caption-text">Inicializando Motor de Apresentação...</span></div>
+        <div id="tour-caption"><span id="caption-text">Inicializando...</span></div>
+    </div>
+
+    <!-- TOAST NOTIFICATION (WhatsApp) -->
+    <div id="toast-notification">
+        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 shrink-0"><i class='bx bxl-whatsapp text-3xl'></i></div>
+        <div>
+            <h4 class="font-black text-slate-800 text-sm" id="toast-title">Negociação Fechada!</h4>
+            <p class="text-[11px] font-bold text-slate-500 mt-0.5" id="toast-msg">Cliente respondeu no WhatsApp.</p>
+        </div>
     </div>
 
     <!-- TELA FINAL CTA -->
     <div id="final-screen">
-        <img src="WhatsApp Image 2026-03-23 at 22.12.36.jpeg" class="final-logo" alt="Logo thIAguinho" onerror="this.src='https://via.placeholder.com/260/1e40af/ffffff?text=thIAguinho+LOG'">
-        <h2 class="text-white text-6xl font-black mb-6 tracking-tighter">Um Ecossistema Completo.</h2>
-        <p class="text-blue-200 text-2xl max-w-4xl mb-12 leading-relaxed font-medium">Você viu a operação inteira. Do cadastro do motorista ao recebimento do cliente. Escale suas entregas, zere os erros e aumente seu lucro com o thIAguinho LOG.</p>
-        <a href="https://wa.me/" class="cta-btn"><i class='bx bxl-whatsapp text-4xl'></i> QUERO ASSINAR AGORA</a>
+        <img src="image_f278e2.png" onerror="this.src='https://via.placeholder.com/150/1e40af/ffffff?text=LOG'" class="final-logo">
+        <h2 class="text-white text-4xl font-black mb-4 tracking-tighter">Logística Inteligente.</h2>
+        <p class="text-blue-200 text-sm max-w-sm mb-10 leading-relaxed font-medium">Você acabou de ver o futuro: a IA transforma um frete caro em uma oportunidade de lucro na mesma viagem. Assinatura digital na ponta e relatórios exatos na base.</p>
+        <a href="https://wa.me/" class="bg-green-500 text-white py-4 px-8 rounded-full font-black text-sm shadow-xl shadow-green-500/40 flex items-center justify-center gap-2 w-full max-w-xs"><i class='bx bxl-whatsapp text-2xl'></i> QUERO ASSINAR AGORA</a>
     </div>
 
     <!-- TRANSIÇÃO DE NUVEM -->
-    <div id="transition-overlay" class="fixed inset-0 bg-slate-950 z-[200000] opacity-0 pointer-events-none flex flex-col items-center justify-center transition-opacity duration-500 text-center px-6">
-        <i class='bx bx-cloud-upload bx-flashing text-8xl text-blue-500 mb-6'></i>
-        <h3 id="transition-title" class="text-white text-5xl font-black tracking-tight mb-4">Sincronização Nuvem</h3>
-        <p id="transition-subtitle" class="text-slate-400 font-bold text-2xl">Conectando dados em tempo real...</p>
+    <div id="transition-overlay" class="absolute inset-0 bg-slate-950 z-[200000] opacity-0 pointer-events-none flex flex-col items-center justify-center transition-opacity duration-500 text-center px-6">
+        <i class='bx bx-cloud-upload bx-fade-up text-7xl text-blue-500 mb-4'></i>
+        <h3 id="transition-title" class="text-white text-2xl font-black tracking-tight mb-2">Sincronizando...</h3>
+        <p id="transition-subtitle" class="text-slate-400 font-bold text-xs">Enviando Rota para o Celular do Motorista.</p>
     </div>
 
     <!-- ========================================== -->
-    <!-- TELA DE LOGIN                              -->
+    <!-- TELA DE LOGIN (COM IMAGEM REAL)            -->
     <!-- ========================================== -->
-    <div id="userScreen" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900 p-4 transition-opacity">
-        <img src="image_f22652.jpg" onerror="this.style.display='none'" class="absolute inset-0 w-full h-full object-cover opacity-20">
-        <div class="bg-white p-12 rounded-[2rem] shadow-2xl w-full max-w-lg text-center border-t-8 border-blue-700 z-10 relative">
-            <img src="image_f278e2.png" onerror="this.style.display='none'" class="w-20 h-20 mx-auto mb-6 object-contain">
-            <h1 class="text-base font-black text-slate-400 mb-1 tracking-widest uppercase">Acesso Restrito</h1>
-            <h2 class="text-6xl font-black text-blue-900 mb-2 tracking-tighter">thIAguinho</h2>
-            <p class="text-sm font-bold text-blue-500 uppercase tracking-widest mb-10 border-b border-gray-100 pb-6">Logística de Alta Performance</p>
-            <form id="loginForm" class="text-left space-y-6" onsubmit="return false;">
+    <div id="userScreen" class="absolute inset-0 z-[100] flex items-center justify-center bg-slate-900 p-4 transition-opacity">
+        <img src="image_f22652.jpg" onerror="this.style.display='none'" class="absolute inset-0 w-full h-full object-cover opacity-30">
+        <div class="bg-white p-6 rounded-3xl shadow-2xl w-full text-center border-t-8 border-blue-700 z-10 relative">
+            <img src="image_f278e2.png" onerror="this.style.display='none'" class="w-16 h-16 mx-auto mb-4 object-contain bg-slate-100 p-2 rounded-xl">
+            <h2 class="text-4xl font-black text-blue-900 mb-1 tracking-tighter">thIAguinho</h2>
+            <p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-8 border-b border-gray-100 pb-4">Diretoria de Operações</p>
+            <form id="loginForm" onsubmit="return false;" class="text-left space-y-4">
                 <div>
-                    <label class="block text-sm font-black text-slate-400 uppercase mb-2 ml-1">Selecione o Acesso</label>
-                    <select id="userSelect" class="w-full p-5 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold outline-none text-slate-700 text-lg">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-1.5 ml-1">Usuário / Base</label>
+                    <select id="userSelect" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none text-slate-700 text-xs focus:border-blue-500">
                         <option value="">Selecione...</option>
-                        <option value="admin">Gestor de Logística (Painel WEB)</option>
+                        <option value="admin">Thiago Ventura (Gestor)</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-black text-slate-400 uppercase mb-2 ml-1">Senha de Autorização</label>
-                    <input type="password" id="passwordInput" placeholder="••••••" class="w-full p-5 bg-slate-50 border-2 border-slate-200 rounded-xl font-black outline-none text-slate-700 text-xl tracking-widest">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-1.5 ml-1">Senha de Acesso</label>
+                    <input type="password" id="passwordInput" placeholder="••••••" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-black outline-none text-slate-700 tracking-widest text-sm focus:border-blue-500">
                 </div>
-                <button type="button" id="loginBtn" class="w-full bg-blue-700 text-white py-6 rounded-xl font-black uppercase text-xl shadow-xl shadow-blue-700/30 mt-6 tracking-wider">Acessar Sistema</button>
+                <button type="button" id="loginBtn" class="w-full bg-blue-700 text-white py-4 rounded-xl font-black uppercase text-xs shadow-lg shadow-blue-700/30 mt-2 hover:bg-blue-600 transition-colors">Autenticar Sistema</button>
             </form>
         </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- APP: VISÃO DO GESTOR (ADMIN ERP)           -->
+    <!-- APP: VISÃO DO GESTOR (ROTEIRIZADOR IA)     -->
     <!-- ========================================== -->
-    <div id="app-admin" class="layout-admin hidden-view">
-        <aside class="sidebar relative overflow-hidden">
-            <img src="image_f2268c.jpg" onerror="this.style.display='none'" class="absolute inset-0 w-full h-full object-cover opacity-10 mix-blend-overlay">
-            
-            <div class="p-8 flex items-center gap-4 border-b border-slate-800 relative z-10">
-                <img src="image_f278e2.png" onerror="this.style.display='none'" class="w-12 h-12 bg-white rounded-xl p-1">
-                <div><h1 class="font-black text-2xl text-white leading-none tracking-tight">thIAguinho</h1><p class="text-xs text-blue-400 font-bold uppercase tracking-widest mt-1">LOGÍSTICA</p></div>
+    <div id="app-admin" class="layout-admin hidden-view flex flex-col h-full w-full">
+        <header class="topbar">
+            <div class="flex items-center gap-2">
+                <i class='bx bx-menu text-2xl text-slate-400'></i>
+                <h1 class="text-sm font-black text-white leading-none tracking-tight ml-2 uppercase">Planejamento IA & Rotas</h1>
             </div>
-            <div class="p-6 space-y-3 relative z-10">
-                <!-- TODOS OS MÓDULOS REAIS -->
-                <div class="flex items-center gap-4 px-5 py-4 bg-blue-600 rounded-xl text-white font-bold cursor-pointer shadow-lg shadow-blue-600/20"><i class='bx bxs-dashboard text-2xl'></i> Dashboard / Despacho</div>
-                <div class="flex items-center gap-4 px-5 py-4 text-slate-400 font-bold hover:text-white cursor-pointer transition" id="btnMenuMotoristas"><i class='bx bxs-user-badge text-2xl'></i> Gestão de Motoristas</div>
-                <div class="flex items-center gap-4 px-5 py-4 text-slate-400 font-bold hover:text-white cursor-pointer transition" id="btnMenuDespesas"><i class='bx bxs-gas-pump text-2xl'></i> Lançar Despesas</div>
-                <div class="flex items-center gap-4 px-5 py-4 text-slate-400 font-bold hover:text-white cursor-pointer transition" id="btnMenuRelatorios"><i class='bx bx-bar-chart-alt-2 text-2xl'></i> Fechamento e Relatórios</div>
+            <div class="w-8 h-8 bg-slate-800 text-white rounded-full flex items-center justify-center font-bold text-xs border border-slate-600 shadow-sm">TV</div>
+        </header>
+
+        <main class="content-area p-0 overflow-y-auto flex-grow" id="adminScrollArea">
+            <div class="panel-header">
+                <p class="text-[9px] font-black text-amber-500 uppercase tracking-widest mb-1 flex items-center gap-1"><i class='bx bx-radar text-base'></i> Radar Preditivo</p>
+                <h2 class="font-black text-slate-800 text-sm leading-tight">Mapeamento de Corredor Logístico e Vendas de Oportunidade.</h2>
             </div>
-        </aside>
 
-        <main class="main-content relative">
-            <header class="topbar">
-                <div class="flex items-center gap-3 text-slate-600 font-bold text-xl">
-                    <i class='bx bx-menu text-4xl'></i> Central de Operações
+            <!-- Formulário de Rota -->
+            <div class="config-box space-y-4">
+                <div>
+                    <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Origem (Fábrica)</label>
+                    <input type="text" id="rota-origem" value="São José do Rio Preto, SP" class="w-full p-3 border rounded-lg text-xs font-bold bg-slate-50 outline-none text-slate-700">
                 </div>
-                <div class="flex items-center gap-5">
-                    <button id="btnNovaEntrega" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-black text-sm uppercase shadow-lg shadow-blue-600/20 flex items-center gap-2"><i class='bx bx-plus text-xl'></i> Despachar Nova NFe</button>
-                    <div class="w-14 h-14 bg-slate-800 text-white rounded-full flex items-center justify-center font-bold text-xl border-4 border-white shadow-md">G</div>
-                </div>
-            </header>
-
-            <div class="content-area grid grid-cols-1 lg:grid-cols-5 gap-8" id="adminScrollArea">
-                <!-- Coluna 1: Lista de Cargas -->
-                <div class="lg:col-span-2 flex flex-col gap-5 h-full">
-                    <h2 class="font-black text-slate-800 text-base uppercase flex items-center gap-2"><i class='bx bx-list-ul text-blue-600 text-xl'></i> Entregas em Andamento</h2>
-                    <div id="admin-delivery-list" class="space-y-4 overflow-y-auto pr-2 pb-10" style="max-height: calc(100vh - 180px);">
-                        <!-- Injetado via JS -->
-                    </div>
+                <div>
+                    <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Destino Principal</label>
+                    <input type="text" id="rota-destino" value="São Paulo, SP" class="w-full p-3 border rounded-lg text-xs font-bold bg-slate-50 outline-none text-slate-700 focus:border-amber-500 transition-colors">
                 </div>
                 
-                <!-- Coluna 2: Mapa de Rastreio -->
-                <div class="lg:col-span-3 flex flex-col gap-5 h-full">
-                    <h2 class="font-black text-slate-800 text-base uppercase flex items-center justify-between">
-                        <span class="flex items-center gap-2"><i class='bx bx-map text-red-500 text-xl'></i> Rastreamento em Tempo Real</span>
-                        <span class="text-xs bg-green-100 text-green-700 px-4 py-1.5 rounded-full font-black uppercase tracking-wider flex items-center gap-2"><i class='bx bxs-circle text-[10px] animate-pulse'></i> GPS Ativo</span>
-                    </h2>
-                    <div id="map-rastreio" class="rounded-2xl">
-                        <img src="image_f223a6.png" onerror="this.style.display='none'" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-multiply">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d30000!2d-46.633309!3d-23.550520!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1spt-BR!2sbr" width="100%" height="100%" style="border:0; position:relative; z-index:10;" allowfullscreen="" loading="lazy"></iframe>
-                        <div class="map-blocker"></div>
-                        
-                        <div class="map-marker">
-                            <div class="w-14 h-14 bg-blue-600 rounded-full border-4 border-white shadow-2xl gps-active-pulse flex items-center justify-center relative z-40">
-                                <i class='bx bxs-truck text-white text-3xl'></i>
-                            </div>
-                            <div class="bg-slate-900 text-white px-4 py-2 rounded-xl shadow-xl text-[11px] font-black absolute top-full left-1/2 transform -translate-x-1/2 mt-3 whitespace-nowrap z-40">Carlos Silva (Baú)</div>
-                        </div>
+                <button id="btn-tracar-rota" class="w-full bg-slate-900 text-amber-400 py-4 rounded-xl font-black uppercase text-[10px] shadow-xl flex items-center justify-center gap-2 mt-2 active:scale-95 transition-transform tracking-widest">
+                    <i class='bx bx-map-pin text-lg'></i> Traçar Rota & Iniciar Varredura
+                </button>
+            </div>
+
+            <!-- Stats (Inicia vazio/zerado) -->
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-1">Distância</p>
+                    <p class="text-sm font-black" id="stat-dist">--</p>
+                </div>
+                <div class="stat-item">
+                    <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-1">Tempo</p>
+                    <p class="text-sm font-black text-amber-400" id="stat-time">--</p>
+                </div>
+                <div class="stat-item">
+                    <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mb-1">Custo Frete</p>
+                    <p class="text-sm font-black text-red-400" id="stat-cost">--</p>
+                </div>
+            </div>
+
+            <!-- Mapa Realista (Rodovias SP) -->
+            <div class="map-container relative">
+                <img src="image_f22652.jpg" onerror="this.style.display='none'" class="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-multiply">
+                
+                <svg width="100%" height="100%" style="position:absolute; top:0; left:0; z-index:10;" viewBox="0 0 300 300">
+                    <path id="path-original" d="M 50 50 C 120 150, 200 200, 250 260" fill="none" stroke="#0f172a" stroke-width="4" class="hidden-view route-path" />
+                    <path id="path-optimized" d="M 50 50 C 130 110, 160 170, 250 260" fill="none" stroke="#22c55e" stroke-width="5" class="hidden-view route-path" />
+                </svg>
+
+                <div id="wp-origem" class="waypoint hidden-view" style="top: 16%; left: 16%;">
+                    <div class="waypoint-dot wp-base">A</div>
+                    <div class="wp-label">SJRP</div>
+                </div>
+
+                <div id="wp-destino" class="waypoint hidden-view" style="top: 86%; left: 83%;">
+                    <div class="waypoint-dot wp-base">B</div>
+                    <div class="wp-label">SÃO PAULO</div>
+                </div>
+
+                <!-- Cliente Potencial IA -->
+                <div id="wp-cliente-ia" class="waypoint hidden-view" style="top: 50%; left: 53%;">
+                    <div class="waypoint-dot wp-potential"><i class='bx bx-radar text-xs'></i></div>
+                    <div class="wp-label text-amber-600 border border-amber-200">Campinas (Oportunidade)</div>
+                </div>
+            </div>
+
+            <!-- Visão do Radar -->
+            <div id="radar-vision" class="radar-vision hidden-view">
+                <div class="bg-slate-900 p-4 text-white flex justify-between items-center">
+                    <h3 class="font-black uppercase text-[10px] tracking-widest flex items-center gap-2"><i class='bx bxs-user-check text-amber-500 text-lg'></i> Visão do Radar IA</h3>
+                    <span class="bg-amber-500 text-slate-900 px-2 py-0.5 rounded font-black text-[8px]">1 NO CORREDOR 50KM</span>
+                </div>
+                
+                <div class="radar-card" id="radar-card-client">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="font-black text-slate-800 text-xs uppercase leading-tight w-3/4">Depósito Campinas - SP</p>
+                        <span class="text-[8px] bg-white border border-amber-200 text-amber-700 px-1.5 py-0.5 rounded font-black">2.4 KM ROTA</span>
+                    </div>
+                    <p class="text-[9px] text-slate-500 font-bold mb-3 leading-tight"><i class='bx bx-map text-red-500'></i> Rodovia Anhanguera, Km 98 - Campinas</p>
+                    <p class="text-[9px] font-black text-red-600 uppercase mb-3 bg-red-50 p-2 rounded border border-red-100">Alerta: Cliente sem fazer pedidos há 35 dias.</p>
+                    
+                    <button id="btn-abordagem-ia" class="w-full bg-slate-900 text-amber-400 py-3 rounded-lg text-[9px] font-black uppercase tracking-widest active:scale-95 transition flex justify-center gap-2 items-center"><i class='bx bx-brain text-sm'></i> Abordagem IA WhatsApp</button>
+                    
+                    <div id="btn-confirmar-rota-container" class="hidden-view mt-3 pt-3 border-t border-amber-200">
+                        <button id="btn-add-rota" class="w-full bg-green-600 text-white py-3 rounded-lg text-[9px] font-black uppercase tracking-widest active:scale-95 transition flex justify-center gap-2 items-center shadow-lg"><i class='bx bx-check-double text-sm'></i> Venda Fechada! Adicionar à Rota</button>
                     </div>
                 </div>
+            </div>
+
+            <div class="p-4 bg-white border-t border-slate-200 mt-4">
+                <button id="btn-despachar-motorista" disabled class="w-full bg-blue-700 text-white py-4 rounded-xl font-black uppercase text-xs shadow-xl flex justify-center items-center gap-2 disabled:opacity-40 transition-opacity active:scale-95"><i class='bx bx-send text-lg'></i> Confirmar Viagem p/ Motorista</button>
             </div>
         </main>
     </div>
 
-    <!-- MODAL 1: GERENCIAR MOTORISTAS -->
-    <div id="modal-motoristas" class="modal hidden-view">
-        <div class="modal-content">
-            <div class="bg-slate-900 text-white p-6 flex justify-between items-center border-b border-slate-800 shrink-0">
-                <h2 class="font-black text-xl flex items-center gap-3 uppercase tracking-tight"><i class='bx bxs-user-badge text-blue-400 text-3xl'></i> Cadastro de Motoristas</h2>
-                <button class="btn-close text-slate-400 text-3xl hover:text-white">&times;</button>
-            </div>
-            <div class="p-8 bg-slate-50 space-y-6">
-                <form id="formMot" onsubmit="return false;" class="space-y-5 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <p class="text-xs font-black text-slate-400 uppercase mb-4 border-b pb-2">Adicionar Novo</p>
-                    <div><label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Nome Completo / Veículo</label><input id="motName" type="text" placeholder="Ex: Carlos Silva (Caminhão 01)" class="w-full p-4 border-2 border-slate-200 rounded-xl font-bold outline-none text-slate-800"></div>
-                    <div><label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Percentual de Comissão (%)</label><input id="motCom" type="number" placeholder="Ex: 10" class="w-full p-4 border-2 border-slate-200 rounded-xl font-black outline-none text-blue-700 text-lg"></div>
-                    <button id="btnSalvarMot" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black uppercase tracking-widest mt-2">Cadastrar no Sistema</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 2: LANÇAR DESPESAS -->
-    <div id="modal-despesas" class="modal hidden-view">
-        <div class="modal-content">
-            <div class="bg-slate-900 text-white p-6 flex justify-between items-center border-b border-slate-800 shrink-0">
-                <h2 class="font-black text-xl flex items-center gap-3 uppercase tracking-tight"><i class='bx bxs-gas-pump text-red-400 text-3xl'></i> Registrar Despesa de Frota</h2>
-                <button class="btn-close text-slate-400 text-3xl hover:text-white">&times;</button>
-            </div>
-            <div class="p-8 bg-slate-50 space-y-6">
-                <form id="formDesp" onsubmit="return false;" class="space-y-5 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <div>
-                        <label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Selecionar Veículo/Motorista</label>
-                        <select id="despMot" class="w-full p-4 border-2 border-slate-200 rounded-xl font-bold outline-none text-slate-800">
-                            <option value="Carlos Silva">Carlos Silva (Caminhão Baú)</option>
-                        </select>
-                    </div>
-                    <div><label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Tipo de Despesa</label><input id="despDesc" type="text" placeholder="Ex: Abastecimento Diesel" class="w-full p-4 border-2 border-slate-200 rounded-xl font-bold outline-none text-slate-800"></div>
-                    <div><label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Valor (R$)</label><input id="despVal" type="number" placeholder="0.00" class="w-full p-4 border-2 border-slate-200 rounded-xl font-black outline-none text-red-600 text-xl"></div>
-                    <button id="btnSalvarDesp" class="w-full bg-red-600 text-white py-4 rounded-xl font-black uppercase tracking-widest mt-2">Lançar Despesa</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 3: DESPACHAR NOVA CARGA (NFe) -->
-    <div id="modal-nova-entrega" class="modal hidden-view">
-        <div class="modal-content max-w-3xl">
-            <div class="bg-blue-600 text-white p-6 flex justify-between items-center shrink-0">
-                <h2 class="font-black text-xl flex items-center gap-3 uppercase tracking-tight"><i class='bx bx-barcode-reader text-white text-3xl'></i> Gerar Despacho / NFe</h2>
-                <button class="btn-close text-white text-3xl hover:text-slate-200">&times;</button>
-            </div>
-            <div class="p-8 bg-slate-50 space-y-6 overflow-y-auto">
-                <form id="formNovaEntrega" onsubmit="return false;" class="space-y-5 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="grid grid-cols-2 gap-6">
-                        <div><label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Número NFe</label><input id="nfeInput" type="text" placeholder="Ex: 5040" class="w-full p-4 border-2 border-slate-200 rounded-xl font-mono font-black text-2xl outline-none text-slate-800"></div>
-                        <div><label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Valor da NFe (R$)</label><input id="valInput" type="number" placeholder="0.00" class="w-full p-4 border-2 border-slate-200 rounded-xl font-black outline-none text-blue-700 text-2xl"></div>
-                    </div>
-                    <div><label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Cliente / Empresa</label><input id="clienteInput" type="text" placeholder="Nome do Destinatário" class="w-full p-4 border-2 border-slate-200 rounded-xl font-bold outline-none text-slate-800 text-lg"></div>
-                    <div><label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Endereço de Entrega Completo</label><textarea id="endInput" rows="2" placeholder="Rua, Número, Bairro, Cidade..." class="w-full p-4 border-2 border-slate-200 rounded-xl font-medium outline-none resize-none text-slate-800"></textarea></div>
-                    <div>
-                        <label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Atribuir ao Motorista</label>
-                        <select id="motSelectEnt" class="w-full p-4 border-2 border-slate-200 rounded-xl font-bold outline-none text-slate-800 bg-slate-50">
-                            <option value="Carlos Silva">Carlos Silva (Caminhão Baú)</option>
-                        </select>
-                    </div>
-                    <button id="btnSalvarEntrega" class="w-full bg-blue-600 text-white py-6 rounded-2xl font-black text-xl shadow-xl shadow-blue-600/30 uppercase tracking-tighter mt-4">Sincronizar com App Motorista</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 4: DETALHES E AUDITORIA DO CANHOTO (VISÃO GESTOR) -->
-    <div id="modal-detalhes-entrega" class="modal hidden-view">
-        <div class="modal-content max-w-2xl">
-            <div class="bg-white p-6 border-b border-slate-200 flex justify-between items-center shrink-0">
-                <div><h2 class="font-black text-3xl text-slate-800 tracking-tighter flex items-center gap-3"><i class='bx bx-check-shield text-green-500'></i> Detalhes da Entrega</h2></div>
-                <button class="btn-close text-slate-400 text-4xl hover:text-slate-600">&times;</button>
-            </div>
-            <div class="p-8 bg-slate-50 space-y-6">
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="flex justify-between items-center mb-6">
-                        <p class="font-black text-2xl text-slate-800" id="det-nfe">NFe: 8890</p>
-                        <span class="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-black uppercase text-xs">Entregue e Validado</span>
-                    </div>
-                    <p class="text-sm font-bold text-slate-500 uppercase mb-1">Cliente</p>
-                    <p class="font-black text-xl text-slate-800 mb-6" id="det-cliente">Lojas Silva</p>
-                    
-                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
-                        <p class="text-xs font-black text-blue-600 uppercase border-b border-slate-200 pb-2"><i class='bx bx-fingerprint text-lg'></i> Canhoto Digital / Assinatura</p>
-                        <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase">Recebedor Registrado</p>
-                            <p class="font-bold text-slate-800 text-base" id="det-recebedor">Roberto Alves (Portaria)</p>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase">Ocorrências / Observações da Descarga</p>
-                            <p class="font-medium text-slate-700 text-sm bg-white p-3 rounded-lg border mt-1" id="det-obs">Tudo conferido.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- ========================================== -->
-    <!-- APP: VISÃO DO MOTORISTA (CELULAR NA RUA)   -->
+    <!-- APP: VISÃO DO MOTORISTA (MOBILE APP NA RUA)-->
+    <!-- Lógica Real: App.js -> Ocorrências / Baixa -->
     <!-- ========================================== -->
-    <div id="app-motorista" class="hidden-view absolute inset-0 z-50 bg-slate-900 flex justify-center items-center backdrop-blur-md p-4">
-        <div class="driver-device w-full rounded-[3rem] overflow-hidden border-[10px] border-slate-800 shadow-[0_0_60px_rgba(0,0,0,0.9)]">
-            <header class="p-8 pt-12 flex justify-between items-center border-b border-slate-800 bg-slate-900 shrink-0 z-50 relative">
-                <div class="flex items-center gap-4">
-                    <img src="image_f278e2.png" onerror="this.style.display='none'" class="w-12 h-12 bg-white rounded-full p-1.5 shadow-lg">
-                    <div><p class="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1">Rota Ativa</p><h2 class="font-black text-2xl text-white leading-none">Carlos Silva</h2></div>
-                </div>
-                <div class="w-12 h-12 bg-slate-800 rounded-2xl flex items-center justify-center relative text-white"><i class='bx bx-bell text-2xl'></i><div class="absolute top-2 right-2 w-3 h-3 bg-red-500 border-2 border-slate-800 rounded-full"></div></div>
-            </header>
+    <div id="app-motorista" class="hidden-view absolute inset-0 z-50 bg-slate-900 flex-col w-full h-full">
+        <header class="p-5 flex justify-between items-center border-b border-slate-800 bg-slate-950 shrink-0">
+            <div class="flex items-center gap-3">
+                <img src="image_f278e2.png" onerror="this.style.display='none'" class="w-10 h-10 rounded-full bg-white p-1">
+                <div><p class="text-[8px] font-black text-red-500 uppercase tracking-widest mb-0.5">App Motorista</p><h2 class="font-black text-sm text-white leading-none">Carlos Silva</h2></div>
+            </div>
+            <button class="bg-slate-800 p-2 rounded-lg border border-slate-700"><i class='bx bx-log-out text-xl text-red-500'></i></button>
+        </header>
+        
+        <div class="flex-grow relative overflow-hidden bg-slate-900">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15000!2d-46.633309!3d-23.550520!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDMzJzAxLjkiUyA0NsKwMzgnMDAuMCJX!5e0!3m2!1spt-BR!2sbr" width="100%" height="100%" style="border:0; filter: invert(90%) hue-rotate(180deg);" allowfullscreen="" loading="lazy"></iframe>
             
-            <div class="driver-map-area relative">
-                <div class="map-blocker"></div>
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15000!2d-46.633309!3d-23.550520!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDMzJzAxLjkiUyA0NsKwMzgnMDAuMCJX!5e0!3m2!1spt-BR!2sbr" width="100%" height="100%" style="border:0; filter: invert(90%) hue-rotate(180deg);" allowfullscreen="" loading="lazy"></iframe>
-                
-                <div class="absolute bottom-0 left-0 right-0 p-6 z-30 bg-gradient-to-t from-slate-950 via-slate-900 to-transparent pt-32">
-                    <p class="text-[11px] font-black text-slate-400 uppercase mb-3 ml-2 tracking-widest drop-shadow-md">Próxima Parada GPS</p>
-                    <div id="driver-current-stop">
-                        <!-- Injetado via JS -->
+            <div class="absolute inset-0 z-10 bg-transparent"></div>
+            
+            <div class="absolute bottom-0 left-0 right-0 p-4 z-30 bg-gradient-to-t from-slate-950 via-slate-900 to-transparent pt-20">
+                <div id="driver-card-wrapper">
+                    <!-- Card de Entrega (Campinas) -->
+                    <div class="bg-slate-800 border-2 border-slate-700 rounded-2xl p-5 shadow-2xl relative overflow-hidden" id="driver-card">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
+                        <p class="text-[8px] font-black text-amber-500 uppercase tracking-widest mb-2 flex items-center gap-1"><i class='bx bx-radar'></i> Parada Otimizada (Venda Adicional)</p>
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-black text-2xl text-white tracking-tighter">NFe: 8901</h3>
+                            <div class="bg-slate-700 w-10 h-10 rounded-xl flex items-center justify-center text-white"><i class='bx bxs-navigation text-lg'></i></div>
+                        </div>
+                        <p class="text-sm font-black text-blue-300 uppercase mb-1 leading-tight">Depósito Campinas</p>
+                        <p class="text-[10px] font-bold text-slate-400 mb-4 flex items-start gap-1 bg-slate-900/50 p-2 rounded-lg border border-slate-700"><i class='bx bx-map-pin text-sm text-red-500'></i> Rodovia Anhanguera, Km 98</p>
+                        
+                        <button id="btnCheguei" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-[10px] shadow-lg active:scale-95 transition-all tracking-wider flex items-center justify-center gap-2">Registrar Descarga <i class='bx bx-right-arrow-alt text-lg'></i></button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: BAIXA NO CANHOTO (CELULAR MOTORISTA) - EXATO DO ORIGINAL -->
+    <!-- MODAL: BAIXA NO CANHOTO (IDs Originais: conf-recebedor, conf-obs) -->
     <div id="modal-confirmar-entrega" class="modal hidden-view z-[100000]">
-        <div class="modal-content-dark w-full max-w-md p-8 rounded-[2.5rem] shadow-2xl border border-slate-700 mx-auto bg-slate-900">
-            <h2 class="font-black text-2xl text-white mb-6 flex items-center gap-3 border-b border-slate-700 pb-5 uppercase tracking-tighter"><i class='bx bx-check-shield text-green-500 text-4xl'></i> Assinatura Digital</h2>
-            <form id="formConfirm" onsubmit="return false;" class="space-y-5">
-                <div>
-                    <label class="block text-[11px] font-black text-slate-400 uppercase ml-1 mb-2">Quem Recebeu a Mercadoria?</label>
-                    <input type="text" id="conf-recebedor" placeholder="Nome e RG de quem assinou..." required class="w-full p-5 rounded-2xl bg-slate-800 text-white border-2 border-slate-600 outline-none font-bold text-base focus:border-green-500 transition-colors">
-                </div>
-                <div>
-                    <label class="block text-[11px] font-black text-slate-400 uppercase ml-1 mb-2">Ocorrências na Descarga?</label>
-                    <textarea id="conf-obs" placeholder="Ex: Faltou volume, tudo certo..." required class="w-full p-5 rounded-2xl bg-slate-800 text-white border-2 border-slate-600 resize-none outline-none font-medium text-base h-36 focus:border-green-500 transition-colors"></textarea>
-                </div>
-                <button type="button" id="btn-confirmar-entrega" class="w-full bg-green-600 hover:bg-green-500 text-white py-6 rounded-2xl font-black uppercase text-base shadow-xl shadow-green-600/30 flex justify-center items-center gap-3 mt-4 tracking-widest transition-all active:scale-95">
-                    <i class='bx bx-cloud-upload text-3xl'></i> Salvar e Baixar NFe
+        <div class="modal-content-dark w-full mx-auto pb-6 rounded-t-3xl border-t-2 border-slate-700 bg-slate-900 p-6">
+            <h2 class="font-black text-lg text-white mb-4 flex items-center gap-2 border-b border-slate-800 pb-3 uppercase tracking-tighter"><i class='bx bx-check-shield text-green-500 text-xl'></i> Assinatura Digital</h2>
+            <form id="formConfirm" onsubmit="return false;">
+                <label class="block text-[9px] font-black text-slate-400 uppercase ml-1 mb-1">Nome / RG do Recebedor</label>
+                <input type="text" id="conf-recebedor" placeholder="Ex: João Portaria..." required class="w-full p-3.5 rounded-xl bg-slate-800 text-white border border-slate-600 outline-none font-bold text-xs mb-3 focus:border-green-500 transition-colors">
+                
+                <label class="block text-[9px] font-black text-slate-400 uppercase ml-1 mb-1">Ocorrências na Descarga?</label>
+                <textarea id="conf-obs" placeholder="Faltou item? Avaria? Tudo OK?" required class="w-full p-3.5 rounded-xl bg-slate-800 text-white border border-slate-600 resize-none outline-none font-medium text-xs h-24 focus:border-green-500 transition-colors"></textarea>
+                
+                <button type="button" id="btn-confirmar-baixa" class="w-full bg-green-600 text-white py-3.5 rounded-xl font-black uppercase text-[10px] shadow-lg flex justify-center items-center gap-2 mt-4 tracking-widest transition-all active:scale-95">
+                    <i class='bx bx-cloud-upload text-sm'></i> Salvar e Baixar NFe no ERP
                 </button>
             </form>
         </div>
@@ -361,235 +324,128 @@
 
     <!-- ========================================== -->
     <!-- MODAL: RELATÓRIOS DO GESTOR (FECHAMENTO)   -->
+    <!-- Lógicas reais extraídas do app.js original -->
     <!-- ========================================== -->
-    <div id="modal-relatorios" class="modal hidden-view">
-        <div class="modal-content max-w-6xl h-[94dvh]">
-            <div class="bg-white border-b border-slate-200 p-8 flex justify-between items-center shrink-0">
+    <div id="modal-relatorios" class="modal hidden-view z-[100000]">
+        <div class="modal-content h-[85dvh] rounded-t-3xl">
+            <div class="bg-white border-b border-slate-200 p-4 flex justify-between items-center shrink-0">
                 <div>
-                    <h2 class="font-black text-3xl text-slate-800 uppercase tracking-tight flex items-center gap-3"><i class='bx bx-line-chart text-blue-600 text-4xl'></i> Dashboard Financeiro</h2>
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2">Fechamento Mensal, Comissões e Despesas</p>
+                    <h2 class="font-black text-sm text-slate-800 uppercase tracking-tight flex items-center gap-1.5"><i class='bx bx-line-chart text-blue-600 text-lg'></i> Dash. Financeiro</h2>
                 </div>
-                <button class="btn-close text-slate-400 text-5xl hover:text-slate-600 transition-colors">&times;</button>
             </div>
             
-            <div class="p-8 bg-slate-50 flex-grow overflow-y-auto" id="relatoriosScrollArea">
-                <!-- Visão Geral Financeira -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-6 border-l-8 border-l-green-500">
-                        <div class="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center text-green-600"><i class='bx bx-money text-5xl'></i></div>
-                        <div>
-                            <p class="text-xs font-black text-slate-400 uppercase mb-2 tracking-widest">Total Faturado / Entregue</p>
-                            <p class="text-5xl font-black text-slate-800 tracking-tighter">R$ 145.890,00</p>
-                        </div>
+            <div class="p-4 bg-slate-50 flex-grow overflow-y-auto" id="relatoriosScrollArea">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-3 border-l-4 border-l-green-500 mb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-green-600"><i class='bx bx-money text-xl'></i></div>
+                    <div>
+                        <p class="text-[8px] font-black text-slate-400 uppercase mb-0.5 tracking-widest">Faturamento da Operação</p>
+                        <p class="text-xl font-black text-slate-800 tracking-tighter">R$ 3.200,00</p>
                     </div>
-                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-6 border-l-8 border-l-blue-600">
-                        <div class="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600"><i class='bx bx-wallet text-5xl'></i></div>
-                        <div>
-                            <p class="text-xs font-black text-slate-400 uppercase mb-2 tracking-widest">Comissões Calculadas (Motoristas)</p>
-                            <p class="text-5xl font-black text-blue-700 tracking-tighter">R$ 3.450,00</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-3">
+                    <h4 class="font-black text-slate-800 uppercase text-[9px] mb-3 border-b border-slate-100 pb-2 flex items-center gap-1.5"><i class='bx bx-money text-red-500'></i> Despesas Globais (Frota)</h4>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center p-2.5 bg-red-50 rounded-lg border border-red-100">
+                            <div><p class="font-black text-[10px] text-slate-800">Custo Base do Frete</p><p class="text-[7px] font-bold text-red-500 uppercase mt-0.5">Viagem SJRP -> SP</p></div>
+                            <p class="font-black text-red-600 text-[10px]">- R$ 850,00</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Ranking Motoristas -->
-                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-                        <h4 class="font-black text-slate-800 uppercase text-sm mb-6 border-b border-slate-100 pb-4 flex items-center gap-3"><i class='bx bxs-user-badge text-slate-400 text-2xl'></i> Ranking de Entregas por Motorista</h4>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center p-5 bg-slate-50 rounded-2xl border border-slate-100">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center font-black text-2xl shadow-inner">1º</div>
-                                    <div><p class="font-black text-lg text-slate-800">Carlos Silva</p><p class="text-xs font-bold text-slate-500 uppercase mt-1">29 Entregas Concluídas</p></div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-black text-green-600 text-xl">R$ 1.950,00</p>
-                                    <p class="text-[10px] text-slate-400 font-black uppercase mt-1">Comissão</p>
-                                </div>
-                            </div>
-                            <!-- Mais motoristas podem ser adicionados aqui -->
-                        </div>
+                <div class="bg-blue-50 p-4 rounded-xl shadow-sm border border-blue-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-[9px] font-black text-blue-600 uppercase mb-0.5 tracking-widest">Lucro Líquido Gerado</p>
+                        <p class="text-2xl font-black text-blue-900 tracking-tighter">R$ 2.350,00</p>
                     </div>
-                    
-                    <!-- Despesas Globais -->
-                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-                        <h4 class="font-black text-slate-800 uppercase text-sm mb-6 border-b border-slate-100 pb-4 flex items-center gap-3"><i class='bx bx-money text-red-500 text-2xl'></i> Despesas Globais Lançadas</h4>
-                        <div class="space-y-4" id="rel-despesas-list">
-                            <div class="flex justify-between items-center p-5 bg-red-50 rounded-2xl border border-red-100">
-                                <div><p class="font-black text-base text-slate-800">Abastecimento Diesel</p><p class="text-xs font-bold text-red-500 uppercase mt-1">Carlos Silva (Caminhão 01)</p></div>
-                                <p class="font-black text-red-600 text-xl">- R$ 600,00</p>
-                            </div>
-                        </div>
-                    </div>
+                    <i class='bx bx-trending-up text-4xl text-blue-300'></i>
                 </div>
             </div>
-            <div class="bg-white p-6 border-t border-slate-200 shrink-0 flex justify-end">
-                <button id="exportReportBtn" class="bg-slate-900 hover:bg-slate-800 text-white px-10 py-5 rounded-2xl font-black uppercase text-base flex items-center gap-3 shadow-2xl transition-colors"><i class='bx bxs-file-pdf text-red-500 text-3xl'></i> Exportar Fechamento (PDF)</button>
+            
+            <div class="bg-white p-3 border-t border-slate-200 shrink-0">
+                <button class="w-full bg-slate-900 text-white py-3 rounded-lg font-black uppercase text-[10px] shadow-lg"><i class='bx bxs-file-pdf text-red-500'></i> Exportar Relatório PDF</button>
             </div>
         </div>
     </div>
 
-    <!-- O CLÍMAX FINAL: PDF ENGINE -->
-    <div id="pdf-preview-modal" class="modal hidden-view z-[100000]">
-        <div class="modal-content bg-slate-900 border-none w-full max-w-4xl h-[95dvh] flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.8)]">
-            <div class="p-5 bg-slate-950 flex justify-between items-center text-white shrink-0">
-                <span class="text-sm font-black tracking-widest flex items-center gap-3 uppercase"><i class='bx bxs-file-pdf text-red-500 text-3xl'></i> PDF Gerado com Sucesso</span>
-                <button class="btn-close text-white text-4xl font-light hover:text-red-500 transition">&times;</button>
-            </div>
-            
-            <div class="bg-slate-700 flex-grow relative overflow-y-auto" id="pdfScrollArea">
-                <div class="pdf-paper" style="background: white; width: 100%; max-width: 800px; margin: 0 auto; min-height: 1000px; padding: 50px; box-shadow: 0 15px 50px rgba(0,0,0,0.4); border-top: 16px solid #1e3a8a; position: relative; color: #1e293b; font-family: 'Arial', sans-serif;">
-                    <div class="pdf-watermark" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 80px; font-weight: 900; color: rgba(0,0,0,0.03); pointer-events: none; white-space: nowrap;">thIAguinho LOG</div>
-                    
-                    <div class="flex justify-between items-end border-b-4 border-blue-900 pb-4 mb-8">
-                        <div>
-                            <h3 style="font-weight: 900; font-size: 32px; color: #1e3a8a; margin:0; line-height: 1;">thIAguinho LOG</h3>
-                            <p style="font-size: 11px; color: #64748b; font-weight: 800; letter-spacing: 2px; margin-top:4px;">RELATÓRIO DE DESEMPENHO E COMISSÕES</p>
-                        </div>
-                        <div class="text-right">
-                            <p style="font-size: 16px; font-weight: 900; margin:0; color: #b91c1c;">COMPETÊNCIA: MARÇO / 2026</p>
-                            <p style="font-size: 11px; color: #94a3b8; margin-top:2px;">EMISSÃO: HOJE</p>
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 30px;">
-                        <p style="font-size: 13px; color: #1e3a8a; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 15px;">1. Desempenho Global (Fechamento)</p>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <thead><tr style="background: #f8fafc;"><th style="text-align: left; padding: 12px; font-size: 11px; color: #64748b;">MÉTRICA DE OPERAÇÃO</th><th style="text-align: right; padding: 12px; font-size: 11px; color: #64748b;">VALOR TOTAL</th></tr></thead>
-                            <tbody>
-                                <tr><td style="padding: 12px; font-size: 13px; border-bottom: 1px solid #f1f5f9; font-weight: 600;">Faturamento (Cargas Entregues e Validadas)</td><td style="text-align: right; padding: 12px; font-size: 14px; border-bottom: 1px solid #f1f5f9; font-weight: 900; color:#166534;">R$ 145.890,00</td></tr>
-                                <tr><td style="padding: 12px; font-size: 13px; border-bottom: 1px solid #f1f5f9; font-weight: 600;">(-) Despesas Registradas na Frota (Combustível, etc)</td><td style="text-align: right; padding: 12px; font-size: 14px; border-bottom: 1px solid #f1f5f9; font-weight: 900; color:#b91c1c;">- R$ 600,00</td></tr>
-                                <tr><td style="padding: 12px; font-size: 13px; border-bottom: 1px solid #f1f5f9; font-weight: 600;">(-) Comissões a Pagar para Motoristas (App)</td><td style="text-align: right; padding: 12px; font-size: 14px; border-bottom: 1px solid #f1f5f9; font-weight: 900; color:#1d4ed8;">- R$ 3.450,00</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div style="display: flex; justify-content: flex-end; margin-bottom: 60px;">
-                        <div style="background: #f8fafc; padding: 25px 40px; border-radius: 16px; border: 2px solid #cbd5e1; text-align: right; box-shadow: 0 10px 15px rgba(0,0,0,0.05);">
-                            <p style="font-size: 12px; font-weight: 900; text-transform: uppercase; margin:0; color: #64748b;">Resultado Líquido Operacional</p>
-                            <p style="font-size: 42px; font-weight: 900; margin:0; color: #1e3a8a;">R$ 141.840,00</p>
-                        </div>
-                    </div>
-
-                    <div style="background: #f1f5f9; padding: 30px; border-radius: 16px; margin-top: 50px; text-align: center;">
-                        <p style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px;">Documento Gerado Oficialmente &bull; thIAguinho Soluções Logísticas</p>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-slate-950 p-5 shrink-0 flex justify-center z-10 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]">
-                <button class="btn-close w-full max-w-[700px] bg-green-500 hover:bg-green-600 text-white py-5 rounded-2xl font-black uppercase text-lg shadow-2xl flex justify-center items-center gap-3 transition-colors tracking-widest"><i class='bx bxl-whatsapp text-4xl'></i> Imprimir e Enviar Relatório PDF</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Assinatura -->
-    <div class="fixed bottom-3 right-5 text-[10px] font-bold text-slate-500 z-50 pointer-events-none uppercase tracking-widest bg-white/90 px-3 py-1.5 rounded-md shadow-sm">Tecnologia thIAguinho Soluções</div>
+</div>
 
     <script>
         // =====================================================================
-        // ESTADO GLOBAL DO SISTEMA MOCKADO (FIEL À SUA LÓGICA)
+        // MOTORES DE ANIMAÇÃO E SCROLL 100% BLINDADOS
         // =====================================================================
-        let state = {
-            deliveries: [
-                { id: 'd1', nfe: '5010', cliente: 'Marcenaria Central', address: 'Rua das Indústrias, 100 - SP', status: 'Entregue', val: '12.500,00' },
-                { id: 'd2', nfe: '5011', cliente: 'Construtora Alfa S/A', address: 'Av Paulista, 1000 - SP', status: 'Em-Rota', val: '8.300,00' }
-            ]
-        };
-
         const sleep = (ms) => new Promise(r => setTimeout(r, ms));
         const cursor = document.getElementById('ghost-cursor');
 
-        // Fecha modais globais
-        document.querySelectorAll('.btn-close').forEach(btn => {
-            btn.onclick = (e) => { e.target.closest('.modal').classList.add('hidden-view'); }
-        });
-
-        // =====================================================================
-        // RENDERIZADORES FIEIS AO ORIGINAL
-        // =====================================================================
-        function renderAdminList() {
-            try {
-                const list = document.getElementById('admin-delivery-list');
-                list.innerHTML = state.deliveries.map(d => {
-                    let isRoute = d.status === 'Em-Rota';
-                    let isDelivered = d.status === 'Entregue';
-                    let cardClass = isDelivered ? 'border-l-green-500 bg-slate-50 opacity-80' : (isRoute ? 'border-l-blue-600' : 'border-l-amber-500');
-                    let badgeClass = isDelivered ? 'bg-green-100 text-green-700' : (isRoute ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700');
-                    
-                    return `
-                    <div class="delivery-card ${cardClass}" id="card-${d.id}">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="font-black text-slate-800 text-lg flex items-center gap-2"><i class='bx bx-barcode text-slate-400'></i> NFe: ${d.nfe}</div>
-                            <span class="${badgeClass} px-3 py-1 rounded-lg font-black uppercase text-[10px] tracking-wider">${d.status.replace(/-/g, ' ')}</span>
-                        </div>
-                        <div class="text-sm font-black text-slate-700 uppercase mb-2 leading-tight">${d.cliente}</div>
-                        <div class="text-[11px] text-slate-500 font-bold uppercase flex items-start gap-2 leading-tight"><i class='bx bx-map text-base text-red-400'></i> ${d.address}</div>
-                        <div class="text-[11px] text-slate-400 font-bold uppercase mt-3 pt-3 border-t border-slate-200 flex justify-between items-center">
-                            <span class="flex items-center gap-1"><i class='bx bxs-user-badge'></i> Carlos Silva</span> <span class="text-slate-700">R$ ${d.val}</span>
-                        </div>
-                    </div>`;
-                }).join('');
-            } catch(e) { console.error(e); }
+        // Modificadores de texto seguros
+        function safeText(id, text) {
+            const el = document.getElementById(id);
+            if(el) el.innerText = text;
         }
 
-        function renderDriverStop() {
-            try {
-                const d = state.deliveries[0]; 
-                document.getElementById('driver-current-stop').innerHTML = `
-                    <div class="bg-slate-800 border-2 border-slate-700 rounded-[2rem] p-6 shadow-2xl relative overflow-hidden" id="card-driver-stop">
-                        <div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
-                        <div class="flex justify-between items-center mb-5">
-                            <p class="font-black text-3xl text-white tracking-tighter">NFe: ${d.nfe}</p>
-                            <div class="bg-blue-600 w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-600/30"><i class='bx bxs-navigation text-2xl'></i></div>
-                        </div>
-                        <p class="text-lg font-black text-blue-300 uppercase mb-2 leading-tight">${d.cliente}</p>
-                        <p class="text-sm font-bold text-slate-400 mb-8 flex items-start gap-2 bg-slate-900 p-4 rounded-xl border border-slate-700"><i class='bx bx-map-pin text-xl text-red-500'></i> ${d.address}</p>
-                        
-                        <button id="btnCheguei" class="w-full bg-blue-600 text-white py-6 rounded-2xl font-black uppercase text-sm shadow-xl shadow-blue-600/30 active:scale-95 transition-all tracking-wider flex items-center justify-center gap-2">Registrar Baixa do Canhoto <i class='bx bx-right-arrow-alt text-2xl'></i></button>
-                    </div>
-                `;
-            } catch(e) { console.error(e); }
+        function safeClass(id, action, className) {
+            const el = document.getElementById(id);
+            if(el) el.classList[action](className);
         }
 
-        // =====================================================================
-        // MOTORES DE ANIMAÇÃO BLINDADOS
-        // =====================================================================
-        async function slowScrollTo(container, targetScrollTop, durationMs) {
-            const start = container.scrollTop;
-            const change = targetScrollTop - start;
-            const startTime = performance.now();
-            return new Promise(resolve => {
-                function animateScroll(currentTime) {
-                    const elapsed = currentTime - startTime;
-                    const progress = Math.min(elapsed / durationMs, 1);
-                    const ease = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-                    container.scrollTop = start + change * ease;
-                    if (progress < 1) requestAnimationFrame(animateScroll);
-                    else resolve();
-                }
-                requestAnimationFrame(animateScroll);
-            });
-        }
-
+        // === CORREÇÃO DO SCROLL QUE FICAVA "DOIDO" ===
+        // Em vez de usar scrollIntoView que mexe com a viewport global do navegador,
+        // usamos scrollTo no contêiner interno calculando a distância exata.
         async function moveCursor(sel, offX=0, offY=0) {
             try {
                 const el = document.querySelector(sel);
                 if(!el) return;
                 
-                // Trata o scroll suave das áreas grandes
-                if(document.getElementById('relatoriosScrollArea') && document.getElementById('relatoriosScrollArea').contains(el)) {
-                     document.getElementById('relatoriosScrollArea').scrollTo({ top: el.offsetTop - 50, behavior: 'smooth' });
-                } else if(document.getElementById('adminScrollArea') && document.getElementById('adminScrollArea').contains(el)) {
-                     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                } else {
-                     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Encontra o contêiner de scroll mais próximo
+                const container = el.closest('#adminScrollArea') || el.closest('#roteirizadorScrollArea') || el.closest('#relatoriosScrollArea') || el.closest('.content-area');
+                
+                if (container) {
+                    const containerRect = container.getBoundingClientRect();
+                    const elRect = el.getBoundingClientRect();
+                    
+                    // Se o elemento estiver muito em cima ou muito embaixo da área visível, rola
+                    if (elRect.top < containerRect.top + 30 || elRect.bottom > containerRect.bottom - 30) {
+                        const targetScroll = container.scrollTop + (elRect.top - containerRect.top) - (containerRect.height / 2) + (elRect.height / 2);
+                        container.scrollTo({ top: targetScroll, behavior: 'smooth' });
+                        await sleep(600); // Espera a rolagem suave terminar
+                    }
                 }
                 
-                await sleep(400); 
-                const rect = el.getBoundingClientRect();
-                cursor.style.top = (rect.top + rect.height/2 + offY) + 'px';
-                cursor.style.left = (rect.left + rect.width/2 + offX) + 'px';
-                await sleep(600); 
-            } catch(e) { console.error(e); }
+                // Recalcula a posição DEPOIS da rolagem terminar
+                const finalRect = el.getBoundingClientRect();
+                cursor.style.top = (finalRect.top + finalRect.height/2 + offY) + 'px';
+                cursor.style.left = (finalRect.left + finalRect.width/2 + offX) + 'px';
+                await sleep(500); 
+            } catch(e) { console.error("Erro no moveCursor:", e); }
+        }
+
+        // Função para scroll cinematográfico (ex: descer relatório de ponta a ponta)
+        async function slowScrollTo(container, targetScrollTop, durationMs) {
+            if(!container) return;
+            const originalBehavior = container.style.scrollBehavior;
+            container.style.scrollBehavior = 'auto'; // Desativa smooth do CSS para não brigar com JS
+
+            const start = container.scrollTop;
+            const change = targetScrollTop - start;
+            const startTime = performance.now();
+            
+            return new Promise(resolve => {
+                function animateScroll(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / durationMs, 1);
+                    // easeInOutQuad
+                    const ease = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress;
+                    container.scrollTop = start + change * ease;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animateScroll);
+                    } else {
+                        container.style.scrollBehavior = originalBehavior; // Volta o padrão
+                        resolve();
+                    }
+                }
+                requestAnimationFrame(animateScroll);
+            });
         }
 
         async function clickAction(sel) {
@@ -597,9 +453,9 @@
                 cursor.classList.add('cursor-click-effect');
                 const el = document.querySelector(sel);
                 if(el) { if(el.tagName === 'SELECT') el.focus(); else el.click(); }
-                await sleep(300);
+                await sleep(350);
                 cursor.classList.remove('cursor-click-effect');
-            } catch(e) { console.error(e); }
+            } catch(e) { console.error("Erro no clickAction:", e); }
         }
 
         async function typeAction(sel, text, dark=false) {
@@ -611,175 +467,201 @@
                 for(let c of text) { el.value += c; el.dispatchEvent(new Event('input')); await sleep(20 + Math.random() * 20); }
                 await sleep(300);
                 el.classList.remove(dark ? 'typing-focus-dark' : 'typing-focus');
-            } catch(e) { console.error(e); }
+            } catch(e) { console.error("Erro no typeAction:", e); }
         }
 
         function showCaption(text, durationMs = 3500) {
             return new Promise(async (resolve) => {
                 try {
                     const cont = document.getElementById('tour-caption-container');
-                    document.getElementById('caption-text').innerText = text;
-                    cont.style.opacity = 1; cont.style.transform = 'translateY(0)';
+                    safeText('caption-text', text);
+                    cont.style.opacity = 1; 
+                    cont.style.transform = 'translateY(0)';
                     await sleep(durationMs);
-                    cont.style.opacity = 0; cont.style.transform = 'translateY(20px)';
+                    cont.style.opacity = 0; 
+                    cont.style.transform = 'translateY(-20px)';
                     await sleep(400);
                     resolve();
                 } catch(e) { resolve(); }
             });
         }
 
+        async function showToast(title, msg) {
+            const toast = document.getElementById('toast-notification');
+            if(toast) {
+                safeText('toast-title', title);
+                safeText('toast-msg', msg);
+                toast.classList.add('show');
+                await sleep(2500);
+                toast.classList.remove('show');
+            }
+        }
+
         async function transicaoNuvem(titulo, subtitulo) {
             try {
                 const trans = document.getElementById('transition-overlay');
-                document.getElementById('transition-title').innerText = titulo;
-                document.getElementById('transition-subtitle').innerText = subtitulo;
-                trans.classList.remove('pointer-events-none'); trans.classList.add('opacity-100');
-                await sleep(2500);
-                trans.classList.remove('opacity-100'); trans.classList.add('pointer-events-none');
-            } catch(e) { console.error(e); }
+                if(trans) {
+                    safeText('transition-title', titulo);
+                    safeText('transition-subtitle', subtitulo);
+                    trans.classList.remove('pointer-events-none'); 
+                    trans.classList.add('opacity-100');
+                    await sleep(2500);
+                    trans.classList.remove('opacity-100'); 
+                    trans.classList.add('pointer-events-none');
+                }
+            } catch(e) { console.error("Erro transicaoNuvem:", e); }
         }
 
         // =====================================================================
-        // O TOUR DE VENDAS MASTER: TODOS OS MÓDULOS DE PONTA A PONTA
+        // A JORNADA DE VENDAS (A CEREJA DO BOLO - ROTEIRIZADOR IA - MOBILE)
         // =====================================================================
         async function iniciarTour() {
             try {
                 document.getElementById('start-screen').style.display = 'none';
                 cursor.style.opacity = 1;
 
-                // 1. LOGIN NA BASE (ADMIN ERP)
-                showCaption("Acesso Corporativo: O Gestor entra na plataforma para controlar toda a operação logística.", 4000);
+                // 1. LOGIN
+                await showCaption("O Gestor acessa o ERP pelo celular para organizar a logística de hoje.", 3000);
                 await moveCursor('#userSelect'); await clickAction('#userSelect'); document.getElementById('userSelect').value = 'admin'; await sleep(300);
                 await moveCursor('#passwordInput'); await typeAction('#passwordInput', 'admin123');
                 await moveCursor('#loginBtn'); await clickAction('#loginBtn');
                 
-                document.getElementById('userScreen').style.display = 'none';
-                document.getElementById('app-admin').classList.remove('hidden-view');
-                renderAdminList();
-                await sleep(1500);
-
-                // 2. CADASTRO DE MOTORISTA (A LÓGICA EXIGIDA)
-                await showCaption("MÓDULO 1: Cadastre sua frota. Defina motoristas e o percentual de comissão de cada um.", 4500);
-                await moveCursor('#btnMenuMotoristas'); await clickAction('#btnMenuMotoristas');
-                document.getElementById('modal-motoristas').classList.remove('hidden-view');
-                await sleep(600);
-
-                await moveCursor('#motName'); await typeAction('#motName', 'Carlos Silva (Caminhão Baú)');
-                await moveCursor('#motCom'); await typeAction('#motCom', '10');
-                await moveCursor('#btnSalvarMot'); await clickAction('#btnSalvarMot');
-                document.querySelector('#modal-motoristas .btn-close').click();
+                safeClass('userScreen', 'add', 'hidden-view');
+                safeClass('app-admin', 'remove', 'hidden-view');
                 await sleep(1000);
 
-                // 3. LANÇAMENTO DE DESPESAS (A LÓGICA EXIGIDA)
-                await showCaption("MÓDULO 2: Registre os custos operacionais (combustível, pedágio) para ter o lucro real exato.", 4500);
-                await moveCursor('#btnMenuDespesas'); await clickAction('#btnMenuDespesas');
-                document.getElementById('modal-despesas').classList.remove('hidden-view');
-                await sleep(600);
-
-                await moveCursor('#despDesc'); await typeAction('#despDesc', 'Abastecimento Diesel V-Power');
-                await moveCursor('#despVal'); await typeAction('#despVal', '600.00');
-                await moveCursor('#btnSalvarDesp'); await clickAction('#btnSalvarDesp');
-                document.querySelector('#modal-despesas .btn-close').click();
+                // 2. ROTEIRIZADOR IA (A MÁGICA: SJRP -> SP)
+                await showCaption("A Função de Ouro: O Gestor abre o Planejador IA-Log para criar a rota de viagem.", 4000);
+                
+                safeClass('modal-roteirizador', 'remove', 'hidden-view');
                 await sleep(1000);
 
-                // 4. DESPACHO DE CARGA (A LÓGICA EXIGIDA)
-                await showCaption("MÓDULO 3: Despache uma nova carga integrando os dados da NFe e o Motorista.", 4000);
-                await moveCursor('#btnNovaEntrega'); await clickAction('#btnNovaEntrega');
-                document.getElementById('modal-nova-entrega').classList.remove('hidden-view');
-                await sleep(500);
-
-                await moveCursor('#nfeInput'); await typeAction('#nfeInput', '8890');
-                await moveCursor('#valInput'); await typeAction('#valInput', '1400.00'); 
-                await moveCursor('#clienteInput'); await typeAction('#clienteInput', 'Lojas Silva (Matriz)');
-                await moveCursor('#endInput'); await typeAction('#endInput', 'Av Faria Lima, 2000 - São Paulo, SP');
+                const scrollRoteirizador = document.getElementById('roteirizadorScrollArea');
                 
-                await moveCursor('#btnSalvarEntrega'); await clickAction('#btnSalvarEntrega');
-                document.getElementById('modal-nova-entrega').classList.add('hidden-view');
+                await showCaption("O mapa traça a Rota Original: Rio Preto ➔ São Paulo. O Custo do frete base é R$ 850.", 4500);
+                await moveCursor('#rota-destino'); await typeAction('#rota-destino', 'São Paulo, SP');
+                await moveCursor('#btn-tracar-rota'); await clickAction('#btn-tracar-rota');
                 
-                state.deliveries.unshift({ id: 'd0', nfe: '8890', cliente: 'Lojas Silva (Matriz)', address: 'Av Faria Lima, 2000 - SP', status: 'Em-Rota', val: '1.400,00' });
-                renderAdminList();
-                await sleep(1500);
-
-                // 5. A NUVEM
-                showCaption("O manifesto digital é enviado para a nuvem. Transição para o celular do motorista...", 4000);
-                await transicaoNuvem("Sincronização Cloud", "Conectando o ERP ao App do Motorista (Carlos Silva)...");
-
-                document.getElementById('app-admin').style.display = 'none';
-                document.getElementById('app-motorista').classList.remove('hidden-view');
-                renderDriverStop();
-                await sleep(1500);
-
-                // 6. APP DO MOTORISTA NA RUA (O CANHOTO DIGITAL)
-                await showCaption("MÓDULO 4: Na rua, o motorista usa o App com mapa interativo e registra a baixa no destino.", 5000);
-                await moveCursor('#btnCheguei'); await clickAction('#btnCheguei');
-                document.getElementById('modal-confirmar-entrega').classList.remove('hidden-view');
-                await sleep(600);
-
-                await showCaption("Adeus papelada: Assinatura digital do recebedor e registro de ocorrências na descarga.", 4500);
-                await moveCursor('#conf-recebedor'); await typeAction('#conf-recebedor', 'Roberto Alves (Almoxarifado - RG 1234)', true);
-                await moveCursor('#conf-obs'); await typeAction('#conf-obs', 'Mercadoria conferida perfeitamente. 15 caixas entregues sem avarias.', true);
-
-                await moveCursor('#btn-confirmar-entrega'); await clickAction('#btn-confirmar-entrega');
-                document.getElementById('modal-confirmar-entrega').classList.add('hidden-view');
+                safeClass('path-original', 'remove', 'hidden-view');
+                safeClass('wp-origem', 'remove', 'hidden-view');
+                safeClass('wp-destino', 'remove', 'hidden-view');
+                safeText('stat-dist', '440 km');
+                safeText('stat-time', '5h 15m');
+                safeText('stat-cost', 'R$ 850,00');
                 
-                state.deliveries[0].status = 'Entregue';
-                
-                document.getElementById('driver-current-stop').innerHTML = `
-                    <div class="bg-green-600 rounded-[2rem] p-8 text-center text-white shadow-2xl border-4 border-green-400">
-                        <i class='bx bx-check-shield text-7xl mb-2'></i>
-                        <h2 class="font-black text-3xl uppercase tracking-tighter">NFe Baixada!</h2>
-                        <p class="text-sm font-bold text-green-200 mt-2">Canhoto digital validado e enviado ao ERP Base.</p>
-                    </div>`;
+                await slowScrollTo(scrollRoteirizador, 180, 1500); // Rola p/ Mapa
                 await sleep(2500);
 
-                // 7. AUDITORIA NO ERP BASE
-                showCaption("A Baixa é imediata. O Gestor retorna ao ERP e acessa os detalhes da entrega concluída.", 4500);
-                await transicaoNuvem("Retorno ao Escritório", "Sincronizando as Baixas no Painel Gestor...");
-
-                document.getElementById('app-motorista').classList.add('hidden-view');
-                document.getElementById('app-admin').style.display = 'flex';
-                renderAdminList(); 
+                // IA DETECTA CLIENTE
+                await showCaption("Atenção! A Inteligência Artificial detectou um cliente no corredor logístico da viagem.", 4500);
+                safeClass('wp-cliente1', 'remove', 'hidden-view');
+                safeClass('ia-alert-container', 'remove', 'hidden-view');
+                
+                await slowScrollTo(scrollRoteirizador, scrollRoteirizador.scrollHeight, 1500); // Rola p/ Alerta
                 await sleep(1500);
 
-                await moveCursor('#card-d0'); await clickAction('#card-d0');
-                document.getElementById('modal-detalhes-entrega').classList.remove('hidden-view');
-                await showCaption("Transparência total: O Gestor confere exatamente quem assinou e as observações lançadas pelo App.", 5000);
+                // NEGOCIAÇÃO
+                await showCaption("O cliente está inativo há mais de 30 dias. O Gestor envia uma oferta de reposição com Frete Grátis via WhatsApp.", 5000);
+                await moveCursor('#btn-whatsapp-ia'); await clickAction('#btn-whatsapp-ia');
+                
+                await showToast("WhatsApp Disparado", "A oferta foi enviada para Campinas.");
+                await sleep(2000);
+                await showToast("Resposta do Cliente", "'Ótimo! Pode mandar o pedido de R$ 3.200, vamos aproveitar o frete!'");
                 await sleep(1500);
-                document.querySelector('#modal-detalhes-entrega .btn-close').click();
 
-                // 8. RELATÓRIOS DO GESTOR
-                await showCaption("MÓDULO 5: Ao final do mês, acesse o Dashboard para calcular comissões com base no faturamento.", 5000);
-                await moveCursor('#btnRelatoriosSidebar'); await clickAction('#btnRelatoriosSidebar');
-                document.getElementById('modal-relatorios').classList.remove('hidden-view');
+                // RECALCULO DE ROTA
+                await showCaption("Venda Fechada! Adicionamos o pedido na rota atual. A IA recalcula tudo em tempo real.", 4500);
+                safeClass('btn-whatsapp-ia', 'add', 'hidden-view');
+                safeClass('ia-success-container', 'remove', 'hidden-view');
+                
+                await moveCursor('#btn-recalcular-rota'); await clickAction('#btn-recalcular-rota');
+
+                // Animação Mapa
+                await slowScrollTo(scrollRoteirizador, 100, 1500); // Volta pro mapa
+                
+                const pathOriginal = document.getElementById('path-original');
+                if(pathOriginal) pathOriginal.style.display = 'none';
+                
+                safeClass('path-optimized', 'remove', 'hidden-view');
+                
+                const wpClient1Dot = document.querySelector('#wp-cliente1 .waypoint-dot');
+                if(wpClient1Dot) {
+                    wpClient1Dot.classList.replace('wp-potential', 'wp-client');
+                    wpClient1Dot.innerHTML = '3';
+                }
+                
+                safeText('stat-dist', '465 km');
+                safeText('stat-time', '5h 45m');
+                safeText('stat-cost', 'LUCRO');
+                const statCost = document.getElementById('stat-cost');
+                if(statCost) statCost.className = 'text-sm font-black text-green-500';
+                
+                await sleep(2500);
+
+                // DESPACHO
+                await showCaption("O frete da viagem foi totalmente pago pelo lucro dessa venda extra! Agora, despachamos para a rua.", 5000);
+                await slowScrollTo(scrollRoteirizador, scrollRoteirizador.scrollHeight, 1500); 
+                
+                const btnDespachar = document.getElementById('btn-despachar');
+                if(btnDespachar) btnDespachar.removeAttribute('disabled');
+                
+                await moveCursor('#btn-despachar'); await clickAction('#btn-despachar');
+
+                // 3. A NUVEM
+                await transicaoNuvem("Sincronização 5G", "O App do Motorista recebe a rota otimizada...");
+                safeClass('app-admin', 'add', 'hidden-view');
+                safeClass('modal-roteirizador', 'add', 'hidden-view');
+                safeClass('app-motorista', 'remove', 'hidden-view');
+                safeClass('app-motorista', 'add', 'flex'); // Ajuste grid mobile
+                await sleep(1500);
+
+                // 4. APP MOTORISTA NA RUA (BAIXA DIGITAL)
+                await showCaption("O Motorista usa o Maps pelo App. Ao chegar na entrega extra em Campinas, ele acessa o Canhoto Digital.", 5000);
+                await moveCursor('#btnCheguei'); await clickAction('#btnCheguei');
+                safeClass('modal-confirmar-entrega', 'remove', 'hidden-view');
+                await sleep(800);
+
+                await showCaption("Ele preenche o nome do recebedor e as ocorrências (Adeus papéis perdidos).", 4500);
+                await moveCursor('#conf-recebedor'); await typeAction('#conf-recebedor', 'Roberto (Almoxarifado)', true);
+                await moveCursor('#conf-obs'); await typeAction('#conf-obs', 'Mercadoria conferida. 50 pacotes intactos.', true);
+
+                await moveCursor('#btn-confirmar-baixa'); await clickAction('#btn-confirmar-baixa');
+                safeClass('modal-confirmar-entrega', 'add', 'hidden-view');
+                
+                safeHTML('driver-current-stop', `
+                    <div class="bg-green-600 rounded-2xl p-6 text-center text-white shadow-2xl border-2 border-green-400">
+                        <i class='bx bx-check-shield text-6xl mb-2'></i>
+                        <h2 class="font-black text-xl uppercase tracking-tighter">Entrega Baixada!</h2>
+                        <p class="text-[10px] font-bold text-green-200 mt-1">Sincronizado com o ERP Base.</p>
+                    </div>`);
+                await sleep(2500);
+
+                // 5. RETORNO E RELATÓRIOS DO GESTOR
+                await transicaoNuvem("Operação Concluída", "Retornando ao Gestor...");
+                safeClass('app-motorista', 'remove', 'flex');
+                safeClass('app-motorista', 'add', 'hidden-view');
+                safeClass('app-admin', 'remove', 'hidden-view');
+                await sleep(1000);
+
+                await showCaption("Por fim, o Gestor acessa o Painel de Relatórios para verificar o fechamento.", 4000);
+                
+                safeClass('modal-relatorios', 'remove', 'hidden-view');
                 await sleep(1500);
                 
                 const relScroll = document.getElementById('relatoriosScrollArea');
-                await slowScrollTo(relScroll, relScroll.scrollHeight, 4000);
-                await showCaption("As Despesas e o Ranking de Motoristas são calculados de forma automática e imutável.", 4500);
-                await sleep(1000);
-                await slowScrollTo(relScroll, 0, 3000);
+                await showCaption("O sistema cruza as despesas do frete com a venda de oportunidade. Lucro Absoluto e comissões calculadas.", 5000);
+                await slowScrollTo(relScroll, relScroll?.scrollHeight || 1000, 3000);
+                await sleep(1500);
+                await slowScrollTo(relScroll, 0, 2000);
                 await sleep(1000);
                 
-                await showCaption("E a Cereja do Bolo: Exporte o Laudo PDF final do mês com um clique.", 4000);
-                await moveCursor('#exportReportBtn'); await clickAction('#exportReportBtn');
-                
-                // 9. EXPORTAÇÃO PDF ENGINE
-                document.getElementById('pdf-preview-modal').classList.remove('hidden-view');
-                await sleep(2000);
-                
-                const pdfArea = document.getElementById('pdfScrollArea');
-                await slowScrollTo(pdfArea, pdfArea.scrollHeight, 4000);
-                await sleep(2000);
-                await slowScrollTo(pdfArea, 0, 3000);
-                await sleep(1000);
+                safeClass('modal-relatorios', 'add', 'hidden-view');
 
-                document.querySelector('#pdf-preview-modal .btn-close').click();
-                document.querySelector('#modal-relatorios .btn-close').click();
-
-                // 10. CENA FINAL CTA
+                // CENA FINAL
                 cursor.style.opacity = 0;
-                document.getElementById('tour-caption-container').style.opacity = 0;
-                document.getElementById('final-screen').classList.add('active');
+                const tourCaption = document.getElementById('tour-caption-container');
+                if(tourCaption) tourCaption.style.opacity = 0;
+                safeClass('final-screen', 'add', 'active');
 
             } catch (err) {
                 console.error("Tour interrompido:", err);
