@@ -2,634 +2,787 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gravação de Tour - thIAguinho Soluções</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>thIAguinho LOG - Apresentação Master ERP Completo</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <!-- Bibliotecas Oficiais -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
     <style>
-        /* CSS PREMIUM DA PLATAFORMA ORIGINAL */
-        :root {
-            --primary-color: #0ea5e9; --primary-dark: #0284c7; --primary-light: #7dd3fc;
-            --secondary-color: #f97316; --accent-color: #facc15; 
-            --background: #0f172a; --surface: #1e293b; --surface-elevated: #334155;
-            --text-primary: #f8fafc; --text-secondary: #cbd5e1; --text-muted: #94a3b8; 
-            --border: #334155; --success: #22c55e; --error: #ef4444; --warning: #facc15; 
-            --font-main: 'Inter', system-ui, sans-serif;
-            --radius-md: 0.5rem; --radius-lg: 0.75rem; --radius-xl: 1rem; --radius-full: 9999px;
-            --shadow-glow: 0 0 40px rgba(14, 165, 233, 0.3);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
-        body { background: var(--background); color: var(--text-primary); overflow-x: hidden; scroll-behavior: smooth; }
-
-        /* ============================================== */
-        /* COMPONENTES DE GRAVAÇÃO E UX (BALÕES E CURSOR) */
-        /* ============================================== */
+        /* ==============================================================
+           ESTILOS REAIS DO ERP LOGÍSTICO (aed-test2-main.zip)
+           ============================================================== */
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; overflow-x: hidden; height: 100dvh; margin: 0; display: flex; flex-direction: column; }
         
-        /* Cursor Fantasma com Efeito de Clique Realista */
-        #fake-cursor {
-            position: absolute; top: 50%; left: 50%; width: 24px; height: 24px;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>');
-            background-size: cover; z-index: 999999; pointer-events: none;
-            transition: top 0.6s cubic-bezier(0.25, 1, 0.5, 1), left 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s;
-            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.5)); opacity: 0;
-        }
-        #fake-cursor::after {
-            content: ''; position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px;
-            background: rgba(14, 165, 233, 0.6); border-radius: 50%; opacity: 0; transform: scale(0.5);
-        }
-        #fake-cursor.click-anim::after { animation: clickRipple 0.5s ease-out; }
-        @keyframes clickRipple { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.8); opacity: 0; } }
+        .hidden-view { display: none !important; }
 
-        /* Legenda de Narração no Rodapé */
-        #tour-caption {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.95); border: 2px solid var(--primary-color);
-            padding: 1rem 2rem; border-radius: 1rem; text-align: center;
-            font-size: 1.1rem; font-weight: 800; color: white; z-index: 100000;
-            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.3); max-width: 90%;
-            transition: opacity 0.5s ease-in-out; opacity: 0; pointer-events: none; line-height: 1.4;
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        /* BALÃO EXPLICATIVO (TOOLTIP) DE ALTA PRECISÃO */
-        #explainer-tooltip {
-            position: absolute; background: rgba(2, 6, 23, 0.98); border: 2px solid var(--secondary-color);
-            color: white; padding: 1.2rem; border-radius: 0.8rem; font-size: 0.95rem; line-height: 1.5;
-            max-width: 340px; z-index: 100000; box-shadow: 0 15px 35px rgba(0,0,0,0.8);
-            opacity: 0; transition: opacity 0.4s ease, transform 0.4s ease; pointer-events: none;
-            transform: translateY(15px) scale(0.95);
-        }
-        #explainer-tooltip.show { opacity: 1; transform: translateY(0) scale(1); }
-        .explainer-title { font-weight: 900; margin-bottom: 0.5rem; color: var(--secondary-color); font-size: 1.1rem; display: flex; align-items: center; gap: 8px;}
-        .highlight { color: var(--secondary-color); }
+        /* Estrutura Base ERP Admin */
+        .layout-admin { display: flex; height: 100%; width: 100%; }
+        .sidebar { width: 280px; background: #0f172a; color: white; display: flex; flex-direction: column; flex-shrink: 0; z-index: 40; box-shadow: 4px 0 15px rgba(0,0,0,0.15); }
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; background: #f8fafc; }
+        .topbar { height: 80px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; flex-shrink: 0; z-index: 30; }
+        .content-area { flex-grow: 1; padding: 32px; overflow-y: auto; scroll-behavior: smooth; }
 
-        /* TELAS DE CONTROLE (INÍCIO E FIM) */
-        #start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--background); z-index: 1000000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .btn-start { background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white; padding: 1.5rem 3rem; font-size: 1.2rem; font-weight: 900; border: none; border-radius: 1rem; cursor: pointer; text-transform: uppercase; box-shadow: var(--shadow-glow); transition: 0.3s; }
-        .btn-start:hover { transform: scale(1.05); }
-        #final-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--background); z-index: 2000000; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; opacity: 0; transition: opacity 1.5s ease-in-out; }
-
-        /* ============================================== */
-        /* COMPONENTES DA PLATAFORMA ORIGINAL             */
-        /* ============================================== */
-        .container { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
-        header { padding: 1.5rem; border-bottom: 1px solid var(--border); background: rgba(15,23,42,0.9); position: sticky; top: 0; z-index: 100; text-align: center; }
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; position: relative;}
+        /* Mapas Originais */
+        #map-rastreio, #map-motorista { height: 100%; min-height: 450px; border-radius: 1rem; z-index: 10; background-color: #e2e8f0; position: relative; overflow: hidden; border: 1px solid #cbd5e1; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        #map-motorista { min-height: 100%; border-radius: 1.5rem; border: none; }
+        .map-blocker { position: absolute; inset: 0; z-index: 20; background: transparent; }
         
-        .form-group label { display: block; font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 0.5rem; }
-        .form-group input, .form-group select { width: 100%; padding: 0.875rem; background: var(--background); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--text-primary); outline: none; transition: 0.3s; margin-bottom: 1rem;}
-        .focus-simulated { border-color: var(--secondary-color) !important; box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
-        
-        .btn { width: 100%; padding: 1rem; background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white; border: none; border-radius: var(--radius-md); font-weight: 600; font-size: 1rem; transition: 0.3s; display: inline-flex; justify-content: center; align-items: center; gap: 8px;}
-        .btn-success { background: linear-gradient(135deg, var(--success), #16a34a); }
-        .hover-simulated { transform: scale(0.98); filter: brightness(1.2); }
+        /* GPS Pulso */
+        .gps-active-pulse { animation: pulse-blue 2s infinite; }
+        @keyframes pulse-blue { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(37, 99, 235, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
+        .map-marker { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 30; }
 
-        .admin-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 0.5rem; }
-        .tab-btn { background: transparent; border: none; color: var(--text-secondary); padding: 0.5rem 1rem; font-weight: 600; border-radius: var(--radius-md); white-space: nowrap; transition: 0.3s; cursor: pointer;}
-        .tab-btn.active { background: var(--primary-color); color: white; }
+        /* Cards de Carga */
+        .delivery-card { background: white; border-radius: 12px; padding: 16px; border: 1px solid #e2e8f0; border-left: 6px solid #94a3b8; cursor: pointer; transition: all 0.2s; position: relative; margin-bottom: 12px; }
+        .delivery-card.simulated-hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 15px 25px -5px rgba(0,0,0,0.1); border-color: #2563eb; z-index: 20; }
+        .status-Em-Rota { border-left-color: #2563eb; }
+        .status-Entregue { border-left-color: #22c55e; background: #f0fdf4; opacity: 0.9; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; border-top: 3px solid var(--primary-color);}
-        .stat-card h3 { font-size: 1.5rem; margin: 0.5rem 0; }
-        .stat-card p { font-size: 0.75rem; color: var(--text-muted); }
+        /* Modais Universais (O Segredo do ERP) */
+        .modal { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); z-index: 9990; position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: #ffffff; border-radius: 20px; display: flex; flex-direction: column; max-height: 92dvh; width: 100%; max-width: 650px; position: relative; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        .modal-content-lg { max-width: 900px; }
+        .modal-content-dark { background: #0f172a; border: 1px solid #334155; border-radius: 24px; max-width: 450px; padding: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.9); }
 
-        .table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        .table th, .table td { padding: 0.8rem; border-bottom: 1px solid var(--border); text-align: left; }
-        .badge { padding: 0.25rem 0.5rem; border-radius: var(--radius-md); font-weight: bold; font-size: 0.7rem; }
-        .badge.pendente { background: rgba(250,204,21,0.1); color: var(--warning); }
-        .badge.pago { background: rgba(74,222,128,0.1); color: var(--success); }
-        .badge.despesa { background: rgba(248,113,113,0.1); color: var(--error); }
-        .badge.info { background: rgba(59,130,246,0.1); color: #3b82f6; }
+        /* App Motorista Mobile View */
+        .driver-device { max-width: 400px; margin: 0 auto; height: 100%; background: #0f172a; position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.8); display: flex; flex-direction: column; border-left: 2px solid #334155; border-right: 2px solid #334155; border-radius: 2.5rem; overflow: hidden; border: 8px solid #1e293b; }
+        .driver-map-area { flex-grow: 1; position: relative; }
 
-        #app-admin, .admin-view { display: none; }
-        .admin-view.active { display: block; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* GHOST CURSOR */
+        #ghost-cursor { position: fixed; top: 50%; left: 50%; width: 48px; height: 48px; z-index: 999999; pointer-events: none; transition: top 0.6s cubic-bezier(0.25, 1, 0.5, 1), left 0.6s cubic-bezier(0.25, 1, 0.5, 1); filter: drop-shadow(4px 8px 12px rgba(0,0,0,0.6)); opacity: 0; }
+        .cursor-click-effect { animation: cursorClick 0.4s ease-out; }
+        @keyframes cursorClick { 0% { transform: scale(1); } 50% { transform: scale(0.6); } 100% { transform: scale(1); } }
 
-        /* Estilo Específico para o Mapa 3D Strava Mock */
-        .strava-map-container {
-            border-radius: 1rem; overflow: hidden; height: 250px; position: relative;
-            border: 2px solid var(--border); margin-bottom: 1.5rem;
-            background: url('https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=800&q=80') center/cover;
-            display: flex; align-items: flex-end; padding: 1rem;
-        }
-        .strava-badge {
-            background: rgba(0,0,0,0.8); padding: 0.5rem 1rem; border-radius: 0.5rem;
-            color: white; display: flex; align-items: center; gap: 10px; backdrop-filter: blur(5px);
-        }
+        /* FOCO FALSO DA DIGITAÇÃO */
+        .typing-focus { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.4) !important; border-color: #2563eb !important; background: #fff !important;}
+        .typing-focus-dark { box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.4) !important; border-color: #22c55e !important; }
+
+        /* LEGENDA DE VENDAS */
+        #tour-caption-container { position: fixed; bottom: 40px; left: 0; width: 100%; display: flex; justify-content: center; z-index: 99999; pointer-events: none; opacity: 0; transform: translateY(20px); transition: all 0.4s ease-in-out; padding: 0 20px; }
+        #tour-caption { background: rgba(15, 23, 42, 0.98); color: #fff; padding: 20px 32px; border-radius: 24px; font-size: 1.15rem; font-weight: 800; border: 2px solid #2563eb; box-shadow: 0 15px 40px rgba(0,0,0,0.6); display: flex; align-items: center; gap: 15px; max-width: 700px; text-align: center; justify-content: center; line-height: 1.4; }
+
+        /* ENGINE DE PDF INTERNA */
+        #pdf-preview-modal { z-index: 100000; }
+        #pdfScrollArea { overflow-y: hidden; }
+        .pdf-paper { background: white; width: 100%; max-width: 800px; margin: 0 auto; min-height: 1000px; padding: 50px; box-shadow: 0 15px 50px rgba(0,0,0,0.4); border-top: 16px solid #1e3a8a; position: relative; color: #1e293b; font-family: 'Arial', sans-serif; }
+        .pdf-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .pdf-table th { background: #f8fafc; text-align: left; padding: 12px; font-size: 11px; color: #64748b; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; }
+        .pdf-table td { padding: 12px; font-size: 13px; border-bottom: 1px solid #f1f5f9; font-weight: 600; }
+
+        /* TELA FINAL CTA */
+        #final-screen { position: fixed; inset: 0; background: linear-gradient(180deg, #020617 0%, #1e3a8a 100%); z-index: 200000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 1s; text-align: center; padding: 30px; }
+        #final-screen.active { opacity: 1; pointer-events: auto; }
+        .final-logo { width: 260px; height: auto; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); margin-bottom: 40px; border: 4px solid rgba(255,255,255,0.1); }
+        .cta-btn { background: #25D366; color: white; padding: 24px 60px; border-radius: 60px; font-size: 1.5rem; font-weight: 900; text-decoration: none; box-shadow: 0 20px 40px rgba(37, 211, 102, 0.4); margin-top: 30px; display: flex; align-items: center; gap: 15px; transition: transform 0.2s; }
     </style>
 </head>
-<body>
+<body class="text-slate-800 flex h-screen overflow-hidden relative bg-slate-100">
 
-    <div id="start-screen">
-        <h1 style="margin-bottom: 1rem; color: white; text-align: center;">Plataforma de Inscrições<br><span style="color: var(--primary-color);">thIAguinho Soluções</span></h1>
-        <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 500px; text-align: center;">O sistema navegará sozinho com <span style="color: var(--primary-color); font-weight: bold;">100% de precisão</span>. Textos, legendas e o painel administrador completo com dados reais.</p>
-        <button class="btn-start" onclick="iniciarTour()">🔴 Iniciar Gravação</button>
+    <!-- START OVERLAY -->
+    <div id="start-screen" class="fixed inset-0 bg-slate-950 z-[1000000] flex flex-col items-center justify-center p-8 text-center">
+        <img src="image_f278e2.png" onerror="this.style.display='none'" class="w-32 h-32 mb-6 rounded-3xl shadow-2xl shadow-blue-600/50 animate-pulse object-cover bg-white p-2">
+        <h1 class="text-5xl font-black text-white mb-4 tracking-tighter">thIAguinho LOG</h1>
+        <p class="text-blue-200 mb-12 text-xl max-w-3xl font-medium leading-relaxed">Tour Integral. Demonstração de todos os módulos: Motoristas, Despesas, Despacho de NFe, App na Rua, Auditoria de Canhoto e Fechamento de Caixa. Prepare-se.</p>
+        <button onclick="this.disabled=true; iniciarTour();" class="bg-blue-600 text-white w-full max-w-md py-6 rounded-2xl font-black text-2xl uppercase shadow-2xl hover:bg-blue-500 transition-all tracking-widest active:scale-95">Iniciar Gravação Completa</button>
     </div>
 
-    <!-- TELA FINAL (SUA MARCA E LOGO VERDADEIROS) -->
+    <!-- CURSOR FANTASMA -->
+    <div id="ghost-cursor">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.4c.45 0 .67-.54.35-.85L6.35 3.35c-.31-.31-.85-.09-.85.35Z" fill="white" stroke="#0f172a" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+    </div>
+
+    <!-- LEGENDA VENDEDOR (CAPTIONS) -->
+    <div id="tour-caption-container">
+        <div id="tour-caption"><span id="caption-text">Inicializando Motor de Apresentação...</span></div>
+    </div>
+
+    <!-- TELA FINAL CTA -->
     <div id="final-screen">
-        <img src="./WhatsApp Image 2026-03-23 at 22.12.36.jpeg" alt="thIAguinho Soluções" style="max-width: 80%; max-height: 250px; object-fit: contain; border-radius: 1rem; box-shadow: 0 10px 40px rgba(14,165,233,0.4); margin-bottom: 2.5rem;" onerror="this.src='https://placehold.co/400x200/0ea5e9/ffffff?text=LOGO+THIAGUINHO+SOLUCOES'">
-        <h2 style="color: white; font-size: 2.2rem; margin-bottom: 1rem;">Tecnologia de Alta Performance.</h2>
-        <p style="color: var(--text-muted); max-width: 550px; margin: 0 auto 2.5rem; font-size: 1.15rem; line-height: 1.6;">Construímos a plataforma de vendas do seu evento sob medida. Segurança, autonomia e lucros diretos na sua conta.</p>
-        <div style="background: linear-gradient(135deg, #22c55e, #16a34a); color: white; padding: 1.2rem 3rem; border-radius: 0.8rem; font-weight: 900; font-size: 1.4rem; box-shadow: 0 0 25px rgba(34, 197, 94, 0.5);"><i class="fab fa-whatsapp" style="margin-right: 8px;"></i> Implemente no seu Evento!</div>
+        <img src="WhatsApp Image 2026-03-23 at 22.12.36.jpeg" class="final-logo" alt="Logo thIAguinho" onerror="this.src='https://via.placeholder.com/260/1e40af/ffffff?text=thIAguinho+LOG'">
+        <h2 class="text-white text-6xl font-black mb-6 tracking-tighter">Um Ecossistema Completo.</h2>
+        <p class="text-blue-200 text-2xl max-w-4xl mb-12 leading-relaxed font-medium">Você viu a operação inteira. Do cadastro do motorista ao recebimento do cliente. Escale suas entregas, zere os erros e aumente seu lucro com o thIAguinho LOG.</p>
+        <a href="https://wa.me/" class="cta-btn"><i class='bx bxl-whatsapp text-4xl'></i> QUERO ASSINAR AGORA</a>
     </div>
 
-    <div id="fake-cursor"></div>
-    
-    <!-- LEGENDA PRINCIPAL (Aparece e DESAPARECE) -->
-    <div id="tour-caption">Preparando o ambiente...</div>
-    
-    <!-- BALÃO DE EXPLICAÇÃO FLUTUANTE (TOOLTIP UX) -->
-    <div id="explainer-tooltip">
-        <div class="explainer-title" id="explainer-title"><i class="fas fa-info-circle"></i> Info</div>
-        <div id="explainer-text">Texto explicativo</div>
+    <!-- TRANSIÇÃO DE NUVEM -->
+    <div id="transition-overlay" class="fixed inset-0 bg-slate-950 z-[200000] opacity-0 pointer-events-none flex flex-col items-center justify-center transition-opacity duration-500 text-center px-6">
+        <i class='bx bx-cloud-upload bx-flashing text-8xl text-blue-500 mb-6'></i>
+        <h3 id="transition-title" class="text-white text-5xl font-black tracking-tight mb-4">Sincronização Nuvem</h3>
+        <p id="transition-subtitle" class="text-slate-400 font-bold text-2xl">Conectando dados em tempo real...</p>
     </div>
 
-    <!-- ================= VISÃO DO ATLETA (FRONTEND) ================= -->
-    <div id="app-cliente">
-        <header id="header-cliente">
-            <!-- AQUI: Removido o text-transform: uppercase para respeitar a marca thIAguinho -->
-            <h2 style="font-size: 1.2rem; font-weight: 900; color: white; letter-spacing: 1px;"><i class="fas fa-bolt" style="color: var(--primary-color);"></i> Plataforma de Inscrições thIAguinho Soluções</h2>
-        </header>
-        
-        <div class="container">
-            <!-- MAPA STRAVA 3D -->
-            <div class="strava-map-container" id="box-mapa-strava">
-                <div class="strava-badge">
-                    <i class="fab fa-strava" style="color: #fc4c02; font-size: 1.5rem;"></i>
-                    <span style="font-weight: bold;">Percurso 3D Oficial Interativo</span>
+    <!-- ========================================== -->
+    <!-- TELA DE LOGIN                              -->
+    <!-- ========================================== -->
+    <div id="userScreen" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900 p-4 transition-opacity">
+        <img src="image_f22652.jpg" onerror="this.style.display='none'" class="absolute inset-0 w-full h-full object-cover opacity-20">
+        <div class="bg-white p-12 rounded-[2rem] shadow-2xl w-full max-w-lg text-center border-t-8 border-blue-700 z-10 relative">
+            <img src="image_f278e2.png" onerror="this.style.display='none'" class="w-20 h-20 mx-auto mb-6 object-contain">
+            <h1 class="text-base font-black text-slate-400 mb-1 tracking-widest uppercase">Acesso Restrito</h1>
+            <h2 class="text-6xl font-black text-blue-900 mb-2 tracking-tighter">thIAguinho</h2>
+            <p class="text-sm font-bold text-blue-500 uppercase tracking-widest mb-10 border-b border-gray-100 pb-6">Logística de Alta Performance</p>
+            <form id="loginForm" class="text-left space-y-6" onsubmit="return false;">
+                <div>
+                    <label class="block text-sm font-black text-slate-400 uppercase mb-2 ml-1">Selecione o Acesso</label>
+                    <select id="userSelect" class="w-full p-5 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold outline-none text-slate-700 text-lg">
+                        <option value="">Selecione...</option>
+                        <option value="admin">Gestor de Logística (Painel WEB)</option>
+                    </select>
                 </div>
-            </div>
+                <div>
+                    <label class="block text-sm font-black text-slate-400 uppercase mb-2 ml-1">Senha de Autorização</label>
+                    <input type="password" id="passwordInput" placeholder="••••••" class="w-full p-5 bg-slate-50 border-2 border-slate-200 rounded-xl font-black outline-none text-slate-700 text-xl tracking-widest">
+                </div>
+                <button type="button" id="loginBtn" class="w-full bg-blue-700 text-white py-6 rounded-xl font-black uppercase text-xl shadow-xl shadow-blue-700/30 mt-6 tracking-wider">Acessar Sistema</button>
+            </form>
+        </div>
+    </div>
 
-            <div class="card" id="card-inscricao" style="border-style: dashed; border-color: var(--primary-color);">
-                <h3 style="color: white; margin-bottom: 1rem;"><i class="fas fa-id-card"></i> Ficha de Inscrição</h3>
+    <!-- ========================================== -->
+    <!-- APP: VISÃO DO GESTOR (ADMIN ERP)           -->
+    <!-- ========================================== -->
+    <div id="app-admin" class="layout-admin hidden-view">
+        <aside class="sidebar relative overflow-hidden">
+            <img src="image_f2268c.jpg" onerror="this.style.display='none'" class="absolute inset-0 w-full h-full object-cover opacity-10 mix-blend-overlay">
+            
+            <div class="p-8 flex items-center gap-4 border-b border-slate-800 relative z-10">
+                <img src="image_f278e2.png" onerror="this.style.display='none'" class="w-12 h-12 bg-white rounded-xl p-1">
+                <div><h1 class="font-black text-2xl text-white leading-none tracking-tight">thIAguinho</h1><p class="text-xs text-blue-400 font-bold uppercase tracking-widest mt-1">LOGÍSTICA</p></div>
+            </div>
+            <div class="p-6 space-y-3 relative z-10">
+                <!-- TODOS OS MÓDULOS REAIS -->
+                <div class="flex items-center gap-4 px-5 py-4 bg-blue-600 rounded-xl text-white font-bold cursor-pointer shadow-lg shadow-blue-600/20"><i class='bx bxs-dashboard text-2xl'></i> Dashboard / Despacho</div>
+                <div class="flex items-center gap-4 px-5 py-4 text-slate-400 font-bold hover:text-white cursor-pointer transition" id="btnMenuMotoristas"><i class='bx bxs-user-badge text-2xl'></i> Gestão de Motoristas</div>
+                <div class="flex items-center gap-4 px-5 py-4 text-slate-400 font-bold hover:text-white cursor-pointer transition" id="btnMenuDespesas"><i class='bx bxs-gas-pump text-2xl'></i> Lançar Despesas</div>
+                <div class="flex items-center gap-4 px-5 py-4 text-slate-400 font-bold hover:text-white cursor-pointer transition" id="btnMenuRelatorios"><i class='bx bx-bar-chart-alt-2 text-2xl'></i> Fechamento e Relatórios</div>
+            </div>
+        </aside>
+
+        <main class="main-content relative">
+            <header class="topbar">
+                <div class="flex items-center gap-3 text-slate-600 font-bold text-xl">
+                    <i class='bx bx-menu text-4xl'></i> Central de Operações
+                </div>
+                <div class="flex items-center gap-5">
+                    <button id="btnNovaEntrega" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-black text-sm uppercase shadow-lg shadow-blue-600/20 flex items-center gap-2"><i class='bx bx-plus text-xl'></i> Despachar Nova NFe</button>
+                    <div class="w-14 h-14 bg-slate-800 text-white rounded-full flex items-center justify-center font-bold text-xl border-4 border-white shadow-md">G</div>
+                </div>
+            </header>
+
+            <div class="content-area grid grid-cols-1 lg:grid-cols-5 gap-8" id="adminScrollArea">
+                <!-- Coluna 1: Lista de Cargas -->
+                <div class="lg:col-span-2 flex flex-col gap-5 h-full">
+                    <h2 class="font-black text-slate-800 text-base uppercase flex items-center gap-2"><i class='bx bx-list-ul text-blue-600 text-xl'></i> Entregas em Andamento</h2>
+                    <div id="admin-delivery-list" class="space-y-4 overflow-y-auto pr-2 pb-10" style="max-height: calc(100vh - 180px);">
+                        <!-- Injetado via JS -->
+                    </div>
+                </div>
                 
-                <div class="form-group" id="box-contatos"><label>E-mail do Responsável</label><input type="email" id="c-email" placeholder="seu@email.com"></div>
-                <div class="form-group"><label>WhatsApp</label><input type="text" id="c-phone" placeholder="(17) 99999-9999"></div>
-                
-                <div style="border-top: 1px solid var(--border); margin: 1rem 0; padding-top: 1rem;">
-                    <div class="form-group"><label>Nome do Atleta</label><input type="text" id="c-nome" placeholder="Ex: João da Silva"></div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="form-group" id="box-cpf"><label>CPF</label><input type="text" id="c-cpf" placeholder="000.000.000-00"></div>
-                        <div class="form-group">
-                            <label>Modalidade</label>
-                            <select id="c-mod"><option value="">Selecione...</option><option>Corrida 5km</option></select>
+                <!-- Coluna 2: Mapa de Rastreio -->
+                <div class="lg:col-span-3 flex flex-col gap-5 h-full">
+                    <h2 class="font-black text-slate-800 text-base uppercase flex items-center justify-between">
+                        <span class="flex items-center gap-2"><i class='bx bx-map text-red-500 text-xl'></i> Rastreamento em Tempo Real</span>
+                        <span class="text-xs bg-green-100 text-green-700 px-4 py-1.5 rounded-full font-black uppercase tracking-wider flex items-center gap-2"><i class='bx bxs-circle text-[10px] animate-pulse'></i> GPS Ativo</span>
+                    </h2>
+                    <div id="map-rastreio" class="rounded-2xl">
+                        <img src="image_f223a6.png" onerror="this.style.display='none'" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-multiply">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d30000!2d-46.633309!3d-23.550520!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1spt-BR!2sbr" width="100%" height="100%" style="border:0; position:relative; z-index:10;" allowfullscreen="" loading="lazy"></iframe>
+                        <div class="map-blocker"></div>
+                        
+                        <div class="map-marker">
+                            <div class="w-14 h-14 bg-blue-600 rounded-full border-4 border-white shadow-2xl gps-active-pulse flex items-center justify-center relative z-40">
+                                <i class='bx bxs-truck text-white text-3xl'></i>
+                            </div>
+                            <div class="bg-slate-900 text-white px-4 py-2 rounded-xl shadow-xl text-[11px] font-black absolute top-full left-1/2 transform -translate-x-1/2 mt-3 whitespace-nowrap z-40">Carlos Silva (Baú)</div>
                         </div>
                     </div>
-                    <div class="form-group" id="box-upsell">
-                        <label>Tamanho da Camiseta</label>
-                        <select id="c-kit"><option value="">Selecione...</option><option>M (+ R$ 50,00)</option></select>
-                    </div>
                 </div>
-                
-                <button id="btn-add" class="btn"><i class="fas fa-plus-circle"></i> Adicionar ao Carrinho</button>
             </div>
+        </main>
+    </div>
 
-            <div class="card" id="card-carrinho" style="display: none; border-color: var(--secondary-color);">
-                <h3 style="color: white; margin-bottom: 1rem;"><i class="fas fa-shopping-cart"></i> Carrinho Múltiplo</h3>
-                <div style="background: rgba(0,0,0,0.5); padding: 1rem; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <div><strong style="color: white;" id="cart-nome"></strong><br><small style="color: var(--text-secondary);" id="cart-detalhes"></small></div>
-                    <strong style="color: var(--primary-light);">R$ 50,00</strong>
-                </div>
-                <button id="btn-finalizar" class="btn btn-success" id="btn-finalizar-compra"><i class="fas fa-check-circle"></i> Finalizar e Gerar PIX</button>
+    <!-- MODAL 1: GERENCIAR MOTORISTAS -->
+    <div id="modal-motoristas" class="modal hidden-view">
+        <div class="modal-content">
+            <div class="bg-slate-900 text-white p-6 flex justify-between items-center border-b border-slate-800 shrink-0">
+                <h2 class="font-black text-xl flex items-center gap-3 uppercase tracking-tight"><i class='bx bxs-user-badge text-blue-400 text-3xl'></i> Cadastro de Motoristas</h2>
+                <button class="btn-close text-slate-400 text-3xl hover:text-white">&times;</button>
+            </div>
+            <div class="p-8 bg-slate-50 space-y-6">
+                <form id="formMot" onsubmit="return false;" class="space-y-5 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <p class="text-xs font-black text-slate-400 uppercase mb-4 border-b pb-2">Adicionar Novo</p>
+                    <div><label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Nome Completo / Veículo</label><input id="motName" type="text" placeholder="Ex: Carlos Silva (Caminhão 01)" class="w-full p-4 border-2 border-slate-200 rounded-xl font-bold outline-none text-slate-800"></div>
+                    <div><label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Percentual de Comissão (%)</label><input id="motCom" type="number" placeholder="Ex: 10" class="w-full p-4 border-2 border-slate-200 rounded-xl font-black outline-none text-blue-700 text-lg"></div>
+                    <button id="btnSalvarMot" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black uppercase tracking-widest mt-2">Cadastrar no Sistema</button>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- ================= VISÃO DO ADMIN (BACKEND) ================= -->
-    <div id="app-admin">
-        <header style="background: #020617;" id="header-admin">
-            <h2 style="font-size: 1.2rem; color: white;"><i class="fas fa-chart-pie" style="color: var(--primary-color);"></i> Painel Administrativo</h2>
-        </header>
-
-        <div class="container">
-            <div class="admin-tabs" id="box-abas">
-                <button class="tab-btn active" id="tab-geral"><i class="fas fa-users"></i> Inscrições</button>
-                <button class="tab-btn" id="tab-cat"><i class="fas fa-medal"></i> Categorias</button>
-                <button class="tab-btn" id="tab-fin"><i class="fas fa-wallet"></i> Cofre</button>
-                <button class="tab-btn" id="tab-cfg"><i class="fas fa-cogs"></i> Sistema</button>
-                <button class="tab-btn" id="tab-cnt"><i class="fas fa-images"></i> Mídia</button>
-                <button class="tab-btn" id="tab-log"><i class="fas fa-shield-alt"></i> Logs</button>
+    <!-- MODAL 2: LANÇAR DESPESAS -->
+    <div id="modal-despesas" class="modal hidden-view">
+        <div class="modal-content">
+            <div class="bg-slate-900 text-white p-6 flex justify-between items-center border-b border-slate-800 shrink-0">
+                <h2 class="font-black text-xl flex items-center gap-3 uppercase tracking-tight"><i class='bx bxs-gas-pump text-red-400 text-3xl'></i> Registrar Despesa de Frota</h2>
+                <button class="btn-close text-slate-400 text-3xl hover:text-white">&times;</button>
             </div>
-
-            <!-- VIEW 1: GERAL (DADOS PRÉ-PREENCHIDOS BRASIL) -->
-            <div id="view-geral" class="admin-view active">
-                <div class="stats-grid" id="box-dashboard">
-                    <div class="stat-card"><p>Inscritos</p><h3 id="kpi-total">450</h3></div>
-                    <div class="stat-card" style="border-color: var(--success);"><p>Aprovados</p><h3 id="kpi-pagos" style="color: var(--success);">420</h3></div>
-                    <div class="stat-card" style="border-color: var(--warning);"><p>Aguardando PIX</p><h3 id="kpi-pendentes" style="color: var(--warning);">30</h3></div>
-                </div>
-                <div class="card" style="padding: 0; overflow-x: auto;" id="box-tabela-aprovacao">
-                    <table class="table">
-                        <thead><tr><th>Nº Peito</th><th>Atleta e Contato</th><th>Kit</th><th>Status</th><th>Ação</th></tr></thead>
-                        <tbody id="tb-inscricoes">
-                            <!-- Inscrição gerada pelo robô entra aqui oculta, e aparece dinamicamente -->
-                            <tr id="nova-inscricao" style="display: none; background: rgba(14, 165, 233, 0.1);">
-                                <td style="color: var(--primary-color); font-weight: bold;">#451</td>
-                                <td id="td-nome"><strong>-</strong><br><small style="color:var(--text-muted)">CPF: -</small></td>
-                                <td id="td-kit">-</td>
-                                <td><span class="badge pendente" id="td-badge">PENDENTE</span></td>
-                                <td><button class="btn btn-success" style="padding: 8px; font-size: 0.8rem;" id="btn-aprovar-pix">Aprovar PIX</button></td>
-                            </tr>
-                            <!-- Dados pré-preenchidos realistas -->
-                            <tr>
-                                <td style="color: var(--primary-color); font-weight: bold;">#450</td>
-                                <td><strong>Mariana Silva</strong><br><small style="color:var(--text-muted)">(11) 97777-8888</small></td>
-                                <td>Camiseta P</td>
-                                <td><span class="badge pendente">PENDENTE</span></td>
-                                <td><button class="btn btn-success" style="padding: 8px; font-size: 0.8rem;">Aprovar PIX</button></td>
-                            </tr>
-                            <tr>
-                                <td style="color: var(--primary-color); font-weight: bold;">#449</td>
-                                <td><strong>Roberto Carlos Dias</strong><br><small style="color:var(--text-muted)">(21) 96666-5555</small></td>
-                                <td>Camiseta G</td>
-                                <td><span class="badge pago">PAGO</span></td>
-                                <td><button class="btn btn-secondary" style="padding: 8px; font-size: 0.8rem;" disabled><i class="fas fa-check"></i> Aprovado</button></td>
-                            </tr>
-                            <tr>
-                                <td style="color: var(--primary-color); font-weight: bold;">#448</td>
-                                <td><strong>Juliana Costa Oliveira</strong><br><small style="color:var(--text-muted)">(31) 95555-4444</small></td>
-                                <td>Sem Camiseta</td>
-                                <td><span class="badge pago">PAGO</span></td>
-                                <td><button class="btn btn-secondary" style="padding: 8px; font-size: 0.8rem;" disabled><i class="fas fa-check"></i> Aprovado</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- VIEW 1.5: CATEGORIAS / PÓDIOS -->
-            <div id="view-categorias" class="admin-view">
-                <div class="card" style="padding: 0; overflow-x: auto;" id="box-listas-podio">
-                    <div style="padding: 1.5rem; border-bottom: 1px solid var(--border);">
-                        <h3 style="color: var(--primary-light);"><i class="fas fa-running"></i> Corrida 5 KM - Categoria Masculino</h3>
-                    </div>
-                    <table class="table">
-                        <thead><tr><th>Nº Peito</th><th>Atleta</th><th>Idade</th><th>Tempo</th></tr></thead>
-                        <tbody id="tb-cat-5k">
-                            <tr id="nova-categoria" style="display: none;">
-                                <td><span class="badge" style="background: var(--primary-color); color: white;">#451</span></td>
-                                <td><strong style="color: var(--primary-color);">Carlos Eduardo</strong></td>
-                                <td>28</td>
-                                <td>--:--</td>
-                            </tr>
-                            <tr><td><span class="badge" style="background: var(--surface-elevated); color: white;">#112</span></td><td>Roberto Carlos Dias</td><td>34</td><td>--:--</td></tr>
-                            <tr><td><span class="badge" style="background: var(--surface-elevated); color: white;">#045</span></td><td>Fernando Souza</td><td>29</td><td>--:--</td></tr>
-                            <tr><td><span class="badge" style="background: var(--surface-elevated); color: white;">#301</span></td><td>Guilherme Santos</td><td>41</td><td>--:--</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- VIEW 2: FINANÇAS (COM DADOS REAIS E DRE) -->
-            <div id="view-financas" class="admin-view">
-                <div class="card" style="border-color: var(--success); text-align: center;" id="box-dre">
-                    <p style="color: var(--text-muted); text-transform: uppercase; font-size: 0.8rem; font-weight: bold;">Saldo Líquido do Evento</p>
-                    <h2 style="font-size: 2.5rem; color: var(--success); margin-top: 0.5rem;" id="saldo-liquido">R$ 21.000,00</h2>
-                </div>
-                <div class="card" id="box-lancamento">
-                    <h3 style="margin-bottom: 1rem; color: white;"><i class="fas fa-plus-circle"></i> Lançamento Manual</h3>
-                    <div class="form-group"><label>Tipo</label><select id="fin-tipo"><option>Patrocínio / Doação</option></select></div>
-                    <div class="form-group"><label>Valor (R$)</label><input type="text" id="fin-valor" placeholder="Ex: 1500,00"></div>
-                    <div class="form-group"><label>Descrição</label><input type="text" id="fin-desc" placeholder="Ex: Patrocínio Marca X"></div>
-                    <button class="btn btn-success" id="btn-salvar-fin"><i class="fas fa-save"></i> Gravar no Cofre</button>
-                </div>
-                <div class="card" style="padding: 0; margin-top: 1rem; overflow-x: auto;" id="box-tabela-financas">
-                    <table class="table">
-                        <thead><tr><th>Tipo</th><th>Descrição</th><th>Valor</th></tr></thead>
-                        <tbody id="tb-fin">
-                            <tr id="nova-financa" style="display: none;">
-                                <td><span class="badge info">PATROCÍNIO</span></td>
-                                <td>Patrocínio Unimed</td>
-                                <td style="color: var(--success); font-weight: bold;">+ R$ 1.500,00</td>
-                            </tr>
-                            <tr><td><span class="badge pago">INSCRIÇÕES</span></td><td>Lote Promocional (100)</td><td style="color: var(--success); font-weight: bold;">+ R$ 5.000,00</td></tr>
-                            <tr><td><span class="badge pago">INSCRIÇÕES</span></td><td>Lote Atual (320)</td><td style="color: var(--success); font-weight: bold;">+ R$ 16.000,00</td></tr>
-                            <tr><td><span class="badge despesa">DESPESA</span></td><td>Fornecedor de Medalhas</td><td style="color: var(--error); font-weight: bold;">- R$ 2.400,00</td></tr>
-                            <tr><td><span class="badge despesa">DESPESA</span></td><td>Som e Estrutura</td><td style="color: var(--error); font-weight: bold;">- R$ 1.500,00</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- VIEW 3: CONFIGURAÇÕES -->
-            <div id="view-config" class="admin-view">
-                <div class="card" style="border-color: var(--error);" id="box-mestra">
-                    <h3 style="color: var(--error); margin-bottom: 1rem;"><i class="fas fa-power-off"></i> Chave Mestra (Status)</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Encerre as inscrições do site em um clique.</p>
-                    <div class="form-group">
-                        <select id="cfg-status" style="border-color: var(--error); background: rgba(239,68,68,0.1); font-weight: bold; color: white;">
-                            <option value="abertas">✅ ABERTAS</option>
-                            <option value="encerradas">❌ ENCERRADAS (Bloquear Site)</option>
+            <div class="p-8 bg-slate-50 space-y-6">
+                <form id="formDesp" onsubmit="return false;" class="space-y-5 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div>
+                        <label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Selecionar Veículo/Motorista</label>
+                        <select id="despMot" class="w-full p-4 border-2 border-slate-200 rounded-xl font-bold outline-none text-slate-800">
+                            <option value="Carlos Silva">Carlos Silva (Caminhão Baú)</option>
                         </select>
                     </div>
-                </div>
-                <div class="card" style="border-color: #8b5cf6;" id="box-social">
-                    <h3 style="color: #8b5cf6; margin-bottom: 1rem;"><i class="fas fa-gift"></i> Inscrição Gratuita (Lote Social)</h3>
-                    <div class="form-group">
-                        <select id="cfg-gratis">
-                            <option>Desativado (Cobrar Kit Normal)</option>
-                            <option>Ativado (Inscrições 100% Gratuitas)</option>
+                    <div><label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Tipo de Despesa</label><input id="despDesc" type="text" placeholder="Ex: Abastecimento Diesel" class="w-full p-4 border-2 border-slate-200 rounded-xl font-bold outline-none text-slate-800"></div>
+                    <div><label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Valor (R$)</label><input id="despVal" type="number" placeholder="0.00" class="w-full p-4 border-2 border-slate-200 rounded-xl font-black outline-none text-red-600 text-xl"></div>
+                    <button id="btnSalvarDesp" class="w-full bg-red-600 text-white py-4 rounded-xl font-black uppercase tracking-widest mt-2">Lançar Despesa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: DESPACHAR NOVA CARGA (NFe) -->
+    <div id="modal-nova-entrega" class="modal hidden-view">
+        <div class="modal-content max-w-3xl">
+            <div class="bg-blue-600 text-white p-6 flex justify-between items-center shrink-0">
+                <h2 class="font-black text-xl flex items-center gap-3 uppercase tracking-tight"><i class='bx bx-barcode-reader text-white text-3xl'></i> Gerar Despacho / NFe</h2>
+                <button class="btn-close text-white text-3xl hover:text-slate-200">&times;</button>
+            </div>
+            <div class="p-8 bg-slate-50 space-y-6 overflow-y-auto">
+                <form id="formNovaEntrega" onsubmit="return false;" class="space-y-5 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div><label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Número NFe</label><input id="nfeInput" type="text" placeholder="Ex: 5040" class="w-full p-4 border-2 border-slate-200 rounded-xl font-mono font-black text-2xl outline-none text-slate-800"></div>
+                        <div><label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Valor da NFe (R$)</label><input id="valInput" type="number" placeholder="0.00" class="w-full p-4 border-2 border-slate-200 rounded-xl font-black outline-none text-blue-700 text-2xl"></div>
+                    </div>
+                    <div><label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Cliente / Empresa</label><input id="clienteInput" type="text" placeholder="Nome do Destinatário" class="w-full p-4 border-2 border-slate-200 rounded-xl font-bold outline-none text-slate-800 text-lg"></div>
+                    <div><label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Endereço de Entrega Completo</label><textarea id="endInput" rows="2" placeholder="Rua, Número, Bairro, Cidade..." class="w-full p-4 border-2 border-slate-200 rounded-xl font-medium outline-none resize-none text-slate-800"></textarea></div>
+                    <div>
+                        <label class="text-[11px] font-black text-slate-500 uppercase mb-2 block">Atribuir ao Motorista</label>
+                        <select id="motSelectEnt" class="w-full p-4 border-2 border-slate-200 rounded-xl font-bold outline-none text-slate-800 bg-slate-50">
+                            <option value="Carlos Silva">Carlos Silva (Caminhão Baú)</option>
                         </select>
                     </div>
-                </div>
+                    <button id="btnSalvarEntrega" class="w-full bg-blue-600 text-white py-6 rounded-2xl font-black text-xl shadow-xl shadow-blue-600/30 uppercase tracking-tighter mt-4">Sincronizar com App Motorista</button>
+                </form>
             </div>
+        </div>
+    </div>
 
-            <!-- VIEW 4: CONTEÚDO (MÍDIA/MAPAS) -->
-            <div id="view-conteudo" class="admin-view">
-                <div class="card" id="box-mapas">
-                    <h3 style="margin-bottom: 1rem; color: var(--primary-light);"><i class="fas fa-map"></i> Mapa do Percurso (Strava/Google)</h3>
-                    <div class="form-group"><label>Código Iframe</label><input type="text" id="cnt-mapa" placeholder="<iframe src='...' ></iframe>"></div>
-                    <button class="btn" id="btn-save-mapa" style="margin-bottom: 2rem;">Atualizar Mapa no Site</button>
+    <!-- MODAL 4: DETALHES E AUDITORIA DO CANHOTO (VISÃO GESTOR) -->
+    <div id="modal-detalhes-entrega" class="modal hidden-view">
+        <div class="modal-content max-w-2xl">
+            <div class="bg-white p-6 border-b border-slate-200 flex justify-between items-center shrink-0">
+                <div><h2 class="font-black text-3xl text-slate-800 tracking-tighter flex items-center gap-3"><i class='bx bx-check-shield text-green-500'></i> Detalhes da Entrega</h2></div>
+                <button class="btn-close text-slate-400 text-4xl hover:text-slate-600">&times;</button>
+            </div>
+            <div class="p-8 bg-slate-50 space-y-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <p class="font-black text-2xl text-slate-800" id="det-nfe">NFe: 8890</p>
+                        <span class="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-black uppercase text-xs">Entregue e Validado</span>
+                    </div>
+                    <p class="text-sm font-bold text-slate-500 uppercase mb-1">Cliente</p>
+                    <p class="font-black text-xl text-slate-800 mb-6" id="det-cliente">Lojas Silva</p>
                     
-                    <h3 style="margin-bottom: 1rem; color: var(--primary-light);"><i class="fas fa-image"></i> Logo de Patrocinador Principal</h3>
-                    <div class="form-group"><label>Arquivo da Imagem</label><input type="file" id="cnt-pat"></div>
-                </div>
-            </div>
-
-            <!-- VIEW 5: AUDITORIA (LOGS REAIS) -->
-            <div id="view-logs" class="admin-view">
-                <div class="card" style="padding: 0; overflow-x: auto;" id="box-logs">
-                    <div style="padding: 1.5rem; border-bottom: 1px solid var(--border);">
-                        <h3 style="color: white;"><i class="fas fa-shield-alt" style="color: var(--warning);"></i> Auditoria de Segurança</h3>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);">Toda ação financeira, edição ou exclusão é registrada permanentemente.</p>
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                        <p class="text-xs font-black text-blue-600 uppercase border-b border-slate-200 pb-2"><i class='bx bx-fingerprint text-lg'></i> Canhoto Digital / Assinatura</p>
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase">Recebedor Registrado</p>
+                            <p class="font-bold text-slate-800 text-base" id="det-recebedor">Roberto Alves (Portaria)</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase">Ocorrências / Observações da Descarga</p>
+                            <p class="font-medium text-slate-700 text-sm bg-white p-3 rounded-lg border mt-1" id="det-obs">Tudo conferido.</p>
+                        </div>
                     </div>
-                    <table class="table">
-                        <tbody id="tb-logs">
-                            <tr id="novo-log-1" style="display: none;"><td><small>Agora</small><br><strong>admin@thiaguinho.com</strong></td><td><span class="badge info">RECEITA</span><br><small>Patrocínio Unimed (+ R$ 1.500,00)</small></td></tr>
-                            <tr id="novo-log-2" style="display: none;"><td><small>Agora</small><br><strong>admin@thiaguinho.com</strong></td><td><span class="badge despesa">SISTEMA OFF</span><br><small>Inscrições Encerradas</small></td></tr>
-                            <tr><td><small>Ontem 14:30</small><br><strong>financeiro@thiaguinho.com</strong></td><td><span class="badge pago">PIX APROVADO</span><br><small>Atleta: Roberto Carlos Dias</small></td></tr>
-                            <tr><td><small>Ontem 11:15</small><br><strong>admin@thiaguinho.com</strong></td><td><span class="badge warning">ATUALIZAÇÃO</span><br><small>Edição de Estoque (Camisetas G)</small></td></tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
-
         </div>
     </div>
 
-    <!-- CÉREBRO DA AUTOMAÇÃO E SINCRONIA UX -->
+    <!-- ========================================== -->
+    <!-- APP: VISÃO DO MOTORISTA (CELULAR NA RUA)   -->
+    <!-- ========================================== -->
+    <div id="app-motorista" class="hidden-view absolute inset-0 z-50 bg-slate-900 flex justify-center items-center backdrop-blur-md p-4">
+        <div class="driver-device w-full rounded-[3rem] overflow-hidden border-[10px] border-slate-800 shadow-[0_0_60px_rgba(0,0,0,0.9)]">
+            <header class="p-8 pt-12 flex justify-between items-center border-b border-slate-800 bg-slate-900 shrink-0 z-50 relative">
+                <div class="flex items-center gap-4">
+                    <img src="image_f278e2.png" onerror="this.style.display='none'" class="w-12 h-12 bg-white rounded-full p-1.5 shadow-lg">
+                    <div><p class="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1">Rota Ativa</p><h2 class="font-black text-2xl text-white leading-none">Carlos Silva</h2></div>
+                </div>
+                <div class="w-12 h-12 bg-slate-800 rounded-2xl flex items-center justify-center relative text-white"><i class='bx bx-bell text-2xl'></i><div class="absolute top-2 right-2 w-3 h-3 bg-red-500 border-2 border-slate-800 rounded-full"></div></div>
+            </header>
+            
+            <div class="driver-map-area relative">
+                <div class="map-blocker"></div>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15000!2d-46.633309!3d-23.550520!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDMzJzAxLjkiUyA0NsKwMzgnMDAuMCJX!5e0!3m2!1spt-BR!2sbr" width="100%" height="100%" style="border:0; filter: invert(90%) hue-rotate(180deg);" allowfullscreen="" loading="lazy"></iframe>
+                
+                <div class="absolute bottom-0 left-0 right-0 p-6 z-30 bg-gradient-to-t from-slate-950 via-slate-900 to-transparent pt-32">
+                    <p class="text-[11px] font-black text-slate-400 uppercase mb-3 ml-2 tracking-widest drop-shadow-md">Próxima Parada GPS</p>
+                    <div id="driver-current-stop">
+                        <!-- Injetado via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: BAIXA NO CANHOTO (CELULAR MOTORISTA) - EXATO DO ORIGINAL -->
+    <div id="modal-confirmar-entrega" class="modal hidden-view z-[100000]">
+        <div class="modal-content-dark w-full max-w-md p-8 rounded-[2.5rem] shadow-2xl border border-slate-700 mx-auto bg-slate-900">
+            <h2 class="font-black text-2xl text-white mb-6 flex items-center gap-3 border-b border-slate-700 pb-5 uppercase tracking-tighter"><i class='bx bx-check-shield text-green-500 text-4xl'></i> Assinatura Digital</h2>
+            <form id="formConfirm" onsubmit="return false;" class="space-y-5">
+                <div>
+                    <label class="block text-[11px] font-black text-slate-400 uppercase ml-1 mb-2">Quem Recebeu a Mercadoria?</label>
+                    <input type="text" id="conf-recebedor" placeholder="Nome e RG de quem assinou..." required class="w-full p-5 rounded-2xl bg-slate-800 text-white border-2 border-slate-600 outline-none font-bold text-base focus:border-green-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-black text-slate-400 uppercase ml-1 mb-2">Ocorrências na Descarga?</label>
+                    <textarea id="conf-obs" placeholder="Ex: Faltou volume, tudo certo..." required class="w-full p-5 rounded-2xl bg-slate-800 text-white border-2 border-slate-600 resize-none outline-none font-medium text-base h-36 focus:border-green-500 transition-colors"></textarea>
+                </div>
+                <button type="button" id="btn-confirmar-entrega" class="w-full bg-green-600 hover:bg-green-500 text-white py-6 rounded-2xl font-black uppercase text-base shadow-xl shadow-green-600/30 flex justify-center items-center gap-3 mt-4 tracking-widest transition-all active:scale-95">
+                    <i class='bx bx-cloud-upload text-3xl'></i> Salvar e Baixar NFe
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: RELATÓRIOS DO GESTOR (FECHAMENTO)   -->
+    <!-- ========================================== -->
+    <div id="modal-relatorios" class="modal hidden-view">
+        <div class="modal-content max-w-6xl h-[94dvh]">
+            <div class="bg-white border-b border-slate-200 p-8 flex justify-between items-center shrink-0">
+                <div>
+                    <h2 class="font-black text-3xl text-slate-800 uppercase tracking-tight flex items-center gap-3"><i class='bx bx-line-chart text-blue-600 text-4xl'></i> Dashboard Financeiro</h2>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2">Fechamento Mensal, Comissões e Despesas</p>
+                </div>
+                <button class="btn-close text-slate-400 text-5xl hover:text-slate-600 transition-colors">&times;</button>
+            </div>
+            
+            <div class="p-8 bg-slate-50 flex-grow overflow-y-auto" id="relatoriosScrollArea">
+                <!-- Visão Geral Financeira -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-6 border-l-8 border-l-green-500">
+                        <div class="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center text-green-600"><i class='bx bx-money text-5xl'></i></div>
+                        <div>
+                            <p class="text-xs font-black text-slate-400 uppercase mb-2 tracking-widest">Total Faturado / Entregue</p>
+                            <p class="text-5xl font-black text-slate-800 tracking-tighter">R$ 145.890,00</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-6 border-l-8 border-l-blue-600">
+                        <div class="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600"><i class='bx bx-wallet text-5xl'></i></div>
+                        <div>
+                            <p class="text-xs font-black text-slate-400 uppercase mb-2 tracking-widest">Comissões Calculadas (Motoristas)</p>
+                            <p class="text-5xl font-black text-blue-700 tracking-tighter">R$ 3.450,00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Ranking Motoristas -->
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+                        <h4 class="font-black text-slate-800 uppercase text-sm mb-6 border-b border-slate-100 pb-4 flex items-center gap-3"><i class='bx bxs-user-badge text-slate-400 text-2xl'></i> Ranking de Entregas por Motorista</h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center font-black text-2xl shadow-inner">1º</div>
+                                    <div><p class="font-black text-lg text-slate-800">Carlos Silva</p><p class="text-xs font-bold text-slate-500 uppercase mt-1">29 Entregas Concluídas</p></div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-black text-green-600 text-xl">R$ 1.950,00</p>
+                                    <p class="text-[10px] text-slate-400 font-black uppercase mt-1">Comissão</p>
+                                </div>
+                            </div>
+                            <!-- Mais motoristas podem ser adicionados aqui -->
+                        </div>
+                    </div>
+                    
+                    <!-- Despesas Globais -->
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+                        <h4 class="font-black text-slate-800 uppercase text-sm mb-6 border-b border-slate-100 pb-4 flex items-center gap-3"><i class='bx bx-money text-red-500 text-2xl'></i> Despesas Globais Lançadas</h4>
+                        <div class="space-y-4" id="rel-despesas-list">
+                            <div class="flex justify-between items-center p-5 bg-red-50 rounded-2xl border border-red-100">
+                                <div><p class="font-black text-base text-slate-800">Abastecimento Diesel</p><p class="text-xs font-bold text-red-500 uppercase mt-1">Carlos Silva (Caminhão 01)</p></div>
+                                <p class="font-black text-red-600 text-xl">- R$ 600,00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 border-t border-slate-200 shrink-0 flex justify-end">
+                <button id="exportReportBtn" class="bg-slate-900 hover:bg-slate-800 text-white px-10 py-5 rounded-2xl font-black uppercase text-base flex items-center gap-3 shadow-2xl transition-colors"><i class='bx bxs-file-pdf text-red-500 text-3xl'></i> Exportar Fechamento (PDF)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- O CLÍMAX FINAL: PDF ENGINE -->
+    <div id="pdf-preview-modal" class="modal hidden-view z-[100000]">
+        <div class="modal-content bg-slate-900 border-none w-full max-w-4xl h-[95dvh] flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.8)]">
+            <div class="p-5 bg-slate-950 flex justify-between items-center text-white shrink-0">
+                <span class="text-sm font-black tracking-widest flex items-center gap-3 uppercase"><i class='bx bxs-file-pdf text-red-500 text-3xl'></i> PDF Gerado com Sucesso</span>
+                <button class="btn-close text-white text-4xl font-light hover:text-red-500 transition">&times;</button>
+            </div>
+            
+            <div class="bg-slate-700 flex-grow relative overflow-y-auto" id="pdfScrollArea">
+                <div class="pdf-paper" style="background: white; width: 100%; max-width: 800px; margin: 0 auto; min-height: 1000px; padding: 50px; box-shadow: 0 15px 50px rgba(0,0,0,0.4); border-top: 16px solid #1e3a8a; position: relative; color: #1e293b; font-family: 'Arial', sans-serif;">
+                    <div class="pdf-watermark" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 80px; font-weight: 900; color: rgba(0,0,0,0.03); pointer-events: none; white-space: nowrap;">thIAguinho LOG</div>
+                    
+                    <div class="flex justify-between items-end border-b-4 border-blue-900 pb-4 mb-8">
+                        <div>
+                            <h3 style="font-weight: 900; font-size: 32px; color: #1e3a8a; margin:0; line-height: 1;">thIAguinho LOG</h3>
+                            <p style="font-size: 11px; color: #64748b; font-weight: 800; letter-spacing: 2px; margin-top:4px;">RELATÓRIO DE DESEMPENHO E COMISSÕES</p>
+                        </div>
+                        <div class="text-right">
+                            <p style="font-size: 16px; font-weight: 900; margin:0; color: #b91c1c;">COMPETÊNCIA: MARÇO / 2026</p>
+                            <p style="font-size: 11px; color: #94a3b8; margin-top:2px;">EMISSÃO: HOJE</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <p style="font-size: 13px; color: #1e3a8a; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 15px;">1. Desempenho Global (Fechamento)</p>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead><tr style="background: #f8fafc;"><th style="text-align: left; padding: 12px; font-size: 11px; color: #64748b;">MÉTRICA DE OPERAÇÃO</th><th style="text-align: right; padding: 12px; font-size: 11px; color: #64748b;">VALOR TOTAL</th></tr></thead>
+                            <tbody>
+                                <tr><td style="padding: 12px; font-size: 13px; border-bottom: 1px solid #f1f5f9; font-weight: 600;">Faturamento (Cargas Entregues e Validadas)</td><td style="text-align: right; padding: 12px; font-size: 14px; border-bottom: 1px solid #f1f5f9; font-weight: 900; color:#166534;">R$ 145.890,00</td></tr>
+                                <tr><td style="padding: 12px; font-size: 13px; border-bottom: 1px solid #f1f5f9; font-weight: 600;">(-) Despesas Registradas na Frota (Combustível, etc)</td><td style="text-align: right; padding: 12px; font-size: 14px; border-bottom: 1px solid #f1f5f9; font-weight: 900; color:#b91c1c;">- R$ 600,00</td></tr>
+                                <tr><td style="padding: 12px; font-size: 13px; border-bottom: 1px solid #f1f5f9; font-weight: 600;">(-) Comissões a Pagar para Motoristas (App)</td><td style="text-align: right; padding: 12px; font-size: 14px; border-bottom: 1px solid #f1f5f9; font-weight: 900; color:#1d4ed8;">- R$ 3.450,00</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 60px;">
+                        <div style="background: #f8fafc; padding: 25px 40px; border-radius: 16px; border: 2px solid #cbd5e1; text-align: right; box-shadow: 0 10px 15px rgba(0,0,0,0.05);">
+                            <p style="font-size: 12px; font-weight: 900; text-transform: uppercase; margin:0; color: #64748b;">Resultado Líquido Operacional</p>
+                            <p style="font-size: 42px; font-weight: 900; margin:0; color: #1e3a8a;">R$ 141.840,00</p>
+                        </div>
+                    </div>
+
+                    <div style="background: #f1f5f9; padding: 30px; border-radius: 16px; margin-top: 50px; text-align: center;">
+                        <p style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px;">Documento Gerado Oficialmente &bull; thIAguinho Soluções Logísticas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-slate-950 p-5 shrink-0 flex justify-center z-10 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]">
+                <button class="btn-close w-full max-w-[700px] bg-green-500 hover:bg-green-600 text-white py-5 rounded-2xl font-black uppercase text-lg shadow-2xl flex justify-center items-center gap-3 transition-colors tracking-widest"><i class='bx bxl-whatsapp text-4xl'></i> Imprimir e Enviar Relatório PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assinatura -->
+    <div class="fixed bottom-3 right-5 text-[10px] font-bold text-slate-500 z-50 pointer-events-none uppercase tracking-widest bg-white/90 px-3 py-1.5 rounded-md shadow-sm">Tecnologia thIAguinho Soluções</div>
+
     <script>
-        const cursor = document.getElementById('fake-cursor');
-        const caption = document.getElementById('tour-caption');
-        const explainer = document.getElementById('explainer-tooltip');
-        
-        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-        
-        // A MÁGICA DO TEXTO INFERIOR: Aparece, dá tempo pro usuário ler o que vai acontecer e some.
-        async function showMainCaption(text, duration = 3000) {
-            caption.innerHTML = text;
-            caption.style.opacity = 1;
-            await sleep(duration); 
-            caption.style.opacity = 0; 
-            await sleep(500); 
+        // =====================================================================
+        // ESTADO GLOBAL DO SISTEMA MOCKADO (FIEL À SUA LÓGICA)
+        // =====================================================================
+        let state = {
+            deliveries: [
+                { id: 'd1', nfe: '5010', cliente: 'Marcenaria Central', address: 'Rua das Indústrias, 100 - SP', status: 'Entregue', val: '12.500,00' },
+                { id: 'd2', nfe: '5011', cliente: 'Construtora Alfa S/A', address: 'Av Paulista, 1000 - SP', status: 'Em-Rota', val: '8.300,00' }
+            ]
+        };
+
+        const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+        const cursor = document.getElementById('ghost-cursor');
+
+        // Fecha modais globais
+        document.querySelectorAll('.btn-close').forEach(btn => {
+            btn.onclick = (e) => { e.target.closest('.modal').classList.add('hidden-view'); }
+        });
+
+        // =====================================================================
+        // RENDERIZADORES FIEIS AO ORIGINAL
+        // =====================================================================
+        function renderAdminList() {
+            try {
+                const list = document.getElementById('admin-delivery-list');
+                list.innerHTML = state.deliveries.map(d => {
+                    let isRoute = d.status === 'Em-Rota';
+                    let isDelivered = d.status === 'Entregue';
+                    let cardClass = isDelivered ? 'border-l-green-500 bg-slate-50 opacity-80' : (isRoute ? 'border-l-blue-600' : 'border-l-amber-500');
+                    let badgeClass = isDelivered ? 'bg-green-100 text-green-700' : (isRoute ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700');
+                    
+                    return `
+                    <div class="delivery-card ${cardClass}" id="card-${d.id}">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="font-black text-slate-800 text-lg flex items-center gap-2"><i class='bx bx-barcode text-slate-400'></i> NFe: ${d.nfe}</div>
+                            <span class="${badgeClass} px-3 py-1 rounded-lg font-black uppercase text-[10px] tracking-wider">${d.status.replace(/-/g, ' ')}</span>
+                        </div>
+                        <div class="text-sm font-black text-slate-700 uppercase mb-2 leading-tight">${d.cliente}</div>
+                        <div class="text-[11px] text-slate-500 font-bold uppercase flex items-start gap-2 leading-tight"><i class='bx bx-map text-base text-red-400'></i> ${d.address}</div>
+                        <div class="text-[11px] text-slate-400 font-bold uppercase mt-3 pt-3 border-t border-slate-200 flex justify-between items-center">
+                            <span class="flex items-center gap-1"><i class='bx bxs-user-badge'></i> Carlos Silva</span> <span class="text-slate-700">R$ ${d.val}</span>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch(e) { console.error(e); }
         }
 
-        // A MÁGICA DOS BALÕES EXPLICATIVOS: Flutua ao lado do elemento focado
-        async function showExplainer(elementId, title, text, positionOffset = {x: 0, y: -90}, duration = 3500) {
-            const el = document.getElementById(elementId);
-            if(!el) return;
-            
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            await sleep(400); 
-            
-            const rect = el.getBoundingClientRect();
-            document.getElementById('explainer-title').innerHTML = `<i class="fas fa-info-circle"></i> ${title}`;
-            document.getElementById('explainer-text').innerHTML = text;
-            
-            let topPos = rect.top + window.scrollY + positionOffset.y;
-            let leftPos = rect.left + window.scrollX + (rect.width / 2) - 170; 
-            
-            if(leftPos < 10) leftPos = 10;
-            if(leftPos + 340 > window.innerWidth) leftPos = window.innerWidth - 350;
-            
-            explainer.style.top = topPos + 'px';
-            explainer.style.left = leftPos + 'px';
-            
-            explainer.classList.add('show');
-            await sleep(duration); 
-            
-            explainer.classList.remove('show');
-            await sleep(600); 
+        function renderDriverStop() {
+            try {
+                const d = state.deliveries[0]; 
+                document.getElementById('driver-current-stop').innerHTML = `
+                    <div class="bg-slate-800 border-2 border-slate-700 rounded-[2rem] p-6 shadow-2xl relative overflow-hidden" id="card-driver-stop">
+                        <div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
+                        <div class="flex justify-between items-center mb-5">
+                            <p class="font-black text-3xl text-white tracking-tighter">NFe: ${d.nfe}</p>
+                            <div class="bg-blue-600 w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-600/30"><i class='bx bxs-navigation text-2xl'></i></div>
+                        </div>
+                        <p class="text-lg font-black text-blue-300 uppercase mb-2 leading-tight">${d.cliente}</p>
+                        <p class="text-sm font-bold text-slate-400 mb-8 flex items-start gap-2 bg-slate-900 p-4 rounded-xl border border-slate-700"><i class='bx bx-map-pin text-xl text-red-500'></i> ${d.address}</p>
+                        
+                        <button id="btnCheguei" class="w-full bg-blue-600 text-white py-6 rounded-2xl font-black uppercase text-sm shadow-xl shadow-blue-600/30 active:scale-95 transition-all tracking-wider flex items-center justify-center gap-2">Registrar Baixa do Canhoto <i class='bx bx-right-arrow-alt text-2xl'></i></button>
+                    </div>
+                `;
+            } catch(e) { console.error(e); }
         }
 
-        async function moveCursorTo(elementId, offsetY = 0) {
-            const el = document.getElementById(elementId);
-            if(!el) return;
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            await sleep(400); 
-            const rect = el.getBoundingClientRect();
-            cursor.style.top = (rect.top + rect.height / 2 + window.scrollY + offsetY) + 'px';
-            cursor.style.left = (rect.left + rect.width / 2 + window.scrollX) + 'px';
-            await sleep(800); 
+        // =====================================================================
+        // MOTORES DE ANIMAÇÃO BLINDADOS
+        // =====================================================================
+        async function slowScrollTo(container, targetScrollTop, durationMs) {
+            const start = container.scrollTop;
+            const change = targetScrollTop - start;
+            const startTime = performance.now();
+            return new Promise(resolve => {
+                function animateScroll(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / durationMs, 1);
+                    const ease = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+                    container.scrollTop = start + change * ease;
+                    if (progress < 1) requestAnimationFrame(animateScroll);
+                    else resolve();
+                }
+                requestAnimationFrame(animateScroll);
+            });
         }
 
-        async function typeText(elementId, text) {
-            await moveCursorTo(elementId);
-            const el = document.getElementById(elementId);
-            if(!el) return;
-            el.classList.add('focus-simulated');
-            for(let i = 0; i < text.length; i++) { el.value += text[i]; await sleep(40); }
-            await sleep(200);
-            el.classList.remove('focus-simulated');
+        async function moveCursor(sel, offX=0, offY=0) {
+            try {
+                const el = document.querySelector(sel);
+                if(!el) return;
+                
+                // Trata o scroll suave das áreas grandes
+                if(document.getElementById('relatoriosScrollArea') && document.getElementById('relatoriosScrollArea').contains(el)) {
+                     document.getElementById('relatoriosScrollArea').scrollTo({ top: el.offsetTop - 50, behavior: 'smooth' });
+                } else if(document.getElementById('adminScrollArea') && document.getElementById('adminScrollArea').contains(el)) {
+                     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                
+                await sleep(400); 
+                const rect = el.getBoundingClientRect();
+                cursor.style.top = (rect.top + rect.height/2 + offY) + 'px';
+                cursor.style.left = (rect.left + rect.width/2 + offX) + 'px';
+                await sleep(600); 
+            } catch(e) { console.error(e); }
         }
 
-        async function selectOption(elementId, index) {
-            await moveCursorTo(elementId);
-            const el = document.getElementById(elementId);
-            if(!el) return;
-            el.classList.add('focus-simulated');
-            await sleep(300);
-            el.selectedIndex = index;
-            await sleep(200);
-            el.classList.remove('focus-simulated');
+        async function clickAction(sel) {
+            try {
+                cursor.classList.add('cursor-click-effect');
+                const el = document.querySelector(sel);
+                if(el) { if(el.tagName === 'SELECT') el.focus(); else el.click(); }
+                await sleep(300);
+                cursor.classList.remove('cursor-click-effect');
+            } catch(e) { console.error(e); }
         }
 
-        async function clickButton(elementId) {
-            await moveCursorTo(elementId);
-            cursor.classList.add('click-anim'); 
-            
-            const el = document.getElementById(elementId);
-            if(el) {
-                const origTransform = el.style.transform;
-                el.style.transform = 'scale(0.95)';
-                await sleep(150);
-                el.style.transform = origTransform || 'none';
-            }
-            await sleep(200);
-            cursor.classList.remove('click-anim');
+        async function typeAction(sel, text, dark=false) {
+            try {
+                const el = document.querySelector(sel);
+                if(!el) return;
+                el.value = '';
+                el.classList.add(dark ? 'typing-focus-dark' : 'typing-focus');
+                for(let c of text) { el.value += c; el.dispatchEvent(new Event('input')); await sleep(20 + Math.random() * 20); }
+                await sleep(300);
+                el.classList.remove(dark ? 'typing-focus-dark' : 'typing-focus');
+            } catch(e) { console.error(e); }
         }
 
-        // FUNÇÃO BLINDADA DE ABAS
-        async function switchAdminTab(tabId, viewId) {
-            await clickButton(tabId);
-            
-            const tabs = document.querySelectorAll('.tab-btn');
-            for(let i = 0; i < tabs.length; i++) { tabs[i].classList.remove('active'); }
-            
-            const views = document.querySelectorAll('.admin-view');
-            for(let i = 0; i < views.length; i++) {
-                views[i].classList.remove('active');
-                views[i].style.display = 'none';
-            }
-            
-            const targetTab = document.getElementById(tabId);
-            const targetView = document.getElementById(viewId);
-            
-            if(targetTab) targetTab.classList.add('active');
-            if(targetView) {
-                targetView.classList.add('active');
-                targetView.style.display = 'block';
-            }
-            await sleep(600); 
+        function showCaption(text, durationMs = 3500) {
+            return new Promise(async (resolve) => {
+                try {
+                    const cont = document.getElementById('tour-caption-container');
+                    document.getElementById('caption-text').innerText = text;
+                    cont.style.opacity = 1; cont.style.transform = 'translateY(0)';
+                    await sleep(durationMs);
+                    cont.style.opacity = 0; cont.style.transform = 'translateY(20px)';
+                    await sleep(400);
+                    resolve();
+                } catch(e) { resolve(); }
+            });
         }
 
-        // =========================================================================
-        // O TOUR DE ALTA PERFORMANCE B2B - TOTALMENTE SINCRONIZADO
-        // =========================================================================
+        async function transicaoNuvem(titulo, subtitulo) {
+            try {
+                const trans = document.getElementById('transition-overlay');
+                document.getElementById('transition-title').innerText = titulo;
+                document.getElementById('transition-subtitle').innerText = subtitulo;
+                trans.classList.remove('pointer-events-none'); trans.classList.add('opacity-100');
+                await sleep(2500);
+                trans.classList.remove('opacity-100'); trans.classList.add('pointer-events-none');
+            } catch(e) { console.error(e); }
+        }
+
+        // =====================================================================
+        // O TOUR DE VENDAS MASTER: TODOS OS MÓDULOS DE PONTA A PONTA
+        // =====================================================================
         async function iniciarTour() {
             try {
                 document.getElementById('start-screen').style.display = 'none';
                 cursor.style.opacity = 1;
-                
-                // --- PASSO 1: FRONTEND / ATLETA ---
-                await showMainCaption("Iniciando Visão do Usuário: Experiência 100% focada em conversão.", 3000);
-                
-                await showExplainer('box-mapa-strava', 'Integração Strava 3D', 'Apresente os mapas e percursos reais diretamente no site, gerando entusiasmo nos atletas.', {x: 0, y: 100}, 3500);
-                
-                await typeText('c-email', 'atleta.vip@email.com');
-                await typeText('c-phone', '11987654321');
-                await showExplainer('box-contatos', 'Validação de Contatos', 'Nossas máscaras impedem o preenchimento de dados falsos, garantindo a entrega do comprovante PIX no WhatsApp.', {x: 0, y: -100}, 4000);
 
-                await typeText('c-nome', 'Carlos Eduardo');
-                await typeText('c-cpf', '123.456.789-00');
-                await showExplainer('box-cpf', 'Engenharia Anti-Fraude', 'Bloqueio instantâneo de CPFs gerados ou inválidos, mantendo sua base de dados totalmente limpa.', {x: 0, y: -100}, 4000);
+                // 1. LOGIN NA BASE (ADMIN ERP)
+                showCaption("Acesso Corporativo: O Gestor entra na plataforma para controlar toda a operação logística.", 4000);
+                await moveCursor('#userSelect'); await clickAction('#userSelect'); document.getElementById('userSelect').value = 'admin'; await sleep(300);
+                await moveCursor('#passwordInput'); await typeAction('#passwordInput', 'admin123');
+                await moveCursor('#loginBtn'); await clickAction('#loginBtn');
+                
+                document.getElementById('userScreen').style.display = 'none';
+                document.getElementById('app-admin').classList.remove('hidden-view');
+                renderAdminList();
+                await sleep(1500);
 
-                await selectOption('c-mod', 1);
-                await selectOption('c-kit', 1);
-                await showExplainer('box-upsell', 'Upsell Inteligente', 'O sistema identifica compras adicionais (camisetas, kits VIP) e recalcula o valor automaticamente para você faturar mais.', {x: 0, y: -100}, 4500);
-                
-                await clickButton('btn-add');
-                
-                document.getElementById('card-carrinho').style.display = 'block';
-                document.getElementById('cart-nome').innerText = "Carlos Eduardo";
-                document.getElementById('cart-detalhes').innerText = "CPF: 123.456.789-00 | Kit: M";
-                
-                await showExplainer('card-carrinho', 'Carrinho de Equipes', 'Assessorias esportivas podem adicionar dezenas de atletas e fechar um único PIX, agilizando o processo e evitando bloqueios bancários.', {x: 0, y: -100}, 5000);
-                
-                await clickButton('btn-finalizar-compra');
+                // 2. CADASTRO DE MOTORISTA (A LÓGICA EXIGIDA)
+                await showCaption("MÓDULO 1: Cadastre sua frota. Defina motoristas e o percentual de comissão de cada um.", 4500);
+                await moveCursor('#btnMenuMotoristas'); await clickAction('#btnMenuMotoristas');
+                document.getElementById('modal-motoristas').classList.remove('hidden-view');
+                await sleep(600);
 
-                // --- PASSO 2: TRANSIÇÃO PARA O BACKEND / ADMIN ---
-                cursor.style.opacity = 0;
-                document.body.style.background = "#000";
-                document.getElementById('app-cliente').style.opacity = 0;
-                await sleep(1000); 
-                
-                document.getElementById('app-cliente').style.display = 'none';
-                document.getElementById('app-admin').style.display = 'block';
-                
-                // Exibe a nova inscrição no topo da tabela pré-populada
-                document.getElementById('nova-inscricao').style.display = 'table-row';
-                document.getElementById('td-nome').innerHTML = "<strong>Carlos Eduardo</strong><br><small style='color:var(--text-muted)'>(11) 98765-4321</small>";
-                document.getElementById('td-kit').innerText = "Camiseta M";
-                
-                // Atualiza KPIs para a nova inscrição inserida (+1 pendente)
-                document.getElementById('kpi-total').innerText = "451";
-                document.getElementById('kpi-pendentes').innerText = "31";
-
-                document.body.style.background = "var(--background)";
-                window.scrollTo(0,0);
-                cursor.style.opacity = 1;
-                
-                await showMainCaption("Transição perfeita para o Painel do Organizador.", 3000);
-                
-                await showExplainer('box-dashboard', 'Dashboard em Tempo Real', 'Enquanto as vendas ocorrem, sua base de dados atualiza sem necessidade de recarregar a página.', {x: 0, y: 100}, 4000);
-
-                await showExplainer('box-tabela-aprovacao', 'Conciliação em 1 Clique', 'O PIX caiu na sua conta? Clique em Aprovar e nosso sistema notifica o corredor no WhatsApp na mesma hora.', {x: 0, y: -100}, 5000);
-                await clickButton('btn-aprovar-pix');
-                
-                // Aprovação Visual
-                document.getElementById('td-badge').className = "badge pago";
-                document.getElementById('td-badge').innerText = "PAGO";
-                document.getElementById('kpi-pagos').innerText = "421"; 
-                document.getElementById('kpi-pendentes').innerText = "30"; 
-                document.getElementById('btn-aprovar-pix').innerHTML = "<i class='fas fa-check'></i> OK";
-                document.getElementById('btn-aprovar-pix').style.background = "var(--surface-elevated)";
-                document.getElementById('nova-inscricao').style.background = "transparent";
-
-                // --- PASSO 2.5: CATEGORIAS ---
-                await showMainCaption("Navegando: Gestão Automática de Categorias e Pódios.", 3500);
-                await switchAdminTab('tab-cat', 'view-categorias');
-                
-                document.getElementById('nova-categoria').style.display = 'table-row';
-                
-                await showExplainer('box-listas-podio', 'Separação de Resultados', 'Os atletas pagos são filtrados automaticamente por modalidade, idade e gênero para facilitar a entrega de troféus no dia.', {x: 0, y: 100}, 5000);
-                
-                // --- PASSO 3: FLUXO FINANCEIRO COMPLETO ---
-                await showMainCaption("Navegando: Controle Financeiro Profissional.", 3000);
-                await switchAdminTab('tab-fin', 'view-financas');
-                
-                await showExplainer('box-dre', 'D.R.E. Automatizado', 'Acabou o caos na planilha. O sistema debita suas despesas do evento e soma os patrocínios para apresentar o Saldo Líquido exato.', {x: 0, y: 100}, 5000);
-
-                await typeText('fin-valor', '1500,00');
-                await typeText('fin-desc', 'Patrocínio Unimed');
-                await clickButton('btn-salvar-fin');
-                
-                document.getElementById('saldo-liquido').innerText = "R$ 22.500,00";
-                document.getElementById('nova-financa').style.display = 'table-row';
-                
-                // --- PASSO 4: ATUALIZAÇÕES DO SISTEMA ---
-                await showMainCaption("Navegando: Controle Total da Plataforma.", 3000);
-                await switchAdminTab('tab-cfg', 'view-config');
-                
-                await showExplainer('box-mestra', 'Kill Switch Remoto', 'Com um clique do seu celular, você bloqueia vendas e encerra os lotes instantaneamente ao atingir o limite.', {x: 0, y: 100}, 4500);
-                await selectOption('cfg-status', 1);
-                document.getElementById('cfg-status').style.background = "#ef4444";
-                document.getElementById('cfg-status').style.color = "white";
-
-                await showExplainer('box-social', 'Flexibilidade de Lotes', 'Libere inscrições 100% gratuitas ou cortesias sem precisar de nenhum suporte técnico. Você tem total autonomia.', {x: 0, y: -90}, 4500);
-                await selectOption('cfg-gratis', 1);
-                document.getElementById('cfg-gratis').style.background = "rgba(139, 92, 246, 0.2)";
-                document.getElementById('cfg-gratis').style.color = "#8b5cf6";
-                
-                // --- PASSO 5: MÍDIA E ATUALIZAÇÕES ---
-                await showMainCaption("Navegando: Gestão de Mídia.", 3000);
-                await switchAdminTab('tab-cnt', 'view-conteudo');
-                await showExplainer('box-mapas', 'Integrações (CMS)', 'Faça upload de logomarcas de novos patrocinadores e insira rotas interativas do Strava ou Google Maps livremente.', {x: 0, y: 100}, 5000);
-                
-                await typeText('cnt-mapa', '<iframe src="strava.com/rota"></iframe>');
-                await clickButton('btn-save-mapa');
-                await moveCursorTo('cnt-pat');
+                await moveCursor('#motName'); await typeAction('#motName', 'Carlos Silva (Caminhão Baú)');
+                await moveCursor('#motCom'); await typeAction('#motCom', '10');
+                await moveCursor('#btnSalvarMot'); await clickAction('#btnSalvarMot');
+                document.querySelector('#modal-motoristas .btn-close').click();
                 await sleep(1000);
 
-                // --- PASSO 6: AUDITORIA ---
-                await showMainCaption("Navegando: Segurança nível Institucional.", 3000);
-                await switchAdminTab('tab-log', 'view-logs');
-                
-                document.getElementById('novo-log-1').style.display = 'table-row';
-                document.getElementById('novo-log-2').style.display = 'table-row';
-                
-                await showExplainer('box-logs', 'Auditoria Incorruptível', 'Nenhum administrador pode apagar receitas ou aprovar inscrições sem deixar o seu próprio e-mail carimbado para sempre nos Logs.', {x: 0, y: 100}, 5000);
-                
-                // --- FINAL: ASSINATURA ---
-                cursor.style.opacity = 0;
-                document.getElementById('app-admin').style.opacity = 0;
-                document.body.style.background = "#000";
+                // 3. LANÇAMENTO DE DESPESAS (A LÓGICA EXIGIDA)
+                await showCaption("MÓDULO 2: Registre os custos operacionais (combustível, pedágio) para ter o lucro real exato.", 4500);
+                await moveCursor('#btnMenuDespesas'); await clickAction('#btnMenuDespesas');
+                document.getElementById('modal-despesas').classList.remove('hidden-view');
+                await sleep(600);
+
+                await moveCursor('#despDesc'); await typeAction('#despDesc', 'Abastecimento Diesel V-Power');
+                await moveCursor('#despVal'); await typeAction('#despVal', '600.00');
+                await moveCursor('#btnSalvarDesp'); await clickAction('#btnSalvarDesp');
+                document.querySelector('#modal-despesas .btn-close').click();
                 await sleep(1000);
+
+                // 4. DESPACHO DE CARGA (A LÓGICA EXIGIDA)
+                await showCaption("MÓDULO 3: Despache uma nova carga integrando os dados da NFe e o Motorista.", 4000);
+                await moveCursor('#btnNovaEntrega'); await clickAction('#btnNovaEntrega');
+                document.getElementById('modal-nova-entrega').classList.remove('hidden-view');
+                await sleep(500);
+
+                await moveCursor('#nfeInput'); await typeAction('#nfeInput', '8890');
+                await moveCursor('#valInput'); await typeAction('#valInput', '1400.00'); 
+                await moveCursor('#clienteInput'); await typeAction('#clienteInput', 'Lojas Silva (Matriz)');
+                await moveCursor('#endInput'); await typeAction('#endInput', 'Av Faria Lima, 2000 - São Paulo, SP');
+                
+                await moveCursor('#btnSalvarEntrega'); await clickAction('#btnSalvarEntrega');
+                document.getElementById('modal-nova-entrega').classList.add('hidden-view');
+                
+                state.deliveries.unshift({ id: 'd0', nfe: '8890', cliente: 'Lojas Silva (Matriz)', address: 'Av Faria Lima, 2000 - SP', status: 'Em-Rota', val: '1.400,00' });
+                renderAdminList();
+                await sleep(1500);
+
+                // 5. A NUVEM
+                showCaption("O manifesto digital é enviado para a nuvem. Transição para o celular do motorista...", 4000);
+                await transicaoNuvem("Sincronização Cloud", "Conectando o ERP ao App do Motorista (Carlos Silva)...");
 
                 document.getElementById('app-admin').style.display = 'none';
-                const finalScreen = document.getElementById('final-screen');
-                finalScreen.style.display = 'flex';
-                await sleep(100);
-                finalScreen.style.opacity = 1;
+                document.getElementById('app-motorista').classList.remove('hidden-view');
+                renderDriverStop();
+                await sleep(1500);
 
-                await sleep(6000);
+                // 6. APP DO MOTORISTA NA RUA (O CANHOTO DIGITAL)
+                await showCaption("MÓDULO 4: Na rua, o motorista usa o App com mapa interativo e registra a baixa no destino.", 5000);
+                await moveCursor('#btnCheguei'); await clickAction('#btnCheguei');
+                document.getElementById('modal-confirmar-entrega').classList.remove('hidden-view');
+                await sleep(600);
+
+                await showCaption("Adeus papelada: Assinatura digital do recebedor e registro de ocorrências na descarga.", 4500);
+                await moveCursor('#conf-recebedor'); await typeAction('#conf-recebedor', 'Roberto Alves (Almoxarifado - RG 1234)', true);
+                await moveCursor('#conf-obs'); await typeAction('#conf-obs', 'Mercadoria conferida perfeitamente. 15 caixas entregues sem avarias.', true);
+
+                await moveCursor('#btn-confirmar-entrega'); await clickAction('#btn-confirmar-entrega');
+                document.getElementById('modal-confirmar-entrega').classList.add('hidden-view');
                 
-            } catch (error) {
-                console.error("Erro na automação do tour:", error);
-                alert("Erro na simulação. Verifique o console do desenvolvedor para mais detalhes.");
+                state.deliveries[0].status = 'Entregue';
+                
+                document.getElementById('driver-current-stop').innerHTML = `
+                    <div class="bg-green-600 rounded-[2rem] p-8 text-center text-white shadow-2xl border-4 border-green-400">
+                        <i class='bx bx-check-shield text-7xl mb-2'></i>
+                        <h2 class="font-black text-3xl uppercase tracking-tighter">NFe Baixada!</h2>
+                        <p class="text-sm font-bold text-green-200 mt-2">Canhoto digital validado e enviado ao ERP Base.</p>
+                    </div>`;
+                await sleep(2500);
+
+                // 7. AUDITORIA NO ERP BASE
+                showCaption("A Baixa é imediata. O Gestor retorna ao ERP e acessa os detalhes da entrega concluída.", 4500);
+                await transicaoNuvem("Retorno ao Escritório", "Sincronizando as Baixas no Painel Gestor...");
+
+                document.getElementById('app-motorista').classList.add('hidden-view');
+                document.getElementById('app-admin').style.display = 'flex';
+                renderAdminList(); 
+                await sleep(1500);
+
+                await moveCursor('#card-d0'); await clickAction('#card-d0');
+                document.getElementById('modal-detalhes-entrega').classList.remove('hidden-view');
+                await showCaption("Transparência total: O Gestor confere exatamente quem assinou e as observações lançadas pelo App.", 5000);
+                await sleep(1500);
+                document.querySelector('#modal-detalhes-entrega .btn-close').click();
+
+                // 8. RELATÓRIOS DO GESTOR
+                await showCaption("MÓDULO 5: Ao final do mês, acesse o Dashboard para calcular comissões com base no faturamento.", 5000);
+                await moveCursor('#btnRelatoriosSidebar'); await clickAction('#btnRelatoriosSidebar');
+                document.getElementById('modal-relatorios').classList.remove('hidden-view');
+                await sleep(1500);
+                
+                const relScroll = document.getElementById('relatoriosScrollArea');
+                await slowScrollTo(relScroll, relScroll.scrollHeight, 4000);
+                await showCaption("As Despesas e o Ranking de Motoristas são calculados de forma automática e imutável.", 4500);
+                await sleep(1000);
+                await slowScrollTo(relScroll, 0, 3000);
+                await sleep(1000);
+                
+                await showCaption("E a Cereja do Bolo: Exporte o Laudo PDF final do mês com um clique.", 4000);
+                await moveCursor('#exportReportBtn'); await clickAction('#exportReportBtn');
+                
+                // 9. EXPORTAÇÃO PDF ENGINE
+                document.getElementById('pdf-preview-modal').classList.remove('hidden-view');
+                await sleep(2000);
+                
+                const pdfArea = document.getElementById('pdfScrollArea');
+                await slowScrollTo(pdfArea, pdfArea.scrollHeight, 4000);
+                await sleep(2000);
+                await slowScrollTo(pdfArea, 0, 3000);
+                await sleep(1000);
+
+                document.querySelector('#pdf-preview-modal .btn-close').click();
+                document.querySelector('#modal-relatorios .btn-close').click();
+
+                // 10. CENA FINAL CTA
+                cursor.style.opacity = 0;
+                document.getElementById('tour-caption-container').style.opacity = 0;
+                document.getElementById('final-screen').classList.add('active');
+
+            } catch (err) {
+                console.error("Tour interrompido:", err);
             }
         }
     </script>
