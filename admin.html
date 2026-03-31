@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evolution SaaS - Painel Administrativo</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        :root { --bs-body-bg: #212529; --bs-dark-card: #343a40; --bs-accent: #e65100; --text-main: #ffffff; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bs-body-bg); color: var(--text-main) !important; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+        h1, h2, h3, h4, h5, h6, p, label, span, div, th, td, i, small { color: var(--text-main) !important; }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1e2124; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #495057; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--bs-accent); }
+
+        .navbar { background-color: var(--bs-dark-card) !important; border-bottom: 2px solid var(--bs-accent); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .navbar-brand { font-weight: 900; letter-spacing: 1px; text-transform: uppercase;}
+        .navbar-nav .nav-link { font-weight: 600; padding: 10px 15px; opacity: 0.7; transition: all 0.3s; cursor:pointer;}
+        .navbar-nav .nav-link:hover { opacity: 1; color: var(--bs-accent) !important; }
+        .navbar-nav .nav-link.active { background-color: var(--bs-accent); color: #fff !important; border-radius: 8px; opacity: 1; position: relative;}
+        .badge-nav { position: absolute; top: 5px; right: 5px; font-size: 0.6rem; padding: 3px 5px; border-radius: 50%; }
+
+        .container-fluid { padding-top: 20px; flex-grow: 1; }
+        .card { background-color: var(--bs-dark-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 20px; box-shadow: 0 8px 16px rgba(0,0,0,0.4); }
+        .card-header { background-color: transparent; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 15px 20px; font-weight: bold; }
+        .btn-primary { background-color: var(--bs-accent); border-color: var(--bs-accent); font-weight: bold; color: #fff !important; }
+        .btn-primary:hover { background-color: #c94400; border-color: #c94400; }
+        .form-control, .form-select, textarea { background-color: #1e2124 !important; border: 1px solid #495057 !important; border-radius: 8px; padding: 10px 15px; color: #fff !important;}
+        .form-control:focus, .form-select:focus { border-color: var(--bs-accent) !important; box-shadow: 0 0 0 0.2rem rgba(230, 81, 0, 0.25); }
+        .form-control::placeholder { color: #6c757d !important; }
+        .table th { background-color: #1e2124 !important; border-bottom: 2px solid var(--bs-accent) !important; text-transform: uppercase; font-size: 0.85rem;}
+        .table tbody tr { transition: background-color 0.2s; border-bottom: 1px solid #495057; }
+        .table tbody tr:hover { background-color: rgba(255,255,255,0.05) !important; }
+        .modal-content { background-color: var(--bs-dark-card); border: 1px solid #495057; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.6);}
+        .modal-header { background-color: var(--bs-accent); border-bottom: none; border-radius: 15px 15px 0 0; }
+        .kpi-box { padding: 25px; border-radius: 12px; background: linear-gradient(145deg, #2b3035 0%, #1e2124 100%); border: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden;}
+        .kpi-box i { position: absolute; right: -10px; bottom: -10px; font-size: 6rem; opacity: 0.05; color: #fff;}
+        .kpi-value { font-size: 2.5rem; font-weight: 900; margin: 10px 0 0 0; color: var(--bs-accent) !important;}
+        
+        .kanban-board { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; align-items: flex-start; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+        .kanban-col { background-color: #1e2124; border-radius: 10px; min-width: 320px; width: 320px; max-width: 85vw; padding: 15px 10px 15px 15px; border: 1px solid #495057; scroll-snap-align: start; display: flex; flex-direction: column; max-height: 72vh; }
+        .kanban-cards-container { overflow-y: auto; flex-grow: 1; padding-right: 5px; }
+        .kanban-col-header { font-weight: bold; text-transform: uppercase; letter-spacing: 1px; padding-bottom: 10px; border-bottom: 3px solid #6c757d; margin-bottom: 15px; display: flex; justify-content: space-between; margin-right: 5px;}
+        .kanban-col-Aguardando { border-bottom-color: #6c757d; } .kanban-col-Orcamento { border-bottom-color: #ffc107; } .kanban-col-Aprovado { border-bottom-color: #0dcaf0; } .kanban-col-Andamento { border-bottom-color: #fd7e14; } .kanban-col-Concluido { border-bottom-color: #198754; }
+        .k-card { background-color: #2b3035; border-radius: 8px; padding: 15px; margin-bottom: 12px; border-left: 4px solid #6c757d; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s;}
+        .k-card:hover { transform: scale(1.02); }
+        .k-placa { font-size: 1.3rem; font-weight: 900; color: var(--bs-accent) !important; }
+        
+        .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+        .media-box { position: relative; aspect-ratio: 1; background-color: #1e2124; border-radius: 8px; overflow: hidden; border: 1px solid #495057; display: flex; align-items: center; justify-content: center;}
+        .media-box img, .media-box video, .media-box audio { width: 100%; height: 100%; object-fit: cover; }
+        .media-box audio { height: 40px; margin-top: auto; margin-bottom: auto;}
+        .btn-del-media { position: absolute; top: 5px; right: 5px; background: rgba(220,53,69,0.9); border: none; border-radius: 50%; color: white; width: 25px; height: 25px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;}
+        .chat-container { height: 65vh; max-height: 600px; display: flex; flex-direction: column; background-color: #1e2124; border-radius: 12px; border: 1px solid #495057; overflow: hidden;}
+        .chat-messages { flex-grow: 1; overflow-y: auto; padding: 20px; }
+        .message { margin-bottom: 15px; max-width: 85%; padding: 12px 15px; border-radius: 15px; font-size: 0.95rem; word-wrap: break-word;}
+        .message.admin { background-color: var(--bs-accent); align-self: flex-end; margin-left: auto; border-bottom-right-radius: 2px; }
+        .message.cliente { background-color: #343a40; align-self: flex-start; margin-right: auto; border-bottom-left-radius: 2px; border: 1px solid #495057;}
+        .timeline-box { border-left: 2px solid #495057; padding-left: 20px; margin-left: 10px; position: relative;}
+        .timeline-item { margin-bottom: 15px; position: relative; }
+        .timeline-item::before { content: ''; position: absolute; left: -25px; top: 5px; width: 12px; height: 12px; background-color: var(--bs-accent); border-radius: 50%; box-shadow: 0 0 0 3px #1e2124;}
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 1055; }
+        footer { background-color: #111; padding: 15px; text-align: center; border-top: 1px solid #333; margin-top: auto; font-size: 0.85rem;}
+        .spin { display: inline-block; animation: spin 1s infinite linear; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div id="adminPanel" class="d-flex flex-column h-100">
+        <nav class="navbar navbar-expand-xl py-3">
+            <div class="container-fluid px-3 px-md-4">
+                <a class="navbar-brand fs-4" href="#"><i class="bi bi-hexagon-fill me-2"></i><span id="navTenantName">Evolution</span></a>
+                <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1 gap-md-2 ms-xl-4 mt-3 mt-xl-0 flex-wrap">
+                        <li class="nav-item"><a class="nav-link active" onclick="mudarAba('dashboard')"><i class="bi bi-grid-1x2-fill me-1"></i> Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" onclick="mudarAba('agendamentos')"><i class="bi bi-calendar-event me-1"></i> Agenda</a></li>
+                        <li class="nav-item"><a class="nav-link" onclick="mudarAba('os')"><i class="bi bi-kanban me-1"></i> Pátio O.S.</a></li>
+                        <li class="nav-item"><a class="nav-link" onclick="mudarAba('estoque')"><i class="bi bi-box-seam-fill me-1"></i> Estoque</a></li>
+                        <li class="nav-item"><a class="nav-link" onclick="mudarAba('clientesMotos')"><i class="bi bi-people-fill me-1"></i> Clientes</a></li>
+                        <li class="nav-item"><a class="nav-link" onclick="mudarAba('compras')"><i class="bi bi-receipt me-1"></i> Notas Fiscais</a></li>
+                        <li class="nav-item mod-fin" style="display:none;"><a class="nav-link text-success fw-bold" onclick="mudarAba('financeiro')"><i class="bi bi-bank me-1"></i> Financeiro</a></li>
+                        <li class="nav-item"><a class="nav-link" onclick="mudarAba('funcionarios')"><i class="bi bi-person-badge me-1"></i> Equipe</a></li>
+                        <li class="nav-item"><a class="nav-link text-secondary fw-bold" onclick="mudarAba('auditoria')"><i class="bi bi-shield-check me-1"></i> Auditoria</a></li>
+                        <li class="nav-item mod-chat" style="display:none;"><a class="nav-link text-info fw-bold" onclick="mudarAba('mensagens')"><i class="bi bi-chat-left-dots-fill me-1"></i> CRM Chat <span id="chatBadgeGlobal" class="badge bg-danger badge-nav d-none">0</span></a></li>
+                        <li class="nav-item mod-ia" style="display:none;"><a class="nav-link text-warning fw-bold" onclick="mudarAba('ia_assistant')"><i class="bi bi-robot me-1"></i> thIAguinho</a></li>
+                    </ul>
+                    <button class="btn btn-outline-danger fw-bold border-0 mt-3 mt-xl-0 w-100 w-xl-auto" onclick="sair()"><i class="bi bi-power me-2"></i> Encerrar Sessão</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid mt-4 flex-grow-1 px-3 px-md-4">
+            <!-- DASHBOARD -->
+            <section id="dashboard" class="admin-section">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+                    <h3 class="fw-bold mb-0"><i class="bi bi-speedometer2 text-accent me-2"></i> Visão Geral</h3>
+                    <span class="badge bg-success p-2 fs-6 align-self-start align-self-md-auto"><i class="bi bi-cloud-check-fill me-1"></i> Nuvem Sincronizada</span>
+                </div>
+                <div class="row g-3 g-md-4 mb-4">
+                    <div class="col-6 col-md-3"><div class="kpi-box shadow-sm border-success p-3 p-md-4"><i class="bi bi-currency-dollar text-success"></i><p class="text-white-50 fw-bold mb-0 small text-truncate">Faturamento (Mês)</p><h2 class="kpi-value text-success !important fs-3 fs-md-1" id="kpiFaturacao">R$ 0.00</h2></div></div>
+                    <div class="col-6 col-md-3"><div class="kpi-box shadow-sm border-info p-3 p-md-4"><i class="bi bi-tools text-info"></i><p class="text-white-50 fw-bold mb-0 small text-truncate">Veículos no Pátio</p><h2 class="kpi-value text-info !important fs-3 fs-md-1" id="kpiOsPendentes">0</h2></div></div>
+                    <div class="col-6 col-md-3"><div class="kpi-box shadow-sm border-warning p-3 p-md-4"><i class="bi bi-exclamation-triangle text-warning"></i><p class="text-white-50 fw-bold mb-0 small text-truncate">Alerta Estoque</p><h2 class="kpi-value text-warning !important fs-3 fs-md-1" id="kpiStockCritico">0</h2></div></div>
+                    <div class="col-6 col-md-3"><div class="kpi-box shadow-sm border-danger p-3 p-md-4"><i class="bi bi-receipt text-danger"></i><p class="text-white-50 fw-bold mb-0 small text-truncate">Boletos/Inadimp.</p><h2 class="kpi-value text-danger !important fs-3 fs-md-1" id="kpiBoletos">0</h2></div></div>
+                </div>
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="card border-0">
+                            <div class="card-header bg-transparent py-3"><h5 class="mb-0"><i class="bi bi-bell-fill text-warning me-2"></i> Últimas Movimentações no Pátio</h5></div>
+                            <div class="card-body p-0"><div class="list-group list-group-flush bg-transparent" id="listaAtividadesRecentes"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AGENDAMENTOS -->
+            <section id="agendamentos" class="admin-section" style="display:none;">
+                <div class="card border-0">
+                    <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-sm-center py-3 gap-3">
+                        <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i> Agenda da Oficina</h5>
+                        <button class="btn btn-light fw-bold shadow-sm w-100 w-sm-auto" data-bs-toggle="modal" data-bs-target="#modalAgenda"><i class="bi bi-plus-lg"></i> NOVO AGENDAMENTO</button>
+                    </div>
+                    <div class="card-body"><div class="table-responsive"><table class="table table-hover align-middle text-white"><thead><tr><th>Data e Hora</th><th>Cliente</th><th>Moto</th><th>Motivo / Serviço</th><th>Status</th><th>Ações para Pátio</th></tr></thead><tbody id="tabelaAgenda"></tbody></table></div></div>
+                </div>
+            </section>
+
+            <!-- KANBAN O.S. (Com Exportação CSV e Busca Inteligente) -->
+            <section id="os" class="admin-section" style="display:none;">
+                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3">
+                    <h3 class="fw-bold mb-0"><i class="bi bi-kanban text-accent me-2"></i> Quadro de O.S.</h3>
+                    <div class="d-flex flex-column flex-md-row gap-3 w-100" style="max-width: 700px;">
+                        <div class="input-group shadow-sm">
+                            <span class="input-group-text bg-dark border-secondary text-white-50"><i class="bi bi-search"></i></span>
+                            <input type="text" id="searchOS" class="form-control" placeholder="Buscar Placa ou Cliente..." onkeyup="renderKanban()">
+                        </div>
+                        <button class="btn btn-outline-success fw-bold text-nowrap shadow-sm border-2" onclick="exportarCSV('os')"><i class="bi bi-file-earmark-excel"></i> Exportar CSV</button>
+                        <button class="btn btn-primary fw-bold px-4 shadow text-nowrap" data-bs-toggle="modal" data-bs-target="#modalOS" onclick="prepararModalOS('add')"><i class="bi bi-plus-lg me-2"></i> NOVA O.S.</button>
+                    </div>
+                </div>
+                <div class="kanban-board" id="quadroKanban">
+                    <div class="kanban-col"><div class="kanban-col-header kanban-col-Aguardando"><span>Triagem/Avaliação</span> <span class="badge bg-secondary" id="count-Aguardando">0</span></div><div id="kb-Aguardando" class="kanban-cards-container d-flex flex-column gap-2"></div></div>
+                    <div class="kanban-col"><div class="kanban-col-header kanban-col-Orcamento"><span>Orçamentado</span> <span class="badge bg-secondary" id="count-Orcamento">0</span></div><div id="kb-Orcamento" class="kanban-cards-container d-flex flex-column gap-2"></div></div>
+                    <div class="kanban-col"><div class="kanban-col-header kanban-col-Aprovado"><span>Aprovado/Fila</span> <span class="badge bg-secondary" id="count-Aprovado">0</span></div><div id="kb-Aprovado" class="kanban-cards-container d-flex flex-column gap-2"></div></div>
+                    <div class="kanban-col"><div class="kanban-col-header kanban-col-Andamento"><span>No Elevador</span> <span class="badge bg-secondary" id="count-Andamento">0</span></div><div id="kb-Andamento" class="kanban-cards-container d-flex flex-column gap-2"></div></div>
+                    <div class="kanban-col"><div class="kanban-col-header kanban-col-Concluido"><span>Pronto/Entregue</span> <span class="badge bg-secondary" id="count-Concluido">0</span></div><div id="kb-Concluido" class="kanban-cards-container d-flex flex-column gap-2"></div></div>
+                </div>
+            </section>
+
+            <!-- ESTOQUE -->
+            <section id="estoque" class="admin-section" style="display:none;">
+                <div class="card border-0">
+                    <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center py-3 bg-dark gap-3">
+                        <h5 class="mb-0"><i class="bi bi-boxes me-2"></i> Inventário Físico</h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-light btn-sm fw-bold flex-grow-1 flex-md-grow-0" data-bs-toggle="modal" data-bs-target="#modalAjusteStock" onclick="prepararAjusteStock('add')">+ Entrada Avulsa</button>
+                            <button class="btn btn-outline-light btn-sm fw-bold flex-grow-1 flex-md-grow-0" data-bs-toggle="modal" data-bs-target="#modalAjusteStock" onclick="prepararAjusteStock('remove')">- Baixa Avulsa</button>
+                            <button class="btn btn-primary btn-sm fw-bold w-100 w-md-auto mt-2 mt-md-0" data-bs-toggle="modal" data-bs-target="#modalPeca" onclick="prepararModalPeca('add')">Nova Peça</button>
+                        </div>
+                    </div>
+                    <div class="card-body"><div class="table-responsive"><table class="table table-hover align-middle text-white"><thead><tr><th>Produto</th><th>Custo Bruto</th><th>Valor Venda</th><th>Em Estoque</th><th>Ações</th></tr></thead><tbody id="tabelaEstoque"></tbody></table></div></div>
+                </div>
+            </section>
+
+            <!-- CLIENTES E MOTOS -->
+            <section id="clientesMotos" class="admin-section" style="display:none;">
+                <div class="row g-4">
+                    <div class="col-xl-6"><div class="card border-0 h-100"><div class="card-header d-flex justify-content-between align-items-center py-3 bg-dark"><h5 class="mb-0"><i class="bi bi-people-fill me-2"></i> Clientes B2C</h5><button class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalCliente" onclick="prepararModalCliente('add')">Novo Cliente</button></div><div class="card-body"><div class="table-responsive"><table class="table table-hover align-middle text-white"><thead><tr><th>Nome</th><th>Contato</th><th>Portal App</th><th>Ações</th></tr></thead><tbody id="tabelaClientes"></tbody></table></div></div></div></div>
+                    <div class="col-xl-6"><div class="card border-0 h-100"><div class="card-header d-flex justify-content-between align-items-center py-3 bg-dark"><h5 class="mb-0"><i class="bi bi-scooter me-2"></i> Veículos Registrados</h5><button class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalMoto" onclick="prepararModalMoto('add')">Nova Moto</button></div><div class="card-body"><div class="table-responsive"><table class="table table-hover align-middle text-white"><thead><tr><th>Placa</th><th>Proprietário</th><th>Modelo / Ano</th><th>Quilometragem</th><th>Ações</th></tr></thead><tbody id="tabelaMotos"></tbody></table></div></div></div></div>
+                </div>
+            </section>
+
+            <!-- COMPRAS E FORNECEDORES -->
+            <section id="compras" class="admin-section" style="display:none;">
+                <div class="row g-4">
+                    <div class="col-xl-8"><div class="card border-0 h-100"><div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-sm-center py-3 bg-dark gap-3"><h5 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i> Notas de Entrada (NF)</h5><button class="btn btn-primary fw-bold px-4" data-bs-toggle="modal" data-bs-target="#modalCompra" onclick="prepararModalCompra()"><i class="bi bi-upload me-2"></i> Lançar NF / Compra</button></div><div class="card-body"><p class="text-white-50 small mb-4">Integrado: Lançar NF abastece o estoque e lança na auditoria. Se for a prazo, gera dívidas no Caixa.</p><div class="table-responsive"><table class="table table-hover align-middle mt-4 text-white"><thead><tr><th>Data Doc.</th><th>Fornecedor</th><th>Ref/NF</th><th>Liquidação</th><th>Total Faturado</th><th>Auditoria Interna</th></tr></thead><tbody id="tabelaHistoricoCompras"></tbody></table></div></div></div></div>
+                    <div class="col-xl-4"><div class="card border-0 h-100"><div class="card-header d-flex justify-content-between align-items-center py-3 bg-dark"><h5 class="mb-0"><i class="bi bi-buildings me-2"></i> Fornecedores</h5><button class="btn btn-outline-light btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalFornecedor">Novo</button></div><div class="card-body"><div class="table-responsive"><table class="table table-hover align-middle text-white"><thead><tr><th>Entidade</th><th>Ação</th></tr></thead><tbody id="tabelaFornecedores"></tbody></table></div></div></div></div>
+                </div>
+            </section>
+
+            <!-- FUNCIONARIOS & COMISSÕES -->
+            <section id="funcionarios" class="admin-section" style="display:none;">
+                <div class="row g-4">
+                    <div class="col-xl-7"><div class="card border-0 h-100"><div class="card-header d-flex justify-content-between align-items-center py-3 bg-dark"><h5 class="mb-0"><i class="bi bi-person-badge me-2"></i> Equipe Técnica e Gerentes</h5><button class="btn btn-light btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalFuncionario">Contratar Funcionário</button></div><div class="card-body"><div class="table-responsive"><table class="table table-hover align-middle text-white"><thead><tr><th>Nome</th><th>Cargo</th><th>Comissão (%)</th><th>Ações</th></tr></thead><tbody id="tabelaFuncionarios"></tbody></table></div></div></div></div>
+                    <div class="col-xl-5"><div class="card border-0 h-100"><div class="card-header py-3 bg-dark"><h5 class="mb-0"><i class="bi bi-wallet2 text-success me-2"></i> Comissões a Pagar (O.S. Concluídas)</h5></div><div class="card-body p-4 bg-black"><p class="text-white-50 small mb-4">Calculado com base no valor da "Mão de Obra" das O.S. fechadas.</p><div id="boxComissoes" class="d-flex flex-column gap-3"></div></div></div></div>
+                </div>
+            </section>
+
+            <!-- FINANCEIRO PREMIUM -->
+            <section id="financeiro" class="admin-section mod-fin" style="display:none;">
+                <div class="card border-0 shadow">
+                    <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-sm-center py-4 bg-dark gap-3">
+                        <h4 class="mb-0 text-success"><i class="bi bi-bank me-2"></i> Caixa e Contas a Pagar/Receber</h4>
+                        <div class="d-flex gap-2 w-100 w-sm-auto">
+                            <button class="btn btn-outline-success fw-bold text-nowrap border-2" onclick="exportarCSV('financeiro')"><i class="bi bi-file-earmark-excel"></i> Exportar (CSV)</button>
+                            <button class="btn btn-success fw-bold px-4 text-dark w-100" data-bs-toggle="modal" data-bs-target="#modalFinanceiro"><i class="bi bi-cash me-2"></i> Movimento Manual</button>
+                        </div>
+                    </div>
+                    <div class="card-body p-3 p-md-4 bg-black">
+                        
+                        <!-- FILTROS DO FINANCEIRO -->
+                        <div class="row g-3 mb-4 border-bottom border-secondary pb-4">
+                            <div class="col-12 col-md-3">
+                                <label class="form-label text-white-50 small fw-bold">Buscar Descrição</label>
+                                <input type="text" id="filtroFinBusca" class="form-control bg-dark border-secondary text-white" placeholder="Digite para buscar..." onkeyup="renderCaixa()">
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <label class="form-label text-white-50 small fw-bold">Tipo de Movimento</label>
+                                <select id="filtroFinTipo" class="form-select bg-dark border-secondary text-white" onchange="renderCaixa()">
+                                    <option value="">Todos os Tipos</option><option value="Entrada">Entrada (Receitas)</option><option value="Saída">Saída (Despesas)</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <label class="form-label text-white-50 small fw-bold">Status do Pagamento</label>
+                                <select id="filtroFinStatus" class="form-select bg-dark border-secondary text-white" onchange="renderCaixa()">
+                                    <option value="">Todos os Status</option><option value="Pago">Liquidado (Pago)</option><option value="Pendente">Em Dívida (Pendente)</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <label class="form-label text-white-50 small fw-bold">Mês de Competência</label>
+                                <input type="month" id="filtroFinData" class="form-control bg-dark border-secondary text-white" onchange="renderCaixa()">
+                            </div>
+                        </div>
+
+                        <div class="row mb-5 g-3 g-md-4 text-center">
+                            <div class="col-12 col-md-4"><div class="p-3 p-md-4 rounded-4 shadow-sm border border-success" style="background-color: rgba(25,135,84,0.1);"><h6 class="text-success text-uppercase fw-bold mb-2 mb-md-3">Total Entradas (Pagas)</h6><h2 id="caixaEntradas" class="text-success fw-bold mb-0 display-6">R$ 0,00</h2></div></div>
+                            <div class="col-12 col-md-4"><div class="p-3 p-md-4 rounded-4 shadow-sm border border-danger" style="background-color: rgba(220,53,69,0.1);"><h6 class="text-danger text-uppercase fw-bold mb-2 mb-md-3">Total Saídas (Pagas)</h6><h2 id="caixaSaidas" class="text-danger fw-bold mb-0 display-6">R$ 0,00</h2></div></div>
+                            <div class="col-12 col-md-4"><div class="p-3 p-md-4 rounded-4 shadow-lg border border-info" style="background-color: #1e2124;"><h6 class="text-info text-uppercase fw-bold mb-2 mb-md-3">Saldo Disponível (Filtro)</h6><h2 id="caixaSaldo" class="text-white fw-bold mb-0 display-5">R$ 0,00</h2></div></div>
+                        </div>
+                        <h5 class="mb-4 text-white-50 border-bottom border-secondary pb-2"><i class="bi bi-list-columns-reverse me-2"></i> Livro Razão e Títulos</h5>
+                        <div class="table-responsive">
+                            <table class="table align-middle text-white mb-0 border-secondary">
+                                <thead><tr><th>Vencimento</th><th>Tipo</th><th>Descrição</th><th>Auditoria (Notas)</th><th>Pagamento</th><th>Montante</th><th>Estado</th><th>Ações / Edição</th></tr></thead>
+                                <tbody id="tabelaCaixa"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AUDITORIA GLOBAL -->
+            <section id="auditoria" class="admin-section" style="display:none;">
+                <div class="card border-0 shadow">
+                    <div class="card-header py-4 bg-dark border-bottom border-secondary"><h4 class="mb-0 text-secondary"><i class="bi bi-shield-lock-fill me-2"></i> Auditoria de Sistema e Prevenção de Fraudes</h4></div>
+                    <div class="card-body p-0 bg-black">
+                        <div class="p-4 text-white-50 small border-bottom border-secondary">Todos os ajustes de estoque manuais e edições/remoções de valores financeiros são registrados aqui de forma irreversível.</div>
+                        <div class="table-responsive"><table class="table align-middle text-white mb-0"><thead><tr><th>Data da Ação</th><th>Descrição do Log de Auditoria</th></tr></thead><tbody id="tabelaAuditoria"></tbody></table></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CHAT CRM -->
+            <section id="mensagens" class="admin-section mod-chat" style="display:none;">
+                <div class="row h-100 g-4">
+                    <div class="col-lg-4"><div class="card h-100 border-0 shadow"><div class="card-header py-3 bg-dark border-info border-bottom"><h5 class="mb-0 text-info"><i class="bi bi-headset me-2"></i> Central CRM</h5></div><div class="list-group list-group-flush bg-transparent" id="chatListaClientes" style="overflow-y: auto; height: 600px;"></div></div></div>
+                    <div class="col-lg-8"><div class="card h-100 border-0 shadow"><div class="card-header py-3 bg-dark"><h5 id="chatNomeCliente" class="text-warning mb-0">Selecione um cliente na lista.</h5></div><div class="card-body p-0 d-flex flex-column bg-black"><div class="chat-container border-0 w-100 bg-transparent h-100"><div class="chat-messages" id="chatAreaMsg"><div class="text-center text-white-50 mt-5 pt-5 h-100 d-flex flex-column justify-content-center align-items-center"><i class="bi bi-chat-left-dots display-1 mb-4 opacity-50"></i><p>As mensagens chegam na App do Cliente em tempo real via Nuvem.</p></div></div><div class="chat-input p-3" id="chatAreaInput" style="display:none; background-color: #1e2124;">
+                        <button class="btn btn-outline-secondary rounded-circle me-2" style="width: 45px; height: 45px; flex-shrink:0;" onclick="$('chatFileInput').click()"><i class="bi bi-paperclip fs-5"></i></button>
+                        <input type="file" id="chatFileInput" accept="image/*,video/*,audio/*" style="display:none;" onchange="enviarAnexoChat()">
+                        <input type="text" class="form-control form-control-lg rounded-pill px-4 border-info text-white" id="inputChatAdmin" placeholder="Responder ao cliente...">
+                        <button class="btn btn-info rounded-circle ms-2 shadow-lg d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; flex-shrink: 0;" onclick="enviarChat()"><i class="bi bi-send-fill fs-5 text-dark"></i></button>
+                    </div></div></div></div></div>
+                </div>
+            </section>
+
+            <!-- IA ASSISTANT RAG -->
+            <section id="ia_assistant" class="admin-section mod-ia" style="display:none;">
+                <div class="row h-100">
+                    <div class="col-12">
+                        <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #1e2124 0%, #111 100%);">
+                            <div class="card-header bg-dark border-warning border-bottom py-3">
+                                <h4 class="text-warning mb-0 fw-bold"><i class="bi bi-robot me-2"></i> thIAguinho - Auditor de Gestão Sênior</h4>
+                            </div>
+                            <div class="card-body p-0 d-flex flex-column">
+                                <div class="p-3 bg-black border-bottom border-secondary d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                                    <span class="text-white-50 small"><i class="bi bi-shield-lock-fill text-success me-1"></i> A IA (RAG) lê todo o histórico de O.S. da sua oficina para encontrar garantias, clientes inativos e defeitos recorrentes. Base 100% blindada contra alucinações.</span>
+                                </div>
+                                <div id="iaChatBox" class="p-4 overflow-auto custom-scrollbar" style="height: 50vh; min-height: 400px; background-color: #1a1d20;">
+                                    <div class="d-flex justify-content-start mb-3">
+                                        <div class="p-3 rounded-4 shadow-lg text-dark bg-warning" style="max-width: 85%;">
+                                            <strong>thIAguinho:</strong> Olá! Analiso toda a sua base de dados de clientes, peças e ordens de serviço antigas. Pergunte-me sobre garantias, planejamento ou pesquise o histórico de uma placa específica. Não irei inventar nada.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-3 bg-black border-top border-secondary d-flex">
+                                    <input type="text" id="iaInputMsg" class="form-control form-control-lg rounded-pill px-3 px-md-4 bg-dark text-white border-secondary" placeholder="Ex: Analise o histórico da placa ABC-1234. Trocou pneu há menos de 3 meses?">
+                                    <button class="btn btn-warning rounded-circle ms-2 ms-md-3 shadow-lg d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; flex-shrink: 0;" onclick="perguntarIA()"><i class="bi bi-send-fill fs-5 text-dark"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <footer class="mt-auto">
+            <p class="mb-0 text-white-50">SaaS Platform <b>Powered by thIAguinho Soluções</b> &copy; 2026</p>
+        </footer>
+    </div>
+
+    <!-- MODAL GIGANTE DA O.S. -->
+    <div class="modal fade" id="modalOS" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl">
+            <div class="modal-content shadow-lg border-warning" style="border-width: 2px;">
+                <div class="modal-header py-3 bg-dark border-bottom border-warning d-flex justify-content-between align-items-center">
+                    <h4 class="modal-title text-warning fw-bold mb-0 fs-5 fs-md-4"><i class="bi bi-card-checklist me-2"></i> Ficha Mestra O.S.</h4>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="badge bg-secondary fs-6 d-none d-sm-inline" id="osIdDisplay">ID: NOVA</span>
+                        <button type="button" class="btn-close btn-close-white m-0" data-bs-dismiss="modal"></button>
+                    </div>
+                </div>
+                <div class="modal-body p-0 bg-dark custom-scrollbar">
+                    <form id="formOS" onsubmit="salvarOS(event)">
+                        <input type="hidden" id="osId">
+                        <input type="hidden" id="osMediaArray" value="[]">
+                        
+                        <div class="bg-black p-2 p-md-3 pb-0 border-bottom border-secondary overflow-x-auto">
+                            <ul class="nav nav-tabs border-0 flex-nowrap text-nowrap" role="tablist">
+                                <li class="nav-item"><button class="nav-link active px-3 px-md-4 py-2 py-md-3 fs-6 fs-md-5 rounded-top" data-bs-toggle="tab" data-bs-target="#osGeral" type="button">1. Orçamento & Peças</button></li>
+                                <li class="nav-item"><button class="nav-link px-3 px-md-4 py-2 py-md-3 fs-6 fs-md-5 rounded-top" data-bs-toggle="tab" data-bs-target="#osChecklist" type="button">2. Provas, Mídia e Fecho</button></li>
+                                <li class="nav-item"><button class="nav-link px-3 px-md-4 py-2 py-md-3 fs-6 fs-md-5 rounded-top" data-bs-toggle="tab" data-bs-target="#osTimeline" type="button">3. Auditoria (Linha do Tempo)</button></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="tab-content p-3 p-md-4">
+                            <!-- Aba 1: Orçamento -->
+                            <div class="tab-pane fade show active" id="osGeral">
+                                <div class="row g-3 g-md-4 mb-4">
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label text-white-50 fw-bold">Cliente Proprietário</label>
+                                        <div class="input-group">
+                                            <select class="form-select form-select-lg fw-bold bg-black" id="osCliente" required onchange="filtrarMotosOS()"></select>
+                                            <button class="btn btn-outline-success fw-bold border-2" type="button" onclick="abrirNovoClienteOS()" title="Cadastrar novo Cliente agora">+ Novo Cliente</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label text-white-50 fw-bold">Veículo Vinculado</label>
+                                        <div class="input-group">
+                                            <select class="form-select form-select-lg fw-bold bg-black" id="osMoto" required></select>
+                                            <button class="btn btn-outline-warning fw-bold border-2" type="button" onclick="abrirNovaMotoOS()" title="Cadastrar nova Moto para este cliente">+ Nova Moto</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-4"><label class="form-label text-white fw-bold">Defeito Reclamado / Serviço a Realizar</label><textarea class="form-control bg-black text-white" id="osDescricao" rows="3" required placeholder="Relato técnico detalhado para a OS..."></textarea></div>
+
+                                <div class="row g-3 g-md-4 mb-4 p-3 p-md-4 rounded-4" style="background-color: #1e2124; border: 1px solid rgba(255,255,255,0.05);">
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label text-warning text-uppercase small fw-bold">Status Kanban</label>
+                                        <select class="form-select form-select-lg fw-bold border-warning text-warning bg-black shadow-sm" id="osStatus" onchange="verificarStatusOS()">
+                                            <option value="Aguardando">Avaliação Inicial</option>
+                                            <option value="Orcamento">Em Análise / Orçamento</option>
+                                            <option value="Aprovado">Aprovado (Fila de Serviço)</option>
+                                            <option value="Andamento">No Elevador (Em Andamento)</option>
+                                            <option value="Concluido">Concluído (Baixar Estoque e Faturar)</option>
+                                            <option value="Cancelado">Cancelado</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-md-4"><label class="form-label text-white-50 text-uppercase small fw-bold">Mecânico Responsável</label><select class="form-select form-select-lg bg-black" id="osMec"><option value="">Nenhum Alocado</option></select></div>
+                                    <div class="col-12 col-md-4"><label class="form-label text-white-50 text-uppercase small fw-bold">Data Abertura</label><input type="date" class="form-control form-control-lg bg-black" id="osData" required></div>
+                                </div>
+
+                                <div class="mb-4 p-3 rounded-4 bg-black border border-secondary">
+                                    <label class="form-label text-white fw-bold"><i class="bi bi-journal-text text-info me-1"></i> Notas Internas / Auditoria (Opcional)</label>
+                                    <textarea class="form-control bg-dark border-secondary" id="osNotasAuditoria" rows="2" placeholder="Ex: Orçamento aprovado via WhatsApp. Desconto cedido pelo gerente."></textarea>
+                                </div>
+
+                                <div class="p-3 p-md-4 rounded-4 shadow-lg border border-success" style="background-color: #1e2124;">
+                                    <h5 class="text-success mb-4 fw-bold"><i class="bi bi-cash-stack me-2"></i> Tabela de Custos e Peças</h5>
+                                    <div class="row align-items-center mb-4 pb-3 border-bottom border-secondary g-2">
+                                        <div class="col-12 col-md-4"><label class="form-label fw-bold fs-6 fs-md-5 text-white-50 mb-0">Mão de Obra (R$)</label></div>
+                                        <div class="col-12 col-md-8"><input type="number" step="0.01" class="form-control form-control-lg fw-bold text-white bg-black border-success text-end" id="osMaoObra" value="0" oninput="calcularTotalOS()"></div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <div id="containerPecasOS" class="d-flex flex-column gap-2 mb-3"></div>
+                                        <button type="button" class="btn btn-outline-success fw-bold rounded-pill px-4 shadow-sm w-100 w-sm-auto" onclick="adicionarPecaOS()"><i class="bi bi-plus-circle me-1"></i> Associar Artigo do Estoque</button>
+                                    </div>
+                                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center p-3 p-md-4 rounded-4 mt-4 shadow gap-3" style="background: rgba(25, 135, 84, 0.1); border: 2px dashed #198754;">
+                                        <h4 class="mb-0 text-white fw-light text-center text-sm-start">ORÇAMENTO FINAL:</h4>
+                                        <h1 class="mb-0 text-success fw-bold display-5 display-md-4 text-center text-sm-end">R$ <span id="osTotalValor">0.00</span></h1>
+                                        <input type="hidden" id="osTotalHidden" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Aba 2: Checklist e Fecho Financeiro -->
+                            <div class="tab-pane fade" id="osChecklist">
+                                <div class="row g-4 mb-4">
+                                    <div class="col-12">
+                                        <div class="p-3 p-md-4 rounded-4" style="background-color: #1e2124; border: 1px solid #495057;">
+                                            <h5 class="text-white fw-bold mb-3"><i class="bi bi-cloud-arrow-up-fill text-info me-2"></i> Galeria do Veículo (Cloudinary)</h5>
+                                            <p class="text-white-50 small">Anexe fotos da moto arranhada ou vídeos do defeito. Isto aparecerá no App do Cliente e no PDF.</p>
+                                            <div class="input-group mb-4 flex-nowrap">
+                                                <input type="file" class="form-control form-control-lg bg-dark text-white border-secondary" id="osFileInput" accept="image/*,video/*">
+                                                <button class="btn btn-info fw-bold" type="button" onclick="uploadOsMedia()" id="btnUploadMedia"><i class="bi bi-cloud-upload"></i> UPLOAD</button>
+                                            </div>
+                                            <div class="d-flex gap-3 overflow-x-auto pb-3 custom-scrollbar" id="osMediaGrid"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="p-3 p-md-4 rounded-4 bg-black border border-secondary shadow-inner">
+                                            <h5 class="text-warning mb-3 fw-bold"><i class="bi bi-speedometer me-2"></i> Medição de KPIs de Desgaste (Para o App do Cliente)</h5>
+                                            <div class="row g-3 g-md-4">
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label fw-bold text-warning">Desgaste: Pneu Dianteiro (%)</label>
+                                                    <div class="input-group">
+                                                        <input type="number" class="form-control form-control-lg border-warning bg-dark fw-bold text-center text-white" id="chkPneuDia" placeholder="100=Novo, 0=Careca" min="0" max="100">
+                                                        <span class="input-group-text bg-warning text-dark fw-bold">%</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label fw-bold text-warning">Desgaste: Pneu Traseiro (%)</label>
+                                                    <div class="input-group">
+                                                        <input type="number" class="form-control form-control-lg border-warning bg-dark fw-bold text-center text-white" id="chkPneuTra" placeholder="100=Novo, 0=Careca" min="0" max="100">
+                                                        <span class="input-group-text bg-warning text-dark fw-bold">%</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="p-3 p-md-4 rounded-4 bg-black border border-secondary">
+                                            <label class="form-label fw-bold text-white-50 mb-3 d-block">Testes de Segurança e Avarias</label>
+                                            <div class="row g-3 g-md-4 mb-4 border-bottom border-secondary pb-4">
+                                                <div class="col-12 col-md-4">
+                                                    <select class="form-select border-info bg-dark text-white" id="chkComb">
+                                                        <option>Tanque: Não Avaliado</option><option>Tanque: Reserva</option><option>Tanque: Meio</option><option>Tanque: Cheio</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-12 col-md-8 d-flex flex-wrap gap-3 gap-md-4 align-items-center">
+                                                    <div class="form-check form-switch fs-6 fs-md-5"><input class="form-check-input bg-secondary border-0" type="checkbox" id="chkPainel"><label class="form-check-label ms-2 text-white">Elétrica/Painel OK</label></div>
+                                                    <div class="form-check form-switch fs-6 fs-md-5"><input class="form-check-input bg-secondary border-0" type="checkbox" id="chkPneusOk"><label class="form-check-label ms-2 text-white">Pressão Pneus OK</label></div>
+                                                    <div class="form-check form-switch fs-6 fs-md-5"><input class="form-check-input bg-secondary border-0" type="checkbox" id="chkCare"><label class="form-check-label ms-2 text-white">Carenagem OK</label></div>
+                                                </div>
+                                            </div>
+                                            <label class="form-label fw-bold text-danger"><i class="bi bi-shield-exclamation me-1"></i> Avarias Prévias e Danos ao Chegar na Oficina</label>
+                                            <textarea class="form-control border-danger bg-dark text-white" id="chkObs" rows="3" placeholder="Declare qualquer arranhão prévio para proteger a oficina legalmente..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- PAGAMENTO E REVISÃO -->
+                                <div id="areaPagamentoOS" class="mt-4 p-3 p-md-4 rounded-4 d-none shadow-lg mod-fin-block" style="background-color: rgba(13, 202, 240, 0.1); border: 2px dashed #0dcaf0; flex-direction: column;">
+                                    <h4 class="text-info fw-bold mb-3"><i class="bi bi-wallet-fill me-2"></i> Fecho e Recebimento da O.S.</h4>
+                                    <p class="text-white-50 mb-4 small">Guardar a OS como "Concluído" debitará as peças do estoque físico. <br>Se selecionar um método <b>Parcelado ou Boleto</b>, o sistema vai gerar Múltiplas Parcelas e Títulos Pendentes no Caixa.</p>
+                                    
+                                    <div class="row g-3 g-md-4 mb-4 pb-4 border-bottom border-info">
+                                        <div class="col-12 col-md-4">
+                                            <label class="form-label fw-bold text-white text-uppercase small">Data do 1º Vencimento</label>
+                                            <input type="date" class="form-control bg-dark border-info text-white" id="osPgtoDataVenc" title="Data inicial para contar os 30/60 dias">
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <label class="form-label fw-bold text-white text-uppercase small">Via de Pagamento</label>
+                                            <select class="form-select fw-bold text-info border-info bg-black" id="osPgtoForma" onchange="verificarFormaPagamentoOS()">
+                                                <option value="Dinheiro">Dinheiro Espécie (Pago)</option>
+                                                <option value="Chave PIX">Chave PIX (Pago)</option>
+                                                <option value="Contas de Recebimento">Transferência Bancária (Pago)</option>
+                                                <option value="Cartão de Débito">Cartão de Débito (Pago)</option>
+                                                <option value="Cartão de Crédito - À Vista">Cartão Crédito à Vista (Pago)</option>
+                                                <option value="Cartão de Crédito - Parcelado">Cartão de Crédito Parcelado (Gera Títulos)</option>
+                                                <option value="Boleto - À Vista">Boleto à Vista (Pendente)</option>
+                                                <option value="Boleto - Parcelado">Boleto Parcelado (Múltiplos Pendentes)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-12 col-md-4" id="osDivParcelas" style="display:none;">
+                                            <label class="form-label fw-bold text-white text-uppercase small">Nº Parcelas</label>
+                                            <select class="form-select bg-black border-secondary" id="osPgtoParcelas">
+                                                <option value="2x">2x Parcelas</option><option value="3x">3x Parcelas</option><option value="4x">4x Parcelas</option><option value="5x">5x Parcelas</option><option value="6x">6x Parcelas</option><option value="10x">10x Parcelas</option><option value="12x">12x Parcelas</option><option value="30/60 Dias">30 e 60 Dias (2x)</option><option value="30/60/90 Dias">30, 60 e 90 Dias (3x)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- PROGRAMAÇÃO DE REVISÃO -->
+                                    <h6 class="text-warning fw-bold mt-2 border-bottom border-secondary pb-2"><i class="bi bi-calendar-heart me-1"></i> Programação de Retorno (Agenda Automática)</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label text-white-50 small">Sugerir Data da Próxima Revisão</label>
+                                            <input type="date" class="form-control bg-dark border-secondary text-white" id="osProxRevData">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label text-white-50 small">Retornar com quantos KM?</label>
+                                            <input type="number" class="form-control bg-dark border-secondary text-white" id="osProxRevKm" placeholder="Ex: 15000">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Aba 3: LINHA DO TEMPO (AUDITORIA) -->
+                            <div class="tab-pane fade" id="osTimeline">
+                                <div class="p-3 p-md-4 rounded-4 bg-black border border-secondary h-100 min-vh-50">
+                                    <h5 class="text-white fw-bold mb-4"><i class="bi bi-clock-history text-info me-2"></i> Auditoria da Ordem de Serviço</h5>
+                                    <div id="osTimelineContainer" class="timeline-box">
+                                        <p class="text-white-50 fst-italic">Salve a O.S. para iniciar a rastreabilidade.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-2 p-3 p-md-4 border-top border-secondary d-flex flex-column flex-sm-row justify-content-between align-items-center bg-black rounded-bottom gap-3">
+                            <button type="button" class="btn btn-outline-info fw-bold border-2 d-none w-100 w-sm-auto" id="btnGerarPdfOS"><i class="bi bi-file-pdf-fill me-1"></i> GERAR PDF P/ CLIENTE</button>
+                            <button type="submit" class="btn btn-warning btn-lg px-4 px-md-5 py-3 fw-bold text-dark shadow-lg fs-5 w-100 w-sm-auto ms-auto" id="btnSalvarOS"><i class="bi bi-hdd-fill me-2"></i> REGISTRAR O.S.</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAIS SECUNDÁRIOS -->
+    <div class="modal fade" id="modalCompra" tabindex="-1"><div class="modal-dialog modal-dialog-scrollable modal-lg"><div class="modal-content shadow-lg border-primary"><div class="modal-header py-3 bg-dark border-bottom border-primary"><h5 class="modal-title text-white fs-5"><i class="bi bi-box-arrow-in-down me-2 text-primary"></i> Compra de Peças (Nota Entrada)</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body p-3 p-md-4 bg-dark custom-scrollbar"><form id="formCompra" onsubmit="salvarCompra(event)"><div class="row g-3 g-md-4 mb-4"><div class="col-12 col-md-6"><label class="form-label text-white-50">Fornecedor</label><select class="form-select bg-black border-secondary" id="compraForn" required></select></div><div class="col-12 col-md-6"><label class="form-label text-info">Nº da NF Original</label><input type="text" class="form-control fw-bold border-info text-info bg-black" id="compraNF" required></div></div><div class="mb-4 p-3 rounded bg-black border border-secondary"><label class="form-label text-white fw-bold">Auditoria / Observação Interna</label><textarea class="form-control bg-dark border-secondary" id="compraAuditoria" rows="2" placeholder="Ex: Fatura referente a encomenda urgente. Conferido por..."></textarea></div><div class="mb-5 p-3 p-md-4 rounded-4 border border-secondary" style="background-color: #1e2124;"><h6 class="text-white fw-bold mb-3 border-bottom border-secondary pb-3"><i class="bi bi-boxes me-2 text-primary"></i> Itens da NF (Entrarão Automaticamente no Estoque)</h6><div id="containerPecasCompra" class="d-flex flex-column gap-3 mb-4"></div><button type="button" class="btn btn-outline-primary fw-bold rounded-pill px-4 w-100 w-sm-auto" onclick="adicionarPecaCompra()">+ Inserir Artigo na NF</button></div><div class="row g-3 g-md-4 mb-4 p-3 p-md-4 rounded-4 mod-fin-block" style="background-color: rgba(220, 53, 69, 0.05); border: 1px solid #dc3545; display:none;"><div class="col-12 col-md-4"><label class="form-label text-white-50 small fw-bold">Data Base Pagamento</label><input type="date" class="form-control bg-dark border-danger text-white" id="compraDataVenc" title="Data inicial para contar os boletos"></div><div class="col-12 col-md-4"><label class="form-label fw-bold text-danger small">Liquidação da Compra</label><select class="form-select fw-bold border-danger text-danger bg-black" id="compraPgtoForma" onchange="verificarPgtoCompra()"><option value="Dinheiro">Dinheiro Físico</option><option value="Chave PIX">PIX Imediato</option><option value="Cartão de Crédito - À Vista">Cartão Crédito à Vista</option><option value="Cartão de Crédito - Parcelado">Cartão de Crédito Parcelado (Gera Títulos)</option><option value="Boleto - À Vista">Boleto à Vista (Pendente)</option><option value="Boleto - Parcelado">Boleto Parcelado (Múltiplos Pendentes)</option></select></div><div class="col-12 col-md-4" id="compraDivParcelas" style="display:none;"><label class="form-label fw-bold text-danger small">Parcelas / Vencimentos</label><select class="form-select bg-black border-danger text-danger" id="compraParcelas"><option value="2x">2x Parcelas</option><option value="3x">3x Parcelas</option><option value="4x">4x Parcelas</option><option value="6x">6x Parcelas</option><option value="12x">12x Parcelas</option><option value="30/60 Dias">30/60 Dias (2x)</option><option value="30/60/90 Dias">30/60/90 Dias (3x)</option></select></div><div class="col-12 mt-4 text-center text-md-end"><span class="text-white-50 fw-bold d-block mb-2">Total a Pagar na NF:</span><h2 class="text-danger fw-bold mb-0 display-6">R$ <span id="compraTotalVisual">0.00</span></h2><input type="hidden" id="compraTotalFinal" value="0"></div></div><button type="submit" class="btn btn-danger w-100 py-3 fs-5 fw-bold shadow-lg" id="btnSalvarCompra">FINALIZAR COMPRA E ESTOQUE</button></form></div></div></div></div>
+    
+    <div class="modal fade" id="modalPeca" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Ficha de Artigo (Estoque)</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body bg-dark"><form id="formPeca" onsubmit="salvarPeca(event)"><input type="hidden" id="pecaId"><div class="mb-3"><label class="form-label text-white-50">Designação (Nome da Peça)</label><input type="text" class="form-control form-control-lg text-warning fw-bold bg-black" id="pecaNome" required></div><div class="row g-3 mb-3"><div class="col-6"><label class="form-label text-white-50">Custo Base (R$)</label><input type="number" step="0.01" class="form-control form-control-lg bg-black" id="pecaCusto" required></div><div class="col-6"><label class="form-label text-success fw-bold">PVP Sugerido Venda (R$)</label><input type="number" step="0.01" class="form-control form-control-lg bg-black text-success fw-bold border-success" id="pecaVenda" required></div></div><div class="mb-4"><label class="form-label text-white-50">Quantidade no Estoque</label><input type="number" class="form-control form-control-lg bg-black text-center fw-bold" id="pecaQtd" required></div><button type="submit" class="btn btn-primary w-100 py-3 fw-bold">CRIAR REFERÊNCIA</button></form></div></div></div></div>
+    <div class="modal fade" id="modalAjusteStock" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="stockAdjTitle">Ajuste Manual de Estoque</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body bg-dark"><form id="formAjuste" onsubmit="ajustarEstoque(event)"><input type="hidden" id="adjType"><div class="mb-3"><label class="form-label text-white-50">Selecione o Artigo</label><select class="form-select form-select-lg bg-black" id="adjItem" required></select></div><div class="mb-3"><label class="form-label text-white-50">Diferença de Quantidade</label><input type="number" class="form-control form-control-lg bg-black text-center fs-3 fw-bold" id="adjQtd" required min="1"></div><div class="mb-4"><label class="form-label text-white-50">Motivo / Notas de Auditoria</label><input type="text" class="form-control bg-black" id="adjNota" required placeholder="Ex: Peça danificada, quebra na oficina"></div><button type="submit" class="btn btn-primary w-100 py-3 fw-bold">EXECUTAR AJUSTE</button></form></div></div></div></div>
+    
+    <div class="modal fade" id="modalCliente" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Ficha de Cliente B2C</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body bg-dark"><form id="formCliente" onsubmit="salvarCliente(event)"><input type="hidden" id="clienteId"><div class="mb-3"><label class="form-label text-white-50">Nome do Proprietário</label><input type="text" class="form-control form-control-lg bg-black" id="clienteNome" required></div><div class="mb-4"><label class="form-label text-white-50">Telefone / WhatsApp (Apenas Números)</label><input type="number" class="form-control form-control-lg bg-black" id="clienteContato" required></div><hr class="border-secondary mb-4"><h6 class="text-warning mb-3 fw-bold"><i class="bi bi-phone"></i> Portal Online do Cliente</h6><div class="mb-3"><label class="form-label text-white-50">E-mail de Login do Cliente</label><input type="email" class="form-control bg-black" id="clienteEmail" required></div><div class="mb-4"><label class="form-label text-white-50">PIN Gerado</label><div class="input-group"><input type="text" class="form-control bg-black text-warning fw-bold border-warning" id="clienteSenha" required><button class="btn btn-warning fw-bold text-dark px-4" type="button" onclick="document.getElementById('clienteSenha').value=Math.random().toString(36).slice(-6)">Gerar Novo PIN</button></div></div><button type="submit" class="btn btn-primary w-100 py-3 fw-bold">SALVAR CLIENTE</button></form></div></div></div></div>
+    <div class="modal fade" id="modalMoto" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Registo de Veículo</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body bg-dark"><form id="formMoto" onsubmit="salvarMoto(event)"><input type="hidden" id="motoId"><div class="mb-3"><label class="form-label text-white-50">Dono da Viatura (Cliente)</label><select class="form-select form-select-lg bg-black" id="motoDono" required></select></div><div class="mb-3"><label class="form-label text-white-50">Marca e Modelo</label><input type="text" class="form-control form-control-lg bg-black" id="motoModelo" required placeholder="Ex: Honda CG 160"></div><div class="mb-3"><label class="form-label text-white-50">Placa da Moto</label><input type="text" class="form-control form-control-lg bg-black text-uppercase fw-bold text-warning border-warning text-center" id="motoPlaca" required></div><div class="mb-4"><label class="form-label text-white-50">Quilometragem (KM)</label><input type="number" class="form-control form-control-lg bg-black" id="motoKm"></div><button type="submit" class="btn btn-primary w-100 py-3 fw-bold">CADASTRAR VEÍCULO</button></form></div></div></div></div>
+    
+    <div class="modal fade" id="modalFuncionario" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Equipe Mecânica / Gerência</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body bg-dark"><form onsubmit="salvarFunc(event)"><div class="mb-3"><label class="form-label text-white-50">Nome do Colaborador</label><input type="text" class="form-control form-control-lg bg-black" id="funcNome" required></div><div class="mb-3"><label class="form-label text-white-50">Cargo Especialidade</label><input type="text" class="form-control form-control-lg bg-black" id="funcCargo" placeholder="Mecânico Chefe" required></div><div class="mb-4"><label class="form-label text-white-50">Comissão sobre Serviços (%)</label><input type="number" class="form-control form-control-lg bg-black text-success fw-bold" id="funcComissao" required placeholder="Ex: 40 para 40%"></div><button type="submit" class="btn btn-primary w-100 py-3 fw-bold">ADMITIR COLABORADOR</button></form></div></div></div></div>
+    <div class="modal fade" id="modalFornecedor" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Cadastro Fornecedor</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body bg-dark"><form onsubmit="salvarFornecedor(event)"><div class="mb-3"><label class="form-label text-white-50">Razão Social</label><input type="text" class="form-control form-control-lg bg-black" id="fornNome" required></div><div class="mb-4"><label class="form-label text-white-50">O que ele fornece?</label><input type="text" class="form-control form-control-lg bg-black" id="fornCat" placeholder="Ex: Peças Originais Honda"></div><button type="submit" class="btn btn-primary w-100 py-3 fw-bold">SALVAR FORNECEDOR</button></form></div></div></div></div>
+    
+    <!-- MODAL DE EDIÇÃO FINANCEIRA (AUDITORIA RÍGIDA) -->
+    <div class="modal fade" id="modalEditFin" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content border-info"><div class="modal-header bg-dark border-bottom border-info"><h5 class="modal-title text-info"><i class="bi bi-pencil-square"></i> Editar Título Financeiro</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body bg-dark"><form onsubmit="salvarEdicaoFin(event)"><input type="hidden" id="editFinId"><div class="mb-3"><label class="form-label text-white-50">Nova Data de Vencimento</label><input type="date" class="form-control bg-black text-white" id="editFinData" required></div><div class="mb-3"><label class="form-label text-white-50">Novo Valor Corrigido (R$)</label><input type="number" step="0.01" class="form-control bg-black fw-bold text-info" id="editFinValor" required></div><div class="mb-4"><label class="form-label text-danger fw-bold">Motivo da Alteração (Obrigatório para Auditoria)</label><input type="text" class="form-control bg-dark border-danger text-white" id="editFinMotivo" required placeholder="Ex: Juros cobrados, Erro de lançamento..."></div><button type="submit" class="btn btn-info w-100 py-3 fw-bold text-dark fs-5">ALTERAR E GRAVAR NO LOG</button></form></div></div></div></div>
+    
+    <div class="modal fade" id="modalFinanceiro" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Lançamento de Caixa Avulso</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body bg-dark"><form onsubmit="salvarFinManual(event)"><div class="mb-3"><label class="form-label text-white-50">Operação</label><select class="form-select form-select-lg bg-black fw-bold border-secondary" id="finTipo"><option class="text-success" value="Entrada">Registar Receita</option><option class="text-danger" value="Saída">Declarar Despesa</option></select></div><div class="mb-3"><label class="form-label text-white-50">Justificativo Legal (O que é?)</label><input type="text" class="form-control form-control-lg bg-black" id="finDesc" required placeholder="Conta de Internet, Aluguel..."></div><div class="row g-3 mb-3"><div class="col-6"><label class="form-label text-white-50">Valor Apurado (R$)</label><input type="number" step="0.01" class="form-control form-control-lg bg-black fw-bold border-secondary" id="finValor" required></div><div class="col-6"><label class="form-label text-white-50">Data</label><input type="date" class="form-control form-control-lg bg-black border-secondary" id="finData" required></div></div><div class="mb-3"><label class="form-label text-white-50">Notas / Auditoria Interna</label><textarea class="form-control bg-black border-secondary text-white" id="finNota" rows="2" placeholder="Detalhes da nota fiscal, quem autorizou..."></textarea></div><div class="row g-3 mb-4"><div class="col-12 col-md-6"><label class="form-label text-white-50">Forma Pagto</label><select class="form-select border-warning fw-bold bg-black text-white" id="finPgto"><option>Dinheiro</option><option>Chave PIX</option><option>Contas de Recebimento</option><option>Cartão de Débito</option><option>Cartão de Crédito - À Vista</option><option>Boleto - À Vista</option></select></div><div class="col-12 col-md-6"><label class="form-label text-white-50">Estado de Liquidação</label><select class="form-select border-warning text-warning fw-bold bg-black" id="finStatus"><option value="Pago">Liquidado na Hora (Pago)</option><option value="Pendente">Em Dívida / A Receber (Pendente)</option></select></div></div><button type="submit" class="btn btn-success w-100 py-3 fw-bold fs-5 text-dark">INJETAR NO CAIXA</button></form></div></div></div></div>
+    
+    <div class="modal fade" id="modalAgenda" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content border-primary"><div class="modal-header bg-dark border-bottom border-primary"><h5 class="modal-title text-primary"><i class="bi bi-calendar-plus"></i> Agendar Revisão / Serviço</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body bg-dark"><form onsubmit="salvarAgendamento(event)"><input type="hidden" id="agdId"><div class="mb-3"><label class="form-label text-white-50">Cliente Associado</label><select class="form-select bg-black text-white" id="agdCliente" required onchange="filtrarMotosAgenda()"></select></div><div class="mb-3"><label class="form-label text-white-50">Veículo Alvo</label><select class="form-select bg-black text-white" id="agdMoto"></select></div><div class="row g-3 mb-3"><div class="col-6"><label class="form-label text-white-50">Data Pretendida</label><input type="date" class="form-control bg-black text-white" id="agdData" required></div><div class="col-6"><label class="form-label text-white-50">Hora</label><input type="time" class="form-control bg-black text-white" id="agdHora" required></div></div><div class="mb-4"><label class="form-label text-white-50">Motivo / Operação Prevista</label><textarea class="form-control bg-black text-white" id="agdMotivo" rows="2" placeholder="Revisão dos 10mil, Troca óleo..." required></textarea></div><button type="submit" class="btn btn-primary w-100 py-3 fw-bold fs-5">BLOQUEAR HORÁRIO DA AGENDA</button></form></div></div></div></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const $ = id => document.getElementById(id);
+        const $v = id => $(id) ? $(id).value : '';
+
+        function showToast(msg, type='info') {
+            const bg = type==='error'?'bg-danger':'bg-success';
+            const id = 't'+Date.now();
+            const html = `<div id="${id}" class="toast align-items-center text-white ${bg} border-0 show shadow-lg p-3 mt-2 rounded" role="alert"><div class="d-flex"><div class="toast-body fw-bold">${msg}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div></div>`;
+            const div = document.createElement('div'); div.innerHTML = html;
+            const container = $('toastContainer');
+            if(container) { container.appendChild(div.firstChild); setTimeout(() => { if($(id)) $(id).remove(); }, 4000); }
+        }
+
+        // REDIRECIONAMENTO SAAS E INÍCIO
+        let tenantId = sessionStorage.getItem('evo_tenant_id');
+        let modulosAtivos = JSON.parse(sessionStorage.getItem('evo_tenant_mods') || '{}');
+        let minhaGeminiKey = null;
+
+        if (!tenantId) {
+            if (window.location.protocol !== 'blob:') { window.location.replace('index.html'); }
+        } else {
+            if($('navTenantName')) $('navTenantName').innerText = sessionStorage.getItem('evo_tenant_nome') || 'Evolution';
+            if(modulosAtivos.financeiro) { document.querySelectorAll('.mod-fin').forEach(e=>e.style.display='block'); document.querySelectorAll('.mod-fin-block').forEach(e=>e.style.display='flex'); }
+            if(modulosAtivos.chat) document.querySelectorAll('.mod-chat').forEach(e=>e.style.display='block');
+            if(modulosAtivos.ia) document.querySelectorAll('.mod-ia').forEach(e=>e.style.display='block');
+        }
+
+        function sair() { sessionStorage.clear(); window.location.href = 'index.html'; }
+        
+        function mudarAba(id) { 
+            document.querySelectorAll('.admin-section').forEach(el => el.style.display = 'none'); 
+            if($(id)) $(id).style.display = 'block'; 
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active')); 
+            try { event.target.classList.add('active'); } catch(e){} 
+            if(id === 'dashboard') calcularEstatisticasTotais(); 
+            if(id === 'funcionarios') renderComissoes();
+            if(id === 'auditoria') renderAuditoriaGlobal();
+        }
+
+        // EXPORTAR RELATÓRIOS (EXCEL/CSV)
+        function exportarCSV(tipo) {
+            let csvContent = ""; let nomeArquivo = "";
+            if(tipo === 'os') {
+                if(dbServicos.length === 0) return showToast("Não há Ordens de Serviço para exportar.", "error");
+                csvContent = "data:text/csv;charset=utf-8,Data,Cliente,Moto,Placa,Status,Total,Descricao\n";
+                dbServicos.forEach(os => {
+                    const cl = dbClientes.find(x=>x.id===os.clienteId)?.nome || 'N/A';
+                    const mt = dbMotos.find(x=>x.id===os.motoId);
+                    const desc = os.desc ? os.desc.replace(/,/g, ' - ').replace(/\n/g, ' ') : '';
+                    csvContent += `${os.data},${cl},${mt?mt.modelo:'N/A'},${mt?mt.placa:'N/A'},${os.status},${os.total},${desc}\n`;
+                });
+                nomeArquivo = `Relatorio_OS_${new Date().toISOString().split('T')[0]}.csv`;
+            } 
+            else if (tipo === 'financeiro') {
+                if(dbFinanceiro.length === 0) return showToast("Não há dados financeiros para exportar.", "error");
+                csvContent = "data:text/csv;charset=utf-8,Data_Vencimento,Tipo,Descricao,Valor,Pagamento,Status,Auditoria\n";
+                dbFinanceiro.forEach(f => {
+                    const desc = f.descricao ? f.descricao.replace(/,/g, ' - ').replace(/\n/g, ' ') : '';
+                    const aud = f.auditoriaNota ? f.auditoriaNota.replace(/,/g, ' - ').replace(/\n/g, ' ') : '';
+                    csvContent += `${f.data},${f.tipo},${desc},${f.valor},${f.pagto || '-'},${f.status},${aud}\n`;
+                });
+                nomeArquivo = `Relatorio_Financeiro_${new Date().toISOString().split('T')[0]}.csv`;
+            }
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a"); link.setAttribute("href", encodedUri); link.setAttribute("download", nomeArquivo);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        // GERAR PDF DA O.S (JSPDF)
+        window.gerarPdfOS = function(idOs) {
+            const os = dbServicos.find(x=>x.id===idOs);
+            if(!os) return showToast("Erro ao localizar OS. Salve a OS primeiro.", "error");
+
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            const cl = dbClientes.find(x=>x.id===os.clienteId); const mt = dbMotos.find(x=>x.id===os.motoId);
+            const nomeOficina = sessionStorage.getItem('evo_tenant_nome') || 'Evolution Oficina';
+
+            doc.setFontSize(18); doc.setTextColor(230, 81, 0); doc.text(`Ordem de Servico - ${nomeOficina}`, 14, 20);
+            doc.setFontSize(11); doc.setTextColor(0, 0, 0);
+            doc.text(`ID OS: ${os.id.substring(0,8).toUpperCase()}`, 14, 30); doc.text(`Data: ${new Date(os.data).toLocaleDateString('pt-BR')}`, 100, 30); doc.text(`Status: ${os.status.toUpperCase()}`, 150, 30);
+            doc.text(`Cliente: ${cl?cl.nome:'N/A'}`, 14, 40); doc.text(`Contato: ${cl?cl.contato:'N/A'}`, 100, 40);
+            doc.text(`Veiculo: ${mt?mt.modelo:'N/A'}`, 14, 48); doc.text(`Placa: ${mt?mt.placa:'N/A'}`, 100, 48); doc.text(`KM: ${mt?mt.km:'N/A'}`, 150, 48);
+            doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.text("Descricao do Problema / Servico:", 14, 60);
+            doc.setFont("helvetica", "normal");
+            const splitDesc = doc.splitTextToSize(os.desc || '', 180); doc.text(splitDesc, 14, 66);
+            let finalY = 66 + (splitDesc.length * 5) + 5;
+
+            if(os.pecas && os.pecas.length > 0) {
+                const tableData = os.pecas.map(p => [p.qtd, p.nome]);
+                doc.autoTable({ startY: finalY, head: [['Qtd', 'Item / Peca Aplicada']], body: tableData, theme: 'grid', headStyles: { fillColor: [52, 58, 64] } });
+                finalY = doc.lastAutoTable.finalY + 10;
+            }
+
+            doc.setFontSize(12); doc.text(`Mao de Obra: R$ ${os.maoObra ? os.maoObra.toFixed(2) : '0.00'}`, 14, finalY); finalY += 8;
+            doc.setFont("helvetica", "bold"); doc.text(`TOTAL DA O.S.: R$ ${os.total.toFixed(2)}`, 14, finalY); doc.setFont("helvetica", "normal");
+
+            if(os.media && os.media.length > 0) {
+                finalY += 15; doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.text("Anexos Virtuais e Provas Visuais (Acesse os links):", 14, finalY);
+                doc.setFont("helvetica", "normal"); doc.setTextColor(0, 0, 255); 
+                os.media.forEach((m, idx) => { finalY += 6; doc.text(`Anexo ${idx+1}: ${m.url}`, 14, finalY); });
+                doc.setTextColor(0, 0, 0);
+            }
+            doc.setFontSize(9); doc.text("Gerado por Evolution SaaS - thIAguinho Solucoes", 14, 280);
+            doc.save(`OS_${mt?mt.placa:'SemPlaca'}_${os.id.substring(0,6)}.pdf`);
+        };
+
+        // FIREBASE MASTER CONFIG & REALTIME SYNCS (COM PROTEÇÃO NULL)
+        const firebaseConfig = { apiKey: "AIzaSyAq6gEJlUGuzJmrNf-lVY0cqdOWsJ9xNeo", authDomain: "evolution-179d0.firebaseapp.com", projectId: "evolution-179d0", storageBucket: "evolution-179d0.firebasestorage.app", messagingSenderId: "349908951188", appId: "1:349908951188:web:457832d484a83f45b19481" };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig); const db = firebase.firestore();
+
+        let dbEstoque=[], dbClientes=[], dbMotos=[], dbFuncionarios=[], dbFornecedores=[], dbServicos=[], dbFinanceiro=[], dbMensagens=[], dbAgendamentos=[], dbCompras=[];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if(!tenantId) return; 
+            
+            db.collection('oficinas').doc(tenantId).onSnapshot(doc => { if(doc.exists && doc.data().geminiKey) { minhaGeminiKey = doc.data().geminiKey; } });
+            db.collection('estoqueItems').where('tenantId', '==', tenantId).onSnapshot(s => { dbEstoque = s.docs.map(d=>({id:d.id,...d.data()})); renderEstoque(); calcularEstatisticasTotais(); });
+            db.collection('clientes').where('tenantId', '==', tenantId).onSnapshot(s => { dbClientes = s.docs.map(d=>({id:d.id,...d.data()})); renderClientes(); renderAgendamentos(); calcularEstatisticasTotais(); });
+            db.collection('motos').where('tenantId', '==', tenantId).onSnapshot(s => { dbMotos = s.docs.map(d=>({id:d.id,...d.data()})); renderMotos(); renderAgendamentos(); });
+            db.collection('funcionarios').where('tenantId', '==', tenantId).onSnapshot(s => { dbFuncionarios = s.docs.map(d=>({id:d.id,...d.data()})); renderFuncionarios(); });
+            db.collection('fornecedores').where('tenantId', '==', tenantId).onSnapshot(s => { dbFornecedores = s.docs.map(d=>({id:d.id,...d.data()})); renderFornecedores(); });
+            db.collection('servicos').where('tenantId', '==', tenantId).onSnapshot(s => { dbServicos = s.docs.map(d=>({id:d.id,...d.data()})); renderKanban(); calcularEstatisticasTotais(); renderComissoes(); });
+            db.collection('financeiroItems').where('tenantId', '==', tenantId).onSnapshot(s => { dbFinanceiro = s.docs.map(d=>({id:d.id,...d.data()})); renderCaixa(); calcularEstatisticasTotais(); renderAuditoriaGlobal(); });
+            db.collection('agendamentos').where('tenantId', '==', tenantId).onSnapshot(s => { dbAgendamentos = s.docs.map(d=>({id:d.id,...d.data()})); renderAgendamentos(); calcularEstatisticasTotais(); });
+            db.collection('compras').where('tenantId', '==', tenantId).onSnapshot(s => { dbCompras = s.docs.map(d=>({id:d.id,...d.data()})); renderCompras(); });
+            
+            db.collection('mensagens').where('tenantId', '==', tenantId).onSnapshot(s => {
+                dbMensagens = s.docs.map(d=>({id:d.id,...d.data()}));
+                dbMensagens.sort((a,b) => (a.timestamp?.toMillis() || 0) - (b.timestamp?.toMillis() || 0));
+                
+                let naoLidas = 0;
+                dbMensagens.forEach(m => { if(m.sender === 'cliente' && !m.lidaAdmin) naoLidas++; });
+                if($('chatBadgeGlobal')) {
+                    if(naoLidas > 0) { $('chatBadgeGlobal').innerText = naoLidas; $('chatBadgeGlobal').classList.remove('d-none'); } 
+                    else { $('chatBadgeGlobal').classList.add('d-none'); }
+                }
+
+                if(chatActiveClienteId) abrirChat(chatActiveClienteId, $('chatActiveClientName')?$('chatActiveClientName').innerText:'');
+            });
+
+            mudarAba('dashboard');
+        });
+
+        function calcularEstatisticasTotais() {
+            const hoje = new Date();
+            const fatura = dbFinanceiro.filter(t => t.tipo === 'Entrada' && (t.status === 'Pago' || !t.status) && new Date(t.data).getMonth() === hoje.getMonth() && new Date(t.data).getFullYear() === hoje.getFullYear()).reduce((a, t) => a + t.valor, 0);
+            if($('kpiFaturacao')) $('kpiFaturacao').innerText = `R$ ${fatura.toFixed(2)}`;
+            if($('kpiOsPendentes')) $('kpiOsPendentes').innerText = dbServicos.filter(s => s.status !== 'Concluido' && s.status !== 'Cancelado').length;
+            if($('kpiStockCritico')) $('kpiStockCritico').innerText = dbEstoque.filter(e => e.qtd < 3).length;
+            if($('kpiBoletos')) $('kpiBoletos').innerText = dbFinanceiro.filter(f => f.status === 'Pendente').length;
+            
+            const tr = new Date(); tr.setHours(0,0,0,0);
+            if($('kpiAgendamentosHoje')) $('kpiAgendamentosHoje').innerText = dbAgendamentos.filter(a => new Date(a.data) >= tr && a.status !== 'Cancelado').length;
+
+            const rec = dbServicos.slice(-5).reverse();
+            if($('listaAtividadesRecentes')) {
+                $('listaAtividadesRecentes').innerHTML = rec.length ? rec.map(s => {
+                    const mo = dbMotos.find(m => m.id === s.motoId);
+                    return `<div class="list-group-item bg-transparent text-white border-secondary py-3"><div class="d-flex flex-column flex-sm-row w-100 justify-content-between"><h6 class="mb-1 text-info fw-bold">${s.status.toUpperCase()}</h6><small class="text-white-50">${new Date(s.data).toLocaleDateString('pt-BR')}</small></div><p class="mb-0 small">O veículo <strong>${mo?mo.placa:'-'}</strong> foi movido para: ${s.status}.</p></div>`;
+                }).join('') : '<div class="p-4 text-center text-white-50">Sem registros recentes.</div>';
+            }
+        }
+
+        // =========================================================================
+        // MÓDULO AGENDAMENTOS -> GERAR O.S. PÁTIO
+        // =========================================================================
+        function filtrarMotosAgenda() { const cid=$v('agdCliente'); if($('agdMoto')) $('agdMoto').innerHTML='<option value="">Avaliar Veículo na Oficina</option>'+dbMotos.filter(m=>m.clienteId===cid).map(m=>`<option value="${m.id}">${m.modelo} (${m.placa})</option>`).join(''); }
+        function renderAgendamentos() {
+            if(!$('tabelaAgenda')) return;
+            $('tabelaAgenda').innerHTML = dbAgendamentos.sort((a,b)=>new Date(a.data+'T'+a.hora) - new Date(b.data+'T'+b.hora)).map(a=>{
+                const c = dbClientes.find(x=>x.id===a.clienteId); const m = dbMotos.find(x=>x.id===a.motoId);
+                let stBadge = `<span class="badge bg-primary px-3">Marcado</span>`; if(a.status==='Concluido') stBadge=`<span class="badge bg-success px-3">Gerou OS</span>`; if(a.status==='Cancelado') stBadge=`<span class="badge bg-danger px-3">Faltou</span>`; else if(a.status==='Sugerido') stBadge=`<span class="badge bg-info text-dark px-3">Retorno Sugerido</span>`;
+                return `<tr><td class="fw-bold">${new Date(a.data).toLocaleDateString('pt-BR')} às ${a.hora}</td><td>${c?c.nome:'-'}</td><td><span class="text-warning">${m?m.placa:'-'}</span></td><td>${a.motivo}</td><td>${stBadge}</td><td><div class="d-flex flex-wrap gap-2"><button class="btn btn-sm btn-info fw-bold text-dark border-0 shadow-sm" onclick="gerarOSdaAgenda('${a.id}')" title="Ingressar Viatura no Pátio (O.S.)"><i class="bi bi-box-arrow-in-right"></i> Gerar O.S.</button><button class="btn btn-sm btn-danger border-0 shadow-sm" onclick="atualizarStatusAgenda('${a.id}','Cancelado')" title="Cliente Faltou"><i class="bi bi-x-lg"></i></button></div></td></tr>`;
+            }).join('');
+        }
+        async function salvarAgendamento(e) { e.preventDefault(); try { await db.collection('agendamentos').add({tenantId, clienteId:$v('agdCliente'), motoId:$v('agdMoto'), data:$v('agdData'), hora:$v('agdHora'), motivo:$v('agdMotivo'), status:'Agendado'}); const mod = bootstrap.Modal.getInstance($('modalAgenda')); if(mod) mod.hide(); showToast("Agenda Reservada!", "success"); } catch(err) { showToast("Erro: " + err.message, "error"); } }
+        async function atualizarStatusAgenda(id, sts) { await db.collection('agendamentos').doc(id).update({status:sts}); showToast(`Status atualizado para ${sts}.`); }
+        
+        function gerarOSdaAgenda(idAgd) {
+            const agd = dbAgendamentos.find(x => x.id === idAgd);
+            if(!agd) return;
+            prepararModalOS('add');
+            setTimeout(() => {
+                if($('osCliente')) $('osCliente').value = agd.clienteId;
+                filtrarMotosOS();
+                setTimeout(() => {
+                    if($('osMoto')) $('osMoto').value = agd.motoId;
+                    if($('osDescricao')) $('osDescricao').value = "Veio através da Agenda: " + agd.motivo;
+                    if($('osStatus')) $('osStatus').value = 'Aguardando';
+                    const mod = new bootstrap.Modal($('modalOS')); mod.show();
+                }, 300);
+            }, 300);
+            atualizarStatusAgenda(idAgd, 'Concluido');
+        }
+
+        // =========================================================================
+        // INVENTÁRIO COM NOTAS DE AUDITORIA
+        // =========================================================================
+        function renderEstoque() {
+            if($('tabelaEstoque')) $('tabelaEstoque').innerHTML = dbEstoque.map(i=>`<tr><td>${i.nome}</td><td>R$ ${i.custo.toFixed(2)}</td><td class="text-success fw-bold fs-6">R$ ${i.venda.toFixed(2)}</td><td><span class="badge ${i.qtd>2?'bg-primary':'bg-danger px-3 shadow'} fs-6">${i.qtd}</span></td><td><div class="d-flex gap-2"><button class="btn btn-sm btn-outline-warning border-0 text-warning shadow-sm" onclick="prepararModalPeca('edit','${i.id}')" data-bs-toggle="modal" data-bs-target="#modalPeca"><i class="bi bi-pencil fs-5"></i></button> <button class="btn btn-sm btn-outline-danger border-0 text-danger shadow-sm" onclick="if(confirm('Erradicar artigo permanentemente?')) db.collection('estoqueItems').doc('${i.id}').delete()"><i class="bi bi-trash fs-5"></i></button></div></td></tr>`).join('');
+            if($('adjItem')) $('adjItem').innerHTML = '<option value="">O que vai intervir?</option>' + dbEstoque.map(i=>`<option value="${i.id}">${i.nome} (Atual: ${i.qtd})</option>`).join('');
+        }
+        function prepararModalPeca(m, id='') { const form = $('formPeca'); if(form) form.reset(); if(m==='edit'){ const i=dbEstoque.find(x=>x.id===id); if($('pecaId')) $('pecaId').value=i.id; if($('pecaNome')) $('pecaNome').value=i.nome; if($('pecaCusto')) $('pecaCusto').value=i.custo; if($('pecaVenda')) $('pecaVenda').value=i.venda; if($('pecaQtd')) $('pecaQtd').value=i.qtd; } else { if($('pecaId')) $('pecaId').value=''; } }
+        async function salvarPeca(e) { e.preventDefault(); try { const id=$v('pecaId'); const d = {tenantId, nome:$v('pecaNome'), custo:parseFloat($v('pecaCusto')), venda:parseFloat($v('pecaVenda')), qtd:parseInt($v('pecaQtd'))}; if(id) await db.collection('estoqueItems').doc(id).update(d); else await db.collection('estoqueItems').add(d); const mod = bootstrap.Modal.getInstance($('modalPeca')); if(mod) mod.hide(); showToast("Estoque modificado.", "success"); } catch(err) { showToast(err.message, "error"); } }
+        function prepararAjusteStock(t) { if($('adjType')) $('adjType').value=t; if($('stockAdjTitle')) $('stockAdjTitle').innerText=t==='add'?'Lançar Excedente (+ Qtd)':'Declarar Quebra/Perda (- Qtd)'; }
+        async function ajustarEstoque(e) { 
+            e.preventDefault(); 
+            try { 
+                const id=$v('adjItem'); const t=$v('adjType'); const q=parseInt($v('adjQtd')); const i=dbEstoque.find(x=>x.id===id); 
+                if(!id) return; if(t==='remove' && i.qtd<q) return showToast("Estoque Incoerente.", "error"); 
+                
+                const userLogin = sessionStorage.getItem('evo_tenant_nome') || 'Desconhecido';
+                const obs = $v('adjNota') || 'Ajuste Manual Direto';
+                await db.collection('estoqueItems').doc(id).update({qtd: t==='add'?i.qtd+q:i.qtd-q}); 
+                
+                await db.collection('financeiroItems').add({tenantId, tipo:'Auditoria', descricao:`Ajuste Estoque ${t}: ${i.nome} (Qtd: ${q})`, valor:0, data:new Date().toISOString().split('T')[0], originType:'Log Estoque', pagto:'N/A', status:'Pago', auditoriaNota: obs + ` | Por: ${userLogin}`});
+
+                const mod = bootstrap.Modal.getInstance($('modalAjusteStock')); if(mod) mod.hide(); showToast("Prateleira calibrada e registada.", "success"); 
+            } catch(err) { showToast(err.message, "error"); } 
+        }
+
+        // =========================================================================
+        // CLIENTES E NOVA MOTO (NOVO CLIENTE DIRETO DA O.S. IMPLEMENTADO)
+        // =========================================================================
+        function renderClientes() {
+            let appUrl = window.location.origin + window.location.pathname.replace('admin.html', '') + 'clientes/projeto_evolution_24.html';
+            if($('tabelaClientes')) $('tabelaClientes').innerHTML = dbClientes.map(c=>`<tr><td class="fw-bold">${c.nome}</td><td>${c.contato}</td><td><span class="text-info">${c.email}</span></td><td><div class="d-flex flex-wrap gap-2"><button class="btn btn-sm btn-success fw-bold border-0 shadow-sm" onclick="window.open('https://wa.me/55${c.contato}?text=${encodeURIComponent(`Olá ${c.nome}! Faça a gestão das revisões no seu App Privado:\\n👉 ${appUrl} \\n\\nLogin: ${c.email}\\nPIN Fixo: ${c.senhaProv}`)}','_blank')"><i class="bi bi-whatsapp"></i></button> <button class="btn btn-sm btn-outline-warning border-0" onclick="prepararModalCliente('edit','${c.id}')" data-bs-toggle="modal" data-bs-target="#modalCliente"><i class="bi bi-pencil fs-5 text-warning"></i></button></div></td></tr>`).join('');
+            const ops='<option value="">Selecione a pessoa na lista...</option>'+dbClientes.map(c=>`<option value="${c.id}">${c.nome}</option>`).join(''); 
+            if($('osCliente')) $('osCliente').innerHTML=ops; if($('motoDono')) $('motoDono').innerHTML=ops; if($('agdCliente')) $('agdCliente').innerHTML=ops;
+            if($('chatListaClientes')) $('chatListaClientes').innerHTML = dbClientes.map(c=>`<button class="list-group-item list-group-item-action bg-transparent text-white border-secondary py-3 fs-5" onclick="abrirChat('${c.id}', '${c.nome}')"><i class="bi bi-person-circle text-primary me-3"></i> ${c.nome}</button>`).join('');
+        }
+
+        function prepararModalCliente(m, id='') { 
+            if($('formCliente')) $('formCliente').reset(); 
+            if(m==='edit'){ 
+                const c=dbClientes.find(x=>x.id===id); 
+                if($('clienteId')) $('clienteId').value=c.id; if($('clienteNome')) $('clienteNome').value=c.nome; if($('clienteContato')) $('clienteContato').value=c.contato; if($('clienteEmail')) $('clienteEmail').value=c.email; if($('clienteSenha')) $('clienteSenha').value=c.senhaProv; 
+            } else { 
+                if($('clienteId')) $('clienteId').value=''; if($('clienteSenha')) $('clienteSenha').value=Math.random().toString(36).slice(-6); 
+            } 
+        }
+
+        let clienteOsContexto = false;
+        function abrirNovoClienteOS() {
+            const modOS = bootstrap.Modal.getInstance($('modalOS')); if(modOS) modOS.hide();
+            if($('formCliente')) $('formCliente').reset();
+            if($('clienteSenha')) $('clienteSenha').value=Math.random().toString(36).slice(-6);
+            clienteOsContexto = true;
+            new bootstrap.Modal($('modalCliente')).show();
+        }
+
+        async function salvarCliente(e) { 
+            e.preventDefault(); 
+            try { 
+                const id=$v('clienteId'); 
+                const d={tenantId, nome:$v('clienteNome'), contato:$v('clienteContato'), email:$v('clienteEmail'), senhaProv:$v('clienteSenha')}; 
+                let savedId = id;
+                if(id) { await db.collection('clientes').doc(id).update(d); }
+                else { const docRef = await db.collection('clientes').add(d); savedId = docRef.id; }
+                
+                const mod = bootstrap.Modal.getInstance($('modalCliente')); if(mod) mod.hide(); 
+                showToast("Perfil Gravado no Banco.", "success"); 
+                
+                if(clienteOsContexto) {
+                    clienteOsContexto = false;
+                    setTimeout(() => {
+                        new bootstrap.Modal($('modalOS')).show();
+                        if($('osCliente')) { setTimeout(() => { $('osCliente').value = savedId; filtrarMotosOS(); }, 600); }
+                    }, 500);
+                }
+            } catch(err) { showToast(err.message, "error"); } 
+        }
+        
+        function renderMotos() { if($('tabelaMotos')) $('tabelaMotos').innerHTML = dbMotos.map(m=>{const d=dbClientes.find(x=>x.id===m.clienteId); return `<tr><td><span class="text-warning fw-bold fs-5 px-3 py-1 rounded bg-black border border-warning shadow-sm">${m.placa}</span></td><td>${d?d.nome:'<span class="text-danger fw-bold">Sem Registo</span>'}</td><td class="fw-bold text-info">${m.modelo}</td><td>${m.km||'0'} km</td><td><button class="btn btn-sm btn-outline-danger border-0 text-danger shadow-sm" onclick="if(confirm('Imobilizar o Veículo e retirar da frota?')) db.collection('motos').doc('${m.id}').delete()"><i class="bi bi-trash fs-5"></i></button></td></tr>`; }).join(''); }
+        
+        let retornarParaOS = false; let clienteOsTemp = null;
+        function abrirNovaMotoOS() {
+            clienteOsTemp = $v('osCliente');
+            if(!clienteOsTemp) return showToast('Selecione o Cliente Proprietário na caixa acima primeiro!', 'error');
+            const modOS = bootstrap.Modal.getInstance($('modalOS')); if(modOS) modOS.hide();
+            if($('formMoto')) $('formMoto').reset();
+            $('motoDono').value = clienteOsTemp;
+            retornarParaOS = true;
+            new bootstrap.Modal($('modalMoto')).show();
+        }
+        
+        async function salvarMoto(e) { 
+            e.preventDefault(); 
+            try { 
+                await db.collection('motos').add({tenantId, clienteId:$v('motoDono'), modelo:$v('motoModelo'), placa:$v('motoPlaca').toUpperCase(), km:$v('motoKm')}); 
+                const mod = bootstrap.Modal.getInstance($('modalMoto')); if(mod) mod.hide(); 
+                showToast("Viatura Vinculada à Frota.", "success"); 
+                
+                if(retornarParaOS) { 
+                    retornarParaOS = false; 
+                    setTimeout(() => { 
+                        new bootstrap.Modal($('modalOS')).show(); 
+                        $('osCliente').value = clienteOsTemp;
+                        filtrarMotosOS(); 
+                    }, 600); 
+                }
+            } catch(err) { showToast(err.message, "error"); } 
+        }
+
+        // =========================================================================
+        // FUNCIONÁRIOS E COMISSÕES
+        // =========================================================================
+        function renderFuncionarios() { 
+            if($('tabelaFuncionarios')) $('tabelaFuncionarios').innerHTML = dbFuncionarios.map(f=>`<tr><td class="fw-bold"><i class="bi bi-person-fill-gear me-2 text-primary fs-5"></i> ${f.nome}</td><td><span class="badge bg-secondary px-3 py-2 fs-6 shadow-sm border border-light">${f.funcao}</span></td><td>${f.comissao || 0}%</td><td><button class="btn btn-sm btn-outline-danger border-0" onclick="db.collection('funcionarios').doc('${f.id}').delete()"><i class="bi bi-trash fs-5"></i></button></td></tr>`).join(''); 
+            if($('osMec')) $('osMec').innerHTML='<option value="">A Oficina fará a triagem</option>'+dbFuncionarios.map(f=>`<option value="${f.id}">${f.nome} (${f.comissao||0}%)</option>`).join(''); 
+        }
+        async function salvarFunc(e) { e.preventDefault(); try { await db.collection('funcionarios').add({tenantId, nome:$v('funcNome'), funcao:$v('funcCargo'), comissao:parseFloat($v('funcComissao'))||0}); const mod=bootstrap.Modal.getInstance($('modalFuncionario')); if(mod) mod.hide(); showToast("Membro Adicionado à Equipe.", "success"); } catch(err) { showToast(err.message, "error"); } }
+        
+        function renderComissoes() {
+            if(!$('boxComissoes')) return;
+            const comissoesMap = {};
+            dbServicos.filter(s => s.status === 'Concluido' && s.comissaoGerada).forEach(os => {
+                if(!comissoesMap[os.mecId]) comissoesMap[os.mecId] = 0;
+                comissoesMap[os.mecId] += os.comissaoGerada;
+            });
+            const html = Object.keys(comissoesMap).map(mId => {
+                const mec = dbFuncionarios.find(f => f.id === mId);
+                return `<div class="d-flex justify-content-between align-items-center border-bottom border-secondary pb-2 mb-2"><span class="text-white fw-bold"><i class="bi bi-person-badge text-info me-2"></i>${mec?mec.nome:'Desconhecido'}</span><span class="text-success fw-bold fs-5">R$ ${comissoesMap[mId].toFixed(2)}</span></div>`;
+            }).join('');
+            $('boxComissoes').innerHTML = html || '<p class="text-white-50 small">Nenhuma O.S. finalizada com mecânico comissionado ainda.</p>';
+        }
+
+        // =========================================================================
+        // COMPRAS DE PEÇAS (NOTAS DE ENTRADA E BOLETOS FRACIONADOS COM AUDITORIA)
+        // =========================================================================
+        function renderFornecedores() { if($('tabelaFornecedores')) $('tabelaFornecedores').innerHTML = dbFornecedores.map(f=>`<tr><td class="fw-bold">${f.nome}</td><td><span class="text-white-50">${f.cat}</span></td><td><button class="btn btn-sm btn-outline-danger border-0" onclick="db.collection('fornecedores').doc('${f.id}').delete()"><i class="bi bi-trash fs-5"></i></button></td></tr>`).join(''); if($('compraForn')) $('compraForn').innerHTML='<option value="">A quem faturou?</option>'+dbFornecedores.map(f=>`<option value="${f.id}">${f.nome}</option>`).join(''); }
+        async function salvarFornecedor(e) { e.preventDefault(); try { await db.collection('fornecedores').add({tenantId, nome:$v('fornNome'), cat:$v('fornCat')}); const mod=bootstrap.Modal.getInstance($('modalFornecedor')); if(mod) mod.hide(); showToast("Parceiro Registado.", "success"); } catch(err) { showToast(err.message, "error"); } }
+
+        function prepararModalCompra() { if($('formCompra')) $('formCompra').reset(); if($('compraDataVenc')) $('compraDataVenc').value=new Date().toISOString().split('T')[0]; if($('containerPecasCompra')) $('containerPecasCompra').innerHTML=''; if($('compraTotalVisual')) $('compraTotalVisual').innerText='0.00'; if($('compraTotalFinal')) $('compraTotalFinal').value=0; verificarPgtoCompra(); adicionarPecaCompra(); }
+        function adicionarPecaCompra() {
+            const div = document.createElement('div'); div.className='d-flex flex-column flex-sm-row gap-2 gap-md-3 p-3 bg-black rounded-4 border border-secondary align-items-sm-center item-compra shadow-inner';
+            div.innerHTML=`<select class="form-select form-select-lg border-secondary comp-peca text-white" required><option value="">Item Adquirido...</option>${dbEstoque.map(p=>`<option value="${p.id}">${p.nome}</option>`).join('')}</select><input type="number" class="form-control form-control-lg border-secondary text-center comp-qtd text-white fw-bold" placeholder="Qtd" required min="1" style="width: 100px;"><input type="number" step="0.01" class="form-control form-control-lg border-secondary fw-bold text-danger comp-custo" placeholder="R$ Fatura" required style="width: 150px;" oninput="calcularTotalCompra()"><button type="button" class="btn btn-danger btn-lg shadow w-100 w-sm-auto" onclick="this.parentElement.remove(); calcularTotalCompra()"><i class="bi bi-x-lg"></i></button>`;
+            if($('containerPecasCompra')) $('containerPecasCompra').appendChild(div);
+        }
+        function calcularTotalCompra() { let t=0; document.querySelectorAll('.item-compra').forEach(el=>{ const q=parseInt(el.querySelector('.comp-qtd').value)||0; const c=parseFloat(el.querySelector('.comp-custo').value)||0; t+=(q*c); }); if($('compraTotalVisual')) $('compraTotalVisual').innerText=t.toFixed(2); if($('compraTotalFinal')) $('compraTotalFinal').value=t.toFixed(2); }
+        function verificarPgtoCompra() { 
+            const f=$v('compraPgtoForma'); 
+            if($('compraDivParcelas')) { 
+                if(f.includes('Cartão de Crédito - Parcelado') || f.includes('Boleto - Parcelado')) $('compraDivParcelas').style.display='block'; 
+                else $('compraDivParcelas').style.display='none'; 
+            } 
+        }
+        
+        function renderCompras() {
+            if(!$('tabelaHistoricoCompras')) return;
+            $('tabelaHistoricoCompras').innerHTML = dbCompras.sort((a,b)=>new Date(b.data)-new Date(a.data)).map(c => {
+                return `<tr><td class="text-white-50">${new Date(c.data).toLocaleDateString('pt-BR')}</td><td>${c.fornecedorNome}</td><td class="text-warning fw-bold border border-warning px-2 rounded">${c.nf}</td><td><span class="badge bg-dark border border-secondary p-2 text-white-50">${c.pagamento}</span></td><td class="text-danger fw-bold fs-5">R$ ${c.total.toFixed(2)}</td><td><small class="text-white-50 fst-italic">${c.auditoria || 'Sem notas'}</small></td></tr>`;
+            }).join('');
+        }
+
+        async function salvarCompra(e) {
+            e.preventDefault(); 
+            const btnSub = document.getElementById('btnSalvarCompra');
+            const txtOrig = btnSub.innerHTML;
+            btnSub.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> PROCESSANDO AUDITORIA E ESTOQUE...';
+            btnSub.disabled = true;
+
+            try {
+                const forId=$v('compraForn'); 
+                if(!forId) throw new Error("Selecione um fornecedor na lista."); 
+                const fornDb = dbFornecedores.find(x=>x.id===forId);
+                const n = fornDb ? fornDb.nome : 'Fornecedor Excluído'; 
+                const nf = $v('compraNF') || 'S/N'; 
+                const total = parseFloat($v('compraTotalFinal')) || 0; 
+                const dt = new Date().toISOString().split('T')[0]; // Dia da compra hoje
+                const notasAud = $v('compraAuditoria') || ''; 
+                const userLogin = sessionStorage.getItem('evo_tenant_nome') || 'Desconhecido';
+                const fp = $v('compraPgtoForma'); 
+                const parcelasText = $v('compraParcelas');
+
+                const itens=[];
+                document.querySelectorAll('.item-compra').forEach(el=>{ const id=el.querySelector('.comp-peca').value; if(id) itens.push({id:id, qtd:parseInt(el.querySelector('.comp-qtd').value)}); });
+                if(itens.length===0) throw new Error("A Fatura não tem material associado.");
+
+                for(let i of itens) { 
+                    const pEst=dbEstoque.find(x=>x.id===i.id); 
+                    if(pEst) await db.collection('estoqueItems').doc(i.id).update({qtd: pEst.qtd + i.qtd}); 
+                }
+
+                // GRAVA A NOTA DE ENTRADA (COMPRA) NA NOVA COLEÇÃO PARA AUDITORIA PERMANENTE
+                await db.collection('compras').add({
+                    tenantId, fornecedorId: forId, fornecedorNome: n, nf: nf, total: total, data: dt, auditoria: `Por: ${userLogin} | Obs: ${notasAud}`, itens: itens, pagamento: fp
+                });
+                
+                if(modulosAtivos.financeiro) {
+                    let numParcelas = 1;
+                    if(fp.includes('Parcelado')) {
+                        if(parcelasText.includes('2x') || parcelasText.includes('30/60 Dias')) numParcelas = 2;
+                        else if(parcelasText.includes('3x') || parcelasText.includes('90 Dias')) numParcelas = 3;
+                        else if(parcelasText.includes('4x')) numParcelas = 4;
+                        else if(parcelasText.includes('6x')) numParcelas = 6;
+                        else if(parcelasText.includes('12x')) numParcelas = 12;
+                    }
+
+                    const valorParcela = total / numParcelas;
+                    const stsPgto = (fp.includes('Boleto') || fp.includes('Pendente') || fp.includes('Parcelado')) ? 'Pendente' : 'Pago'; 
+                    const dtVencimentoBase = $v('compraDataVenc') || dt;
+                    
+                    for(let i=0; i<numParcelas; i++) {
+                        let dataVenc = new Date(dtVencimentoBase);
+                        if(numParcelas > 1 || stsPgto === 'Pendente') { dataVenc.setDate(dataVenc.getDate() + (i*30)); } // +30 dias por parcela
+                        
+                        const dataIso = dataVenc.toISOString().split('T')[0];
+                        const descFin = numParcelas > 1 ? `Aprovisionamento NF: ${nf} (${n}) - Parc ${i+1}/${numParcelas}` : `Aprovisionamento NF: ${nf} (${n})`;
+                        const txtAuditoria = `NF Lançada por: ${userLogin} | Obs: ${notasAud}`;
+
+                        await db.collection('financeiroItems').add({
+                            tenantId, tipo:'Saída', descricao: descFin, valor:valorParcela, 
+                            data:dataIso, originType:'Compra de Peças (NF)', nota_documento:nf, 
+                            pagto: fp, status: stsPgto, auditoriaNota: txtAuditoria
+                        }); 
+                    }
+                }
+                
+                const mod = bootstrap.Modal.getInstance($('modalCompra')); if(mod) mod.hide(); 
+                showToast("Prateleiras Reforçadas! NF e Despesa Registada.", "success");
+            } catch(err) { 
+                showToast(err.message, "error"); 
+            } finally {
+                btnSub.innerHTML = txtOrig; btnSub.disabled = false;
+            }
+        }
+
+        // =========================================================================
+        // O CORAÇÃO: O.S. KANBAN COM BUSCA E ENCERRAMENTO BLINDADO (COMISSÃO)
+        // =========================================================================
+        function renderKanban() {
+            const termoBusca = ($('searchOS') ? $('searchOS').value.toLowerCase().trim() : '');
+            const cols = { 'Aguardando':[], 'Orcamento':[], 'Aprovado':[], 'Andamento':[], 'Concluido':[] };
+            
+            dbServicos.forEach(os => { 
+                const cl = dbClientes.find(x=>x.id===os.clienteId); 
+                const mt = dbMotos.find(x=>x.id===os.motoId);
+                
+                const placa = mt ? mt.placa.toLowerCase() : '';
+                const nomeCliente = cl ? cl.nome.toLowerCase() : '';
+                
+                if(termoBusca === '' || placa.includes(termoBusca) || nomeCliente.includes(termoBusca)) {
+                    if(cols[os.status]) cols[os.status].push(os); 
+                }
+            });
+            
+            for(const [status, list] of Object.entries(cols)) {
+                if($(`count-${status}`)) $(`count-${status}`).innerText = list.length;
+                const container = $(`kb-${status}`); if(!container) continue;
+                container.innerHTML = list.sort((a,b)=>new Date(b.data)-new Date(a.data)).map(os => {
+                    const cl = dbClientes.find(x=>x.id===os.clienteId); const mt = dbMotos.find(x=>x.id===os.motoId);
+                    return `<div class="k-card shadow-sm"><div class="d-flex justify-content-between mb-2"><span class="k-placa">${mt?mt.placa:'---'}</span><small class="text-white-50">${new Date(os.data).toLocaleDateString('pt-BR')}</small></div><p class="text-white fw-bold mb-1 lh-sm"><i class="bi bi-person me-1"></i>${cl?cl.nome.substring(0,15)+'...':'N/A'}</p><p class="small text-white-50 text-truncate mb-3">${os.desc}</p><button class="btn btn-sm btn-outline-light w-100 fw-bold border-secondary" onclick="prepararModalOS('edit','${os.id}')" data-bs-toggle="modal" data-bs-target="#modalOS"><i class="bi bi-gear-fill me-1 text-warning"></i> INSPECIONAR</button></div>`;
+                }).join('');
+            }
+        }
+
+        function filtrarMotosOS() { const cid=$v('osCliente'); if($('osMoto')) $('osMoto').innerHTML='<option value="">Selecione a Viatura...</option>'+dbMotos.filter(m=>m.clienteId===cid).map(m=>`<option value="${m.id}">${m.modelo} (${m.placa})</option>`).join(''); }
+        function adicionarPecaOS() {
+            const div = document.createElement('div'); div.className='d-flex flex-column flex-sm-row mb-3 gap-2 gap-md-3 p-3 bg-black rounded-4 border border-secondary item-os-peca align-items-sm-center shadow-inner';
+            div.innerHTML=`<select class="form-select form-select-lg border-secondary os-peca-sel text-white bg-dark" onchange="calcOsTotal()"><option value="">Explorar Inventário Global...</option>${dbEstoque.map(i=>`<option value="${i.id}" data-p="${i.venda}">${i.nome} - R$ ${i.venda.toFixed(2)} (Stock: ${i.qtd})</option>`).join('')}</select><input type="number" class="form-control form-control-lg border-secondary text-center os-peca-qtd fw-bold text-info bg-dark" style="width:110px" value="1" min="1" oninput="calcOsTotal()"><button type="button" class="btn btn-danger btn-lg shadow w-100 w-sm-auto" onclick="this.parentElement.remove(); calcOsTotal()"><i class="bi bi-trash"></i></button>`;
+            if($('containerPecasOS')) $('containerPecasOS').appendChild(div);
+        }
+        function calcOsTotal() {
+            let m=parseFloat($v('osMaoObra'))||0; let p=0; document.querySelectorAll('.item-os-peca').forEach(el=>{ const s=el.querySelector('.os-peca-sel'); if(s.value) p+=parseFloat(s.options[s.selectedIndex].getAttribute('data-p'))*parseInt(el.querySelector('.os-peca-qtd').value); });
+            const t = m+p; if($('osTotalValor')) $('osTotalValor').innerText=t.toFixed(2); if($('osTotalHidden')) $('osTotalHidden').value=t.toFixed(2);
+        }
+        function verificarStatusOS() { if($('areaPagamentoOS')) { if($v('osStatus')==='Concluido') $('areaPagamentoOS').classList.remove('d-none'); else $('areaPagamentoOS').classList.add('d-none'); } }
+        function verificarFormaPagamentoOS() { 
+            const f=$v('osPgtoForma'); 
+            if($('osDivParcelas')) { 
+                if(f.includes('Parcelado') || f.includes('Boleto - Parcelado')) $('osDivParcelas').style.display='block'; 
+                else $('osDivParcelas').style.display='none'; 
+            } 
+        }
+
+        async function uploadOsMedia() {
+            const input = $('osFileInput'); if(!input || !input.files || input.files.length === 0) return showToast("Anexe a foto/vídeo para iniciar upload.", "error");
+            const file = input.files[0]; const btn = $('btnUploadMedia'); btn.innerHTML = "<i class='bi bi-arrow-repeat spin'></i>"; btn.disabled = true;
+            try {
+                const fd = new FormData(); fd.append('file', file); fd.append('upload_preset', 'evolution');
+                const res = await fetch(`https://api.cloudinary.com/v1_1/dmuvm1o6m/auto/upload`, { method: 'POST', body: fd });
+                const data = await res.json();
+                if(data.secure_url) {
+                    const arrInput = $('osMediaArray'); const arr = JSON.parse(arrInput.value || '[]');
+                    arr.push({ url: data.secure_url, type: data.resource_type });
+                    arrInput.value = JSON.stringify(arr); renderOsMediaGallery(); input.value = ''; showToast("Arquivo seguro na Nuvem Mestra!", "success");
+                }
+            } catch(e) { showToast("Falha de UPLOAD no Cloudinary.", "error"); }
+            btn.innerHTML = "<i class='bi bi-cloud-upload'></i>"; btn.disabled = false;
+        }
+        function renderOsMediaGallery() {
+            const arr = JSON.parse($v('osMediaArray') || '[]'); const grid = $('osMediaGrid'); if(!grid) return;
+            grid.innerHTML = arr.map((m, idx) => {
+                const inner = (m.type === 'video' || m.url.includes('.mp4')) ? `<video src="${m.url}" controls class="shadow-sm rounded-3" style="width:120px;height:120px;object-fit:cover;"></video>` : (m.type === 'audio' || m.url.includes('.mp3') || m.url.includes('.ogg')) ? `<audio src="${m.url}" controls style="width:200px;"></audio>` : `<img src="${m.url}" onclick="window.open('${m.url}','_blank')" class="shadow-sm rounded-3" style="width:120px;height:120px;object-fit:cover;cursor:pointer;">`;
+                return `<div class="position-relative d-inline-block me-2 mb-2 flex-shrink-0">${inner}<button type="button" class="btn-del-media" onclick="delOsMedia(${idx})"><i class="bi bi-x"></i></button></div>`;
+            }).join('');
+        }
+        function delOsMedia(idx) { const arr = JSON.parse($v('osMediaArray')); arr.splice(idx, 1); if($('osMediaArray')) $('osMediaArray').value = JSON.stringify(arr); renderOsMediaGallery(); }
+
+        let osAtualParaSalvar = null; 
+        function prepararModalOS(m, id='') {
+            if($('formOS')) $('formOS').reset(); if($('containerPecasOS')) $('containerPecasOS').innerHTML=''; if($('osData')) $('osData').value=new Date().toISOString().split('T')[0]; if($('osTotalValor')) $('osTotalValor').innerText="0.00"; if($('osTotalHidden')) $('osTotalHidden').value=0; if($('osMediaArray')) $('osMediaArray').value='[]'; renderOsMediaGallery(); verificarStatusOS(); verificarFormaPagamentoOS(); 
+            
+            if($('btnGerarPdfOS')) $('btnGerarPdfOS').classList.add('d-none');
+            const tlContainer = $('osTimelineContainer');
+            if(tlContainer) tlContainer.innerHTML = '<p class="text-white-50 fst-italic">A linha do tempo iniciará após o primeiro salvamento.</p>';
+
+            try{new bootstrap.Tab(document.querySelector('#formOS .nav-link[data-bs-target="#osGeral"]')).show();}catch(e){}
+            
+            if(m==='edit') {
+                const os=dbServicos.find(x=>x.id===id); 
+                osAtualParaSalvar = os;
+                if($('osId')) $('osId').value=os.id; if($('osIdDisplay')) $('osIdDisplay').innerText = `ID: ${id.substring(0,6).toUpperCase()}`; 
+                if($('osCliente')) $('osCliente').value=os.clienteId; filtrarMotosOS(); 
+                setTimeout(() => { if($('osMoto')) $('osMoto').value=os.motoId; }, 300);
+                if($('osDescricao')) $('osDescricao').value=os.desc; if($('osStatus')) $('osStatus').value=os.status; if($('osMec')) $('osMec').value=os.mecId||''; if($('osMaoObra')) $('osMaoObra').value=os.maoObra||0;
+                if($('osNotasAuditoria')) $('osNotasAuditoria').value=os.notasAuditoria||''; 
+                
+                if(os.pecas){ os.pecas.forEach(p=>{ adicionarPecaOS(); const ss=document.querySelectorAll('.os-peca-sel'); const ls=ss[ss.length-1]; ls.value=p.id; ls.nextElementSibling.value=p.qtd; }); }
+                if(os.check){ 
+                    if($('chkComb')) $('chkComb').value=os.check.comb; if($('chkPainel')) $('chkPainel').checked=os.check.painel; if($('chkPneusOk')) $('chkPneusOk').checked=os.check.pneus; if($('chkCare')) $('chkCare').checked=os.check.care; if($('chkObs')) $('chkObs').value=os.check.obs||''; 
+                    if(os.check.pneuDia !== undefined && $('chkPneuDia')) $('chkPneuDia').value = os.check.pneuDia;
+                    if(os.check.pneuTra !== undefined && $('chkPneuTra')) $('chkPneuTra').value = os.check.pneuTra;
+                }
+                if(os.media && $('osMediaArray')) { $('osMediaArray').value = JSON.stringify(os.media); renderOsMediaGallery(); }
+                
+                // RENDER TIMELINE
+                if(tlContainer && os.timeline) {
+                    tlContainer.innerHTML = os.timeline.sort((a,b)=>new Date(b.data)-new Date(a.data)).map(t => {
+                        return `<div class="timeline-item"><span class="text-white fw-bold d-block">${t.acao}</span><small class="text-warning">${new Date(t.data).toLocaleString('pt-BR')}</small> <small class="text-white-50">por ${t.usuario}</small></div>`;
+                    }).join('');
+                }
+
+                calcOsTotal(); verificarStatusOS();
+
+                if($('btnGerarPdfOS')) {
+                    $('btnGerarPdfOS').classList.remove('d-none');
+                    $('btnGerarPdfOS').onclick = function() { gerarPdfOS(os.id); };
+                }
+
+            } else { 
+                osAtualParaSalvar = null;
+                if($('osId')) $('osId').value=''; if($('osIdDisplay')) $('osIdDisplay').innerText = "ID: NOVA"; 
+            }
+        }
+
+        async function salvarOS(e) {
+            e.preventDefault(); 
+            const btnSub = document.getElementById('btnSalvarOS');
+            const txtOrig = btnSub.innerHTML;
+            btnSub.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> PROCESSANDO BAIXA...';
+            btnSub.disabled = true;
+
+            try {
+                const id=$v('osId'); const sts=$v('osStatus'); const tot=parseFloat($v('osTotalHidden')); const arrP=[]; 
+                document.querySelectorAll('.item-os-peca').forEach(el=>{ 
+                    const sel = el.querySelector('.os-peca-sel');
+                    const ids = sel.value; 
+                    const nomePeca = sel.options[sel.selectedIndex].text.split(' - ')[0]; 
+                    if(ids) arrP.push({id:ids, nome: nomePeca, qtd:parseInt(el.querySelector('.os-peca-qtd').value)}); 
+                });
+                
+                const mediaArr = JSON.parse($v('osMediaArray') || '[]');
+                const notasAud = $v('osNotasAuditoria') || ''; 
+                const userLogin = sessionStorage.getItem('evo_tenant_nome') || 'Desconhecido';
+                const fp = $v('osPgtoForma'); 
+                const parcelasText = $v('osPgtoParcelas');
+
+                let valorComissao = 0;
+                const mecId = $v('osMec');
+                if(mecId) {
+                    const mDB = dbFuncionarios.find(f => f.id === mecId);
+                    if(mDB && mDB.comissao) { valorComissao = parseFloat($v('osMaoObra')) * (parseFloat(mDB.comissao) / 100); }
+                }
+
+                let newTimeline = osAtualParaSalvar && osAtualParaSalvar.timeline ? [...osAtualParaSalvar.timeline] : [];
+                if(!id) {
+                    newTimeline.push({ data: new Date().toISOString(), acao: 'Abertura da O.S.', usuario: userLogin });
+                } else if(osAtualParaSalvar && osAtualParaSalvar.status !== sts) {
+                    newTimeline.push({ data: new Date().toISOString(), acao: `Status alterado de ${osAtualParaSalvar.status} para ${sts}`, usuario: userLogin });
+                }
+
+                const d = { 
+                    tenantId, clienteId:$v('osCliente'), motoId:$v('osMoto'), desc:$v('osDescricao'), status:sts, mecId: mecId, comissaoGerada: valorComissao, data:$v('osData'), maoObra:parseFloat($v('osMaoObra')), total:tot, pecas:arrP, media: mediaArr, notasAuditoria: notasAud,
+                    timeline: newTimeline, pagamento: { forma: fp, parcelas: parcelasText },
+                    check: { comb:$v('chkComb'), painel:$('chkPainel')?$('chkPainel').checked:false, pneus:$('chkPneusOk')?$('chkPneusOk').checked:false, care:$('chkCare')?$('chkCare').checked:false, obs:$v('chkObs'), pneuDia: parseInt($v('chkPneuDia'))||0, pneuTra: parseInt($v('chkPneuTra'))||0 } 
+                };
+
+                if (sts==='Concluido') {
+                    const isNova = (!id || osAtualParaSalvar?.status !== 'Concluido');
+                    if (isNova) {
+                        let err = false; 
+                        let pecasFaltantes = [];
+                        for(let p of arrP) { const es = dbEstoque.find(x=>x.id===p.id); if(!es || es.qtd < p.qtd) { err=true; pecasFaltantes.push(p.nome); } }
+                        if(err) throw new Error("Ação Recusada: Estoque insuficiente para a(s) peça(s): " + pecasFaltantes.join(', '));
+                        
+                        let logPecas = [];
+                        for(let p of arrP) { 
+                            const es=dbEstoque.find(x=>x.id===p.id); 
+                            await db.collection('estoqueItems').doc(p.id).update({qtd: es.qtd-p.qtd}); 
+                            logPecas.push(`${p.qtd}x ${p.nome}`);
+                        }
+                        
+                        const dtRev = $v('osProxRevData'); const kmRev = $v('osProxRevKm');
+                        if(dtRev || kmRev) {
+                            await db.collection('agendamentos').add({
+                                tenantId, clienteId: $v('osCliente'), motoId: $v('osMoto'),
+                                data: dtRev || new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split('T')[0],
+                                hora: '09:00', motivo: `Revisão Preventiva (Retorno OS: ${id||'Nova'}). ${kmRev ? 'Aos '+kmRev+' KM' : ''}`, status: 'Sugerido'
+                            });
+                        }
+
+                        if(modulosAtivos.financeiro) {
+                            let moText = ""; if ($('osMoto') && $('osMoto').selectedIndex >= 0) moText = $('osMoto').options[$('osMoto').selectedIndex].text;
+                            
+                            let numParcelas = 1;
+                            if(fp.includes('Parcelado')) {
+                                if(parcelasText.includes('2x') || parcelasText.includes('30/60')) numParcelas = 2;
+                                else if(parcelasText.includes('3x') || parcelasText.includes('90')) numParcelas = 3;
+                                else if(parcelasText.includes('4x')) numParcelas = 4;
+                                else if(parcelasText.includes('5x')) numParcelas = 5;
+                                else if(parcelasText.includes('6x')) numParcelas = 6;
+                                else if(parcelasText.includes('10x')) numParcelas = 10;
+                                else if(parcelasText.includes('12x')) numParcelas = 12;
+                            }
+
+                            const valorParcela = tot / numParcelas;
+                            const stsPgto = (fp.includes('Boleto') || fp.includes('Pendente') || fp.includes('Parcelado') || fp.includes('Crédito')) ? 'Pendente' : 'Pago';
+                            const txtAuditoria = `OS Fechada por: ${userLogin} | Peças: ${logPecas.join(', ')} | Obs: ${notasAud}`;
+                            const dtVencBase = $v('osPgtoDataVenc') || new Date().toISOString().split('T')[0];
+
+                            for(let i=0; i<numParcelas; i++) {
+                                let dataVenc = new Date(dtVencBase);
+                                if(numParcelas > 1 || stsPgto === 'Pendente') { dataVenc.setDate(dataVenc.getDate() + (i*30)); }
+                                const dataIso = dataVenc.toISOString().split('T')[0];
+                                const descFin = numParcelas > 1 ? `Fatura OS: ${moText} (Parc ${i+1}/${numParcelas})` : `Fatura Serviço Prestado: ${moText}`;
+
+                                await db.collection('financeiroItems').add({
+                                    tenantId, clienteId: $v('osCliente'), tipo:'Entrada', descricao: descFin, valor: valorParcela, 
+                                    data: dataIso, originType:'Receita O.S.', pagto: fp, status: stsPgto, 
+                                    originId: id||'nova', auditoriaNota: txtAuditoria
+                                });
+                            }
+                        }
+                        showToast("Veículo Entregue. O.S. e Títulos criados com Sucesso!", "success");
+
+                        // Mensagem Automática no Chat de Pronta!
+                        await db.collection('mensagens').add({tenantId: tenantId, clienteId: $v('osCliente'), sender: 'admin', text: `✅ O seu veículo está pronto para ser retirado! O valor total fechou em R$ ${tot.toFixed(2)}.`, lidaCliente: false, timestamp: firebase.firestore.FieldValue.serverTimestamp()});
+                        
+                        // Notificação WhatsApp
+                        const cZap = dbClientes.find(x=>x.id===$v('osCliente'));
+                        if(cZap && cZap.contato) {
+                            if(confirm("Deseja notificar o cliente via WhatsApp agora mesmo que a moto está pronta?")) {
+                                window.open(`https://wa.me/55${cZap.contato}?text=${encodeURIComponent(`Olá ${cZap.nome}! Passando para informar que a sua moto já está PRONTA na nossa oficina! O serviço ficou em R$ ${tot.toFixed(2)}.`)}`,'_blank');
+                            }
+                        }
+                    }
+                }
+                
+                if(id) await db.collection('servicos').doc(id).update(d); 
+                else await db.collection('servicos').add(d); 
+                
+                const elModalOS = document.getElementById('modalOS');
+                const mod = bootstrap.Modal.getInstance(elModalOS);
+                if (mod) mod.hide();
+            } catch(err) { 
+                showToast(err.message, "error"); 
+            } finally {
+                btnSub.innerHTML = txtOrig; btnSub.disabled = false;
+            }
+        }
+
+        // =========================================================================
+        // FINANCEIRO E AUDITORIA GLOBAL
+        // =========================================================================
+        function renderCaixa() {
+            let e=0, s=0; const tab = $('tabelaCaixa'); if(!tab) return;
+            
+            const busca = ($('filtroFinBusca') ? $('filtroFinBusca').value.toLowerCase().trim() : '');
+            const tipoF = ($('filtroFinTipo') ? $('filtroFinTipo').value : '');
+            const statusF = ($('filtroFinStatus') ? $('filtroFinStatus').value : '');
+            const dataF = ($('filtroFinData') ? $('filtroFinData').value : ''); 
+
+            let lFiltro = dbFinanceiro.filter(t => {
+                let mB = t.descricao.toLowerCase().includes(busca) || (t.nota_documento && t.nota_documento.toLowerCase().includes(busca));
+                let mT = tipoF === '' || t.tipo === tipoF;
+                let mS = statusF === '' || t.status === statusF;
+                let mD = dataF === '' || t.data.startsWith(dataF);
+                return mB && mT && mS && mD;
+            });
+
+            tab.innerHTML=lFiltro.sort((a,b)=>new Date(b.data)-new Date(a.data)).map(t=>{ 
+                if(t.status === 'Pago' || !t.status) { if(t.tipo==='Entrada') e+=t.valor; else s+=t.valor; }
+                const fp = t.pagto ? `<span class="badge bg-black border border-secondary p-2 text-white-50 shadow-sm">${t.pagto}</span>` : ''; 
+                const notaAud = t.auditoriaNota ? `<br><small class="text-white-50 fst-italic"><i class="bi bi-info-circle me-1"></i>${t.auditoriaNota}</small>` : '';
+                
+                let stsBadge = t.status === 'Pago' || !t.status ? `<span class="badge bg-success p-2 shadow-sm"><i class="bi bi-check-all fs-6"></i> Liquidado</span>` : `<span class="badge bg-warning text-dark border border-warning p-2 shadow-sm"><i class="bi bi-hourglass-split fs-6"></i> Em Dívida</span>`;
+                let bBaixa = t.status === 'Pendente' ? `<button class="btn btn-sm btn-success fw-bold shadow me-2 mb-1 w-100" onclick="darBaixaFin('${t.id}')" title="Liquidar esta parcela para ir para o Saldo Real"><i class="bi bi-cash-coin me-1"></i> Baixar Parcela</button>` : '';
+                
+                const corText = t.tipo === 'Entrada' ? 'text-success' : 'text-danger';
+                const corIcon = t.tipo === 'Entrada' ? 'bi-arrow-up-circle-fill' : 'bi-arrow-down-circle-fill';
+
+                return `<tr style="background-color: #1e2124; border-bottom: 1px solid #334155;"><td class="text-white-50 p-3">${new Date(t.data).toLocaleDateString('pt-BR')}</td><td class="fw-bold ${corText}"><i class="bi ${corIcon} fs-4 me-2"></i> ${t.tipo}</td><td class="text-white">${t.descricao}${notaAud}</td><td>${fp}</td><td class="fw-bold fs-4 ${corText}">R$ ${t.valor.toFixed(2)}</td><td>${stsBadge}</td><td><div class="d-flex flex-column gap-1">${bBaixa}<button class="btn btn-sm btn-outline-info border-2 shadow" onclick="abrirEdicaoFin('${t.id}')"><i class="bi bi-pencil-square"></i> Editar</button></div></td></tr>`; 
+            }).join('');
+            if($('caixaEntradas')) $('caixaEntradas').innerText=`R$ ${e.toFixed(2)}`; if($('caixaSaidas')) $('caixaSaidas').innerText=`R$ ${s.toFixed(2)}`; 
+            if($('caixaSaldo')) { $('caixaSaldo').innerText=`R$ ${(e-s).toFixed(2)}`; if(e-s<0) $('caixaSaldo').classList.add('text-danger'); else $('caixaSaldo').classList.remove('text-danger'); }
+        }
+        
+        async function salvarFinManual(ev) { ev.preventDefault(); try { await db.collection('financeiroItems').add({tenantId, tipo:$v('finTipo'), descricao:$v('finDesc'), valor:parseFloat($v('finValor')), data:$v('finData'), pagto:$v('finPgto'), status:$v('finStatus'), auditoriaNota: ($v('finNota') || '') + ` | Mov. Manual por ${sessionStorage.getItem('evo_tenant_nome')}`}); const elFin = document.getElementById('modalFinanceiro'); const mod = bootstrap.Modal.getInstance(elFin); if(mod) mod.hide(); showToast("Caixa injetado com sucesso.", "success"); } catch(err) { showToast(err.message, "error"); } }
+        async function darBaixaFin(id) { if(confirm("O valor será creditado/debitado do Saldo Real de Tesouraria. Confirma a Liquidação da Parcela?")) { await db.collection('financeiroItems').doc(id).update({status: 'Pago'}); showToast("Parcela descontada e compensada com sucesso!", "success"); } }
+
+        function abrirEdicaoFin(id) {
+            const f = dbFinanceiro.find(x=>x.id===id); if(!f) return;
+            $('editFinId').value = f.id; $('editFinData').value = f.data; $('editFinValor').value = f.valor; $('editFinMotivo').value = '';
+            new bootstrap.Modal($('modalEditFin')).show();
+        }
+        async function salvarEdicaoFin(ev) {
+            ev.preventDefault();
+            try {
+                const id = $v('editFinId'); const f = dbFinanceiro.find(x=>x.id===id); if(!f) return;
+                const nData = $v('editFinData'); const nValor = parseFloat($v('editFinValor')); const motivo = $v('editFinMotivo');
+                const aud = `${f.auditoriaNota || ''} \n[EDITADO ${new Date().toLocaleDateString('pt-BR')}]: De R$${f.valor} para R$${nValor} (Venc: ${nData}). Motivo: ${motivo}`;
+                
+                await db.collection('financeiroItems').doc(id).update({ data: nData, valor: nValor, auditoriaNota: aud });
+                const mod = bootstrap.Modal.getInstance($('modalEditFin')); if(mod) mod.hide(); showToast("Registro Financeiro Alterado e Auditado.", "success");
+            } catch (err) { showToast(err.message, "error"); }
+        }
+
+        function renderAuditoriaGlobal() {
+            if(!$('tabelaAuditoria')) return;
+            const auditoriaLogs = dbFinanceiro.filter(f => f.tipo === 'Auditoria');
+            if(auditoriaLogs.length === 0) {
+                $('tabelaAuditoria').innerHTML = '<tr><td colspan="2" class="text-center text-white-50">Nenhum log de auditoria encontrado.</td></tr>';
+            } else {
+                $('tabelaAuditoria').innerHTML = auditoriaLogs.sort((a,b)=>new Date(b.data)-new Date(a.data)).map(a => {
+                    return `<tr><td class="text-white-50" style="width:150px;">${new Date(a.data).toLocaleDateString('pt-BR')}</td><td><strong class="text-warning">${a.descricao}</strong><br><small class="text-white-50">${a.auditoriaNota}</small></td></tr>`;
+                }).join('');
+            }
+        }
+
+        // =========================================================================
+        // CHAT CRM COM ANEXOS (CLOUD) E NOTIFICAÇÃO
+        // =========================================================================
+        let chatActiveClienteId = null;
+        function abrirChat(id, nm) {
+            chatActiveClienteId=id; 
+            if($('chatNomeCliente')) $('chatNomeCliente').innerHTML = `<span class="text-white">Linha Segura Ativa com:</span> <b class="text-accent fs-4" style="color:var(--bs-accent)">${nm}</b>`; 
+            if($('chatAreaInput')) $('chatAreaInput').style.display='flex'; 
+            const a=$('chatAreaMsg'); if(!a) return; a.innerHTML='';
+            
+            const msgsDaPessoa = dbMensagens.filter(x=>x.clienteId===id);
+            if(msgsDaPessoa.length===0) { 
+                a.innerHTML='<div class="text-center text-white-50 mt-5 pt-5"><i class="bi bi-chat-dots display-1 d-block mb-4 opacity-50"></i><p class="fs-4">Caixa Postal Livre. Inicie o Atendimento.</p></div>'; 
+            } else { 
+                msgsDaPessoa.forEach(x=>{ 
+                    if(x.sender === 'cliente' && !x.lidaAdmin) { db.collection('mensagens').doc(x.id).update({lidaAdmin: true}); }
+                    const t=x.timestamp?new Date(x.timestamp.toDate()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'agora'; 
+                    let content = x.text;
+                    if(x.fileUrl) {
+                        if(x.fileType === 'video' || x.fileUrl.includes('.mp4')) content += `<br><video src="${x.fileUrl}" controls style="max-width:100%; border-radius:8px; margin-top:5px;"></video>`;
+                        else if(x.fileType === 'audio' || x.fileUrl.includes('.mp3') || x.fileUrl.includes('.ogg')) content += `<br><audio src="${x.fileUrl}" controls style="max-width:100%; margin-top:5px;"></audio>`;
+                        else content += `<br><img src="${x.fileUrl}" style="max-width:100%; border-radius:8px; margin-top:5px; cursor:pointer;" onclick="window.open('${x.fileUrl}','_blank')">`;
+                    }
+                    a.innerHTML+=`<div class="message ${x.sender==='admin'?'admin shadow-lg':'cliente shadow-sm'}">${content}<small>${t}</small></div>`; 
+                }); 
+                a.scrollTop=a.scrollHeight; 
+            }
+        }
+        async function enviarChat() { 
+            const v=$v('inputChatAdmin').trim(); if(!v||!chatActiveClienteId) return; 
+            await db.collection('mensagens').add({tenantId: tenantId, clienteId: chatActiveClienteId, sender: 'admin', text: v, lidaCliente: false, timestamp: firebase.firestore.FieldValue.serverTimestamp()}); 
+            if($('inputChatAdmin')) $('inputChatAdmin').value=''; 
+        }
+        async function enviarAnexoChat() {
+            const input = $('chatFileInput'); if(!input || !input.files || input.files.length === 0) return;
+            if(!chatActiveClienteId) return showToast("Selecione um cliente primeiro.", "error");
+            const file = input.files[0]; showToast("A enviar arquivo...", "info");
+            try {
+                const fd = new FormData(); fd.append('file', file); fd.append('upload_preset', 'evolution');
+                const res = await fetch(`https://api.cloudinary.com/v1_1/dmuvm1o6m/auto/upload`, { method: 'POST', body: fd });
+                const data = await res.json();
+                if(data.secure_url) {
+                    await db.collection('mensagens').add({
+                        tenantId: tenantId, clienteId: chatActiveClienteId, sender: 'admin', text: "📎 Arquivo Anexado:", fileUrl: data.secure_url, fileType: data.resource_type, lidaCliente: false, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    input.value = ''; showToast("Anexo enviado!", "success");
+                }
+            } catch(e) { showToast("Falha de UPLOAD no Chat.", "error"); }
+        }
+
+        // =========================================================================
+        // INTELIGÊNCIA ARTIFICIAL (THIAGUINHO RAG - BLINDADO CONTRA INVENÇÕES)
+        // =========================================================================
+        async function perguntarIA() {
+            const key = minhaGeminiKey;
+            const prompt = $v('iaInputMsg').trim();
+            if(!key) return showToast("A chave de Inteligência Artificial ainda não foi configurada para a sua licença no painel Master.", "error");
+            if(!prompt) return;
+
+            const chatBox = $('iaChatBox');
+            chatBox.innerHTML += `<div class="d-flex justify-content-end mb-3"><div class="p-3 bg-secondary text-white rounded-4 w-75 shadow">${prompt}</div></div>`;
+            $('iaInputMsg').value = ''; chatBox.scrollTop = chatBox.scrollHeight;
+
+            const loaderId = 'loader_' + Date.now();
+            chatBox.innerHTML += `<div id="${loaderId}" class="d-flex justify-content-start mb-3"><div class="p-3 bg-warning text-dark rounded-4 w-75 shadow fw-bold"><i class="bi bi-arrow-repeat spin me-2"></i> thIAguinho está a analisar o histórico da oficina...</div></div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // RAG ESTREITO: Só envia dados se existirem e manda a regra absoluta.
+            const historicoLimitado = dbServicos.slice(-50).map(s => ({ placa_moto: dbMotos.find(m=>m.id===s.motoId)?.placa || 'SemPlaca', defeito_reclamado: s.desc, fase: s.status, pecas_usadas: s.pecas.map(p=>p.nome).join(', '), data_servico: s.data }));
+            const motosLimitado = dbMotos.map(m => ({ placa: m.placa, modelo: m.modelo, km: m.km, dono: dbClientes.find(c=>c.id===m.clienteId)?.nome }));
+            
+            const contextoOficina = { historico_ordens_de_servico: historicoLimitado, motos_cadastradas: motosLimitado };
+
+            try {
+                const sysPrompt = `Você é o thIAguinho, consultor auditor da oficina. 
+                REGRA DE OURO E ABSOLUTA: VOCÊ ESTÁ PROIBIDO DE INVENTAR DADOS OU PLACAS. 
+                Sua única fonte de verdade é este JSON que representa o banco de dados da oficina atual: ${JSON.stringify(contextoOficina)}.
+                - Se o usuário perguntar sobre uma placa que não está no JSON, responda EXATAMENTE: "Não encontrei nenhum registro dessa placa no nosso sistema. Por favor, verifique se o veículo foi cadastrado."
+                - Aja como auditor de garantias: se perguntarem se um defeito é recorrente, olhe o JSON 'historico_ordens_de_servico' e veja se a mesma placa reclamou do mesmo defeito ou trocou a mesma peça recentemente. Responda de forma profissional e direta em português do Brasil.`;
+                
+                const payload = { contents: [{ parts: [{ text: prompt }] }], systemInstruction: { parts: [{ text: sysPrompt }] }, generationConfig: { temperature: 0.0 } };
+
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if($(loaderId)) $(loaderId).remove();
+                if(data.error) throw new Error(data.error.message);
+
+                const resposta = data.candidates[0].content.parts[0].text;
+                chatBox.innerHTML += `<div class="d-flex justify-content-start mb-3"><div class="p-3 bg-warning text-dark rounded-4 w-75 shadow" style="white-space: pre-wrap;"><strong>thIAguinho (Auditor RAG):</strong><br>${resposta}</div></div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+            } catch(err) {
+                if($(loaderId)) $(loaderId).remove();
+                showToast("Falha Cognitiva na IA: " + err.message, "error");
+            }
+        }
+    </script>
+</body>
+</html>
