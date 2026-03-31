@@ -1,665 +1,91 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>thIAguinho LOG - Masterclass de Vendas (10/10)</title>
-    
-    <!-- Bibliotecas Oficiais -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evolution SaaS - Login da Oficina</title>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        /* ==============================================================
-           ESTILOS REAIS DO ERP LOGÍSTICO (Mobile-First 100% Fluido)
-           ============================================================== */
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; display: flex; justify-content: center; margin: 0; height: 100dvh; overflow: hidden; }
-        
-        .hidden-view { display: none !important; }
-        
-        /* Remove a scrollbar nativa para uma gravação de tela limpa */
-        ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
-
-        /* Simulador Mobile Container */
-        .mobile-simulator { width: 100%; max-width: 430px; height: 100%; background: #f1f5f9; position: relative; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
-        
-        /* Estrutura do App */
-        .topbar { height: 60px; background: #0f172a; color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; flex-shrink: 0; z-index: 30; }
-        .content-area { flex-grow: 1; overflow-y: auto; scroll-behavior: smooth; background: #f8fafc; padding-bottom: 30px; position: relative; }
-        
-        /* Painel de Planejamento */
-        .panel-header { background: white; border-bottom: 1px solid #e2e8f0; padding: 16px; position: sticky; top: 0; z-index: 20; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .config-box { background: white; border-radius: 12px; padding: 16px; border: 1px solid #e2e8f0; margin: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-t: 4px solid #f59e0b; }
-        
-        /* Stats (Distância, Tempo, Custo) */
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: #0f172a; color: white; border-radius: 12px; margin: 0 16px 16px 16px; padding: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); }
-        .stat-item { text-align: center; border-right: 1px solid #334155; }
-        .stat-item:last-child { border-right: none; }
-        
-        /* Mapa de Roteirização */
-        .map-container { height: 350px; margin: 0 16px 16px 16px; border-radius: 12px; z-index: 10; background-color: #e2e8f0; position: relative; overflow: hidden; border: 2px solid #cbd5e1; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
-        
-        /* Animações de Rota (A Mágica da IA) */
-        .route-path { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: drawRoute 2s ease-in-out forwards; }
-        @keyframes drawRoute { to { stroke-dashoffset: 0; } }
-        
-        .waypoint { position: absolute; transform: translate(-50%, -50%); z-index: 30; display: flex; flex-direction: column; align-items: center; }
-        .waypoint-dot { width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: white; }
-        .wp-base { background-color: #ef4444; } 
-        .wp-client { background-color: #22c55e; } 
-        .wp-potential { background-color: #f59e0b; animation: pulse-warning 2s infinite; cursor: pointer; } 
-        .wp-label { background: white; padding: 3px 6px; border-radius: 6px; font-size: 9px; font-weight: 900; color: #1e293b; margin-top: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); white-space: nowrap; border: 1px solid #cbd5e1;}
-
-        @keyframes pulse-warning { 0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.8); } 70% { box-shadow: 0 0 0 20px rgba(245, 158, 11, 0); } 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
-
-        /* Visão do Radar (IA) */
-        .radar-vision { background: white; margin: 0 16px 16px 16px; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; border-t: 4px solid #0f172a; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .radar-card { border: 1px solid #fcd34d; border-left: 4px solid #f59e0b; margin: 12px; padding: 12px; border-radius: 8px; background: #fffbeb; transition: all 0.3s; }
-        .radar-card.success { border-color: #86efac; border-left-color: #22c55e; background: #f0fdf4; }
-
-        /* Modais Universais e App Motorista */
-        .modal { background: rgba(15, 23, 42, 0.90); backdrop-filter: blur(8px); z-index: 9990; position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; padding: 0; }
-        .modal-content { background: #ffffff; border-radius: 24px 24px 0 0; display: flex; flex-direction: column; max-height: 90%; width: 100%; position: relative; overflow: hidden; box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5); padding-bottom: env(safe-area-inset-bottom); }
-        .modal-content-dark { background: #0f172a; border-top: 1px solid #334155; }
-
-        /* GHOST CURSOR (Mãozinha da Automação) */
-        #ghost-cursor { position: absolute; top: 50%; left: 50%; width: 45px; height: 45px; z-index: 999999; pointer-events: none; transition: top 0.6s cubic-bezier(0.25, 1, 0.5, 1), left 0.6s cubic-bezier(0.25, 1, 0.5, 1); filter: drop-shadow(2px 6px 10px rgba(0,0,0,0.5)); opacity: 0; }
-        .cursor-click-effect { animation: cursorClick 0.3s ease-out; }
-        @keyframes cursorClick { 0% { transform: scale(1); } 50% { transform: scale(0.7); } 100% { transform: scale(1); } }
-
-        /* FOCO FALSO DA DIGITAÇÃO */
-        .typing-focus { box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.4) !important; border-color: #f59e0b !important; background: #fff !important;}
-        .typing-focus-dark { box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.4) !important; border-color: #22c55e !important; }
-
-        /* LEGENDA DE VENDAS CINEMATOGRÁFICA */
-        #tour-caption-container { position: absolute; top: 20px; left: 0; width: 100%; display: flex; justify-content: center; z-index: 99999; pointer-events: none; opacity: 0; transform: translateY(-20px); transition: all 0.4s ease-in-out; padding: 0 16px; }
-        #tour-caption { background: rgba(255, 255, 255, 0.98); color: #0f172a; padding: 16px 20px; border-radius: 16px; font-size: 0.95rem; font-weight: 900; border-left: 6px solid #f59e0b; box-shadow: 0 15px 35px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; line-height: 1.3; }
-
-        /* TOAST NOTIFICATION (WhatsApp) */
-        #toast-notification { position: absolute; top: 100px; right: 16px; left: 16px; background: white; padding: 16px; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); border-left: 6px solid #22c55e; display: flex; align-items: center; gap: 15px; z-index: 99999; transform: translateX(120%); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        #toast-notification.show { transform: translateX(0); }
-
-        /* TELA FINAL CTA */
-        #final-screen { position: absolute; inset: 0; background: linear-gradient(180deg, #020617 0%, #1e3a8a 100%); z-index: 200000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 1s; text-align: center; padding: 24px; }
-        #final-screen.active { opacity: 1; pointer-events: auto; }
-        .final-logo { width: 160px; height: auto; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); margin-bottom: 30px; border: 3px solid rgba(255,255,255,0.1); background: white; padding: 10px;}
+        body { background-color: #0f172a; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; color: #fff; }
+        .login-card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 40px; width: 100%; max-width: 450px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .form-control { background-color: #0f172a !important; border: 1px solid #334155 !important; color: #fff !important; padding: 12px 15px; border-radius: 8px; }
+        .form-control:focus { border-color: #e65100 !important; box-shadow: 0 0 0 0.25rem rgba(230, 81, 0, 0.25); }
+        .btn-primary { background-color: #e65100; border: none; font-weight: bold; padding: 12px; border-radius: 8px; font-size: 1.1rem; transition: 0.3s; }
+        .btn-primary:hover { background-color: #c94400; transform: translateY(-2px); }
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 1055; }
     </style>
 </head>
 <body>
+    <div class="toast-container" id="toastContainer"></div>
 
-<div class="mobile-simulator" id="simulator-container">
-
-    <!-- START OVERLAY -->
-    <div id="start-screen" class="absolute inset-0 bg-slate-950 z-[1000000] flex flex-col items-center justify-center p-6 text-center">
-        <!-- Imagem Real -->
-        <img src="image_f278e2.png" onerror="this.style.display='none'" class="w-24 h-24 mb-6 rounded-2xl shadow-2xl shadow-blue-600/50 bg-white p-2">
-        <h1 class="text-4xl font-black text-white mb-4 tracking-tighter">thIAguinho LOG</h1>
-        <p class="text-blue-200 mb-10 text-sm max-w-sm font-medium leading-relaxed">Sincronizado e Fluido (10/10). Prepare o seu gravador de tela de celular. A demonstração focará na cereja do bolo: <b>Roteirização IA, Pós-Venda Automático e Recálculo de Custo-Benefício.</b></p>
-        <button onclick="this.disabled=true; iniciarTour();" class="bg-blue-600 text-white w-full py-5 rounded-2xl font-black text-lg uppercase shadow-2xl hover:bg-blue-500 transition-all tracking-widest active:scale-95">Iniciar Demo Master</button>
-    </div>
-
-    <!-- CURSOR FANTASMA -->
-    <div id="ghost-cursor">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.4c.45 0 .67-.54.35-.85L6.35 3.35c-.31-.31-.85-.09-.85.35Z" fill="white" stroke="#0f172a" stroke-width="1.5" stroke-linejoin="round"/>
-        </svg>
-    </div>
-
-    <!-- LEGENDA VENDEDOR (CAPTIONS) -->
-    <div id="tour-caption-container">
-        <div id="tour-caption"><span id="caption-text">Inicializando...</span></div>
-    </div>
-
-    <!-- TOAST NOTIFICATION (WhatsApp) -->
-    <div id="toast-notification">
-        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 shrink-0"><i class='bx bxl-whatsapp text-3xl'></i></div>
-        <div>
-            <h4 class="font-black text-slate-800 text-sm" id="toast-title">Negociação Fechada!</h4>
-            <p class="text-[11px] font-bold text-slate-500 mt-0.5" id="toast-msg">Cliente respondeu no WhatsApp.</p>
-        </div>
-    </div>
-
-    <!-- TELA FINAL CTA -->
-    <div id="final-screen">
-        <img src="image_f278e2.png" onerror="this.src='https://via.placeholder.com/150/1e40af/ffffff?text=LOG'" class="final-logo">
-        <h2 class="text-white text-4xl font-black mb-4 tracking-tighter">Logística Inteligente.</h2>
-        <p class="text-blue-200 text-sm max-w-sm mb-10 leading-relaxed font-medium">Você acabou de ver o futuro: a IA transforma um frete caro em uma oportunidade de lucro na mesma viagem. Assinatura digital na ponta e relatórios exatos na base.</p>
-        <a href="https://wa.me/" class="bg-green-500 text-white py-4 px-8 rounded-full font-black text-sm shadow-xl shadow-green-500/40 flex items-center justify-center gap-2 w-full max-w-xs"><i class='bx bxl-whatsapp text-2xl'></i> QUERO ASSINAR AGORA</a>
-    </div>
-
-    <!-- TRANSIÇÃO DE NUVEM -->
-    <div id="transition-overlay" class="absolute inset-0 bg-slate-950 z-[200000] opacity-0 pointer-events-none flex flex-col items-center justify-center transition-opacity duration-500 text-center px-6">
-        <i class='bx bx-cloud-upload bx-fade-up text-7xl text-blue-500 mb-4'></i>
-        <h3 id="transition-title" class="text-white text-2xl font-black tracking-tight mb-2">Sincronizando...</h3>
-        <p id="transition-subtitle" class="text-slate-400 font-bold text-xs">Enviando Rota para o Celular do Motorista.</p>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- TELA DE LOGIN (COM IMAGEM REAL)            -->
-    <!-- ========================================== -->
-    <div id="userScreen" class="absolute inset-0 z-[100] flex items-center justify-center bg-slate-900 p-4 transition-opacity">
-        <img src="image_f22652.jpg" onerror="this.style.display='none'" class="absolute inset-0 w-full h-full object-cover opacity-30">
-        <div class="bg-white p-6 rounded-3xl shadow-2xl w-full text-center border-t-8 border-blue-700 z-10 relative">
-            <img src="image_f278e2.png" onerror="this.style.display='none'" class="w-16 h-16 mx-auto mb-4 object-contain bg-slate-100 p-2 rounded-xl">
-            <h2 class="text-4xl font-black text-blue-900 mb-1 tracking-tighter">thIAguinho</h2>
-            <p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-8 border-b border-gray-100 pb-4">Diretoria de Operações</p>
-            <form id="loginForm" onsubmit="return false;" class="text-left space-y-4">
-                <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-1.5 ml-1">Usuário / Base</label>
-                    <select id="userSelect" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none text-slate-700 text-xs focus:border-blue-500">
-                        <option value="">Selecione...</option>
-                        <option value="admin">Thiago Ventura (Gestor)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-1.5 ml-1">Senha de Acesso</label>
-                    <input type="password" id="passwordInput" placeholder="••••••" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-black outline-none text-slate-700 tracking-widest text-sm focus:border-blue-500">
-                </div>
-                <button type="button" id="loginBtn" class="w-full bg-blue-700 text-white py-4 rounded-xl font-black uppercase text-xs shadow-lg shadow-blue-700/30 mt-2 hover:bg-blue-600 transition-colors">Autenticar Sistema</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- APP: VISÃO DO GESTOR (ROTEIRIZADOR IA)     -->
-    <!-- ========================================== -->
-    <div id="app-admin" class="layout-admin hidden-view flex flex-col h-full w-full">
-        <header class="topbar">
-            <div class="flex items-center gap-2">
-                <i class='bx bx-menu text-2xl text-slate-400'></i>
-                <h1 class="text-sm font-black text-white leading-none tracking-tight ml-2 uppercase">Planejamento IA & Rotas</h1>
-            </div>
-            <div class="w-8 h-8 bg-slate-800 text-white rounded-full flex items-center justify-center font-bold text-xs border border-slate-600 shadow-sm">TV</div>
-        </header>
-
-        <main class="content-area p-0 overflow-y-auto flex-grow" id="adminScrollArea">
-            <!-- Modal de Roteirizador Renderizado Direto para Facilitar Automação -->
-            <div id="modal-roteirizador" class="w-full bg-white flex flex-col min-h-full">
-                <div class="bg-slate-900 text-white p-4 flex justify-between items-center shrink-0">
-                    <h2 class="font-black text-xs flex items-center gap-2 uppercase tracking-tight"><i class='bx bx-radar text-blue-400 text-lg'></i> Roteirizador IA-Log</h2>
-                </div>
-                
-                <div class="p-3 bg-slate-50 flex-grow space-y-3 relative" id="roteirizadorScrollArea">
-                    
-                    <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-200">
-                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Traçar Corredor Logístico</p>
-                        <div class="space-y-2 mt-2">
-                            <div>
-                                <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Origem (Fábrica)</label>
-                                <input type="text" id="rota-origem" value="São José do Rio Preto, SP" class="w-full p-3 border rounded-lg text-xs font-bold bg-slate-50 outline-none text-slate-700">
-                            </div>
-                            <div>
-                                <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Destino Principal</label>
-                                <input type="text" id="rota-destino" value="São Paulo, SP" class="w-full p-3 border rounded-lg text-xs font-bold bg-slate-50 outline-none text-slate-700 focus:border-amber-500 transition-colors">
-                            </div>
-                            <button id="btn-tracar-rota" class="w-full bg-slate-900 text-amber-400 py-3 rounded-xl font-black uppercase text-[10px] shadow-xl flex items-center justify-center gap-2 mt-2 active:scale-95 transition-transform tracking-widest">
-                                <i class='bx bx-map-pin text-lg'></i> Traçar Rota & Varredura IA
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-200">
-                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Destino Principal</p>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <p class="font-black text-slate-800 text-sm">S. Paulo (Capital)</p>
-                                <p class="text-[9px] font-bold text-slate-500"><i class='bx bx-trip'></i> Origem: S. J. Rio Preto</p>
-                            </div>
-                            <div class="bg-slate-100 p-1.5 rounded text-center border border-slate-200">
-                                <p class="text-[8px] font-bold text-slate-400 uppercase">Custo Frete</p>
-                                <p class="font-black text-red-500 text-[10px]" id="stat-cost">R$ 850,00</p>
-                            </div>
-                        </div>
-                        <div class="flex justify-between mt-2 pt-2 border-t border-slate-100">
-                            <p class="text-[10px] font-bold text-slate-600">Dist: <span id="stat-dist">--</span></p>
-                            <p class="text-[10px] font-bold text-slate-600">Tempo: <span id="stat-time">--</span></p>
-                        </div>
-                    </div>
-
-                    <!-- Mapa Simulado (S.J. Rio Preto -> São Paulo) -->
-                    <div class="map-container relative bg-slate-800 h-48 rounded-xl overflow-hidden shadow-md">
-                        <img src="image_f223a6.png" onerror="this.style.display='none'" class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-overlay">
-                        
-                        <svg width="100%" height="100%" style="position:absolute; top:0; left:0; z-index:10;" viewBox="0 0 300 300">
-                            <!-- Rota Direta (SJRP -> SP) -->
-                            <path id="path-original" d="M 50 50 C 120 150, 200 200, 250 260" fill="none" stroke="#64748b" stroke-width="4" stroke-dasharray="6 4" class="route-path hidden-view" />
-                            <!-- Rota Otimizada (Passando por Campinas/Rod. Bandeirantes) -->
-                            <path id="path-optimized" d="M 50 50 C 150 100, 180 180, 250 260" fill="none" stroke="#22c55e" stroke-width="5" class="route-path hidden-view" />
-                        </svg>
-
-                        <!-- Ponto de Partida: São José do Rio Preto -->
-                        <div id="wp-origem" class="waypoint hidden-view" style="top: 16%; left: 16%;">
-                            <div class="waypoint-dot wp-base text-white font-bold text-[8px] flex items-center justify-center">R</div>
-                            <div class="wp-label text-[8px] bg-white text-black px-1 rounded shadow">Rio Preto</div>
-                        </div>
-
-                        <!-- Destino Final: São Paulo -->
-                        <div id="wp-destino" class="waypoint hidden-view" style="top: 86%; left: 83%;">
-                            <div class="waypoint-dot wp-client text-white font-bold text-[8px] flex items-center justify-center">S</div>
-                            <div class="wp-label text-[8px] bg-white text-black px-1 rounded shadow">São Paulo</div>
-                        </div>
-
-                        <!-- Cliente Potencial (Encontrado pela IA na Rodovia) -->
-                        <div id="wp-cliente-ia" class="waypoint hidden-view" style="top: 50%; left: 60%;">
-                            <div class="waypoint-dot wp-potential text-white flex items-center justify-center"><i class='bx bx-radar'></i></div>
-                            <div class="wp-label text-[8px] text-amber-600 bg-white px-1 rounded shadow">Cliente (Campinas)</div>
-                        </div>
-                    </div>
-
-                    <!-- Alerta IA Log -->
-                    <div id="ia-alert-container" class="ai-insight-panel p-4 hidden-view bg-gradient-to-r from-slate-900 to-indigo-900 rounded-xl shadow-lg border border-indigo-400 relative overflow-hidden">
-                        <div class="ai-radar-bg absolute top-0 right-0 w-16 h-16 bg-purple-500/20 rounded-full animate-ping"></div>
-                        <p class="text-[9px] font-black text-blue-200 uppercase mb-1 flex items-center gap-1 relative z-10"><i class='bx bxs-brain'></i> Cérebro IA-LOG Informa:</p>
-                        <h3 class="text-sm font-black text-white mb-1 leading-tight relative z-10">Oportunidade na Rota!</h3>
-                        <p class="text-[10px] text-indigo-100 font-medium mb-3 relative z-10 leading-tight">O <b>Depósito Campinas</b> fica a 4km do trajeto e está sem fazer pedidos há 32 dias. O frete é grátis aproveitando a viagem.</p>
-                        
-                        <button id="btn-whatsapp-ia" class="w-full bg-green-500 text-white py-2.5 rounded-lg font-black text-[10px] uppercase shadow-lg flex items-center justify-center gap-1.5 active:scale-95 transition-transform relative z-10"><i class='bx bxl-whatsapp text-base'></i> Enviar Oferta (1-Click)</button>
-                        
-                        <div id="ia-success-container" class="hidden-view mt-3 pt-3 border-t border-indigo-400 relative z-10 text-center">
-                            <p class="text-[9px] font-black text-green-300 uppercase mb-1.5"><i class='bx bx-check-double'></i> Venda Realizada (R$ 3.200,00)</p>
-                            <button id="btn-recalcular-rota" class="w-full bg-white text-indigo-900 py-2.5 rounded-lg font-black text-[10px] uppercase shadow-lg flex items-center justify-center gap-1.5 active:scale-95 transition-transform"><i class='bx bx-refresh text-base'></i> Recalcular Rota Inteligente</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="p-3 border-t border-slate-200 bg-white shrink-0">
-                    <button id="btn-despachar" disabled class="w-full bg-slate-900 text-white py-3.5 rounded-xl font-black text-xs uppercase shadow-xl flex justify-center items-center gap-2 disabled:opacity-50 active:scale-95 transition-opacity"><i class='bx bx-send text-base'></i> Despachar e Sincronizar App</button>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- APP: VISÃO DO MOTORISTA (MOBILE APP NA RUA)-->
-    <!-- ========================================== -->
-    <div id="app-motorista" class="hidden-view absolute inset-0 z-50 bg-slate-900 flex-col w-full h-full">
-        <header class="p-5 flex justify-between items-center border-b border-slate-800 bg-slate-950 shrink-0">
-            <div class="flex items-center gap-3">
-                <img src="image_f278e2.png" onerror="this.style.display='none'" class="w-10 h-10 rounded-full bg-white p-1">
-                <div><p class="text-[8px] font-black text-red-500 uppercase tracking-widest mb-0.5">App Motorista</p><h2 class="font-black text-sm text-white leading-none">Carlos Silva</h2></div>
-            </div>
-            <button class="bg-slate-800 p-2 rounded-lg border border-slate-700"><i class='bx bx-log-out text-xl text-red-500'></i></button>
-        </header>
+    <div class="login-card text-center">
+        <i class="bi bi-hexagon-fill display-1" style="color: #e65100;"></i>
+        <h2 class="fw-bold mt-3 mb-1">EVOLUTION</h2>
+        <p class="text-white-50 mb-4">Plataforma de Gestão Automotiva</p>
         
-        <div class="flex-grow relative overflow-hidden bg-slate-900">
-            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15000!2d-46.633309!3d-23.550520!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDMzJzAxLjkiUyA0NsKwMzgnMDAuMCJX!5e0!3m2!1spt-BR!2sbr" width="100%" height="100%" style="border:0; filter: invert(90%) hue-rotate(180deg);" allowfullscreen="" loading="lazy"></iframe>
-            
-            <div class="absolute inset-0 z-10 bg-transparent"></div>
-            
-            <div class="absolute bottom-0 left-0 right-0 p-4 z-30 bg-gradient-to-t from-slate-950 via-slate-900 to-transparent pt-20">
-                <div id="driver-current-stop">
-                    <!-- Card de Entrega (Campinas) -->
-                    <div class="bg-slate-800 border-2 border-slate-700 rounded-2xl p-5 shadow-2xl relative overflow-hidden" id="driver-card">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
-                        <p class="text-[8px] font-black text-amber-500 uppercase tracking-widest mb-2 flex items-center gap-1"><i class='bx bx-radar'></i> Parada Otimizada (Venda Adicional)</p>
-                        <div class="flex justify-between items-center mb-3">
-                            <h3 class="font-black text-2xl text-white tracking-tighter">NFe: 8901</h3>
-                            <div class="bg-slate-700 w-10 h-10 rounded-xl flex items-center justify-center text-white"><i class='bx bxs-navigation text-lg'></i></div>
-                        </div>
-                        <p class="text-sm font-black text-blue-300 uppercase mb-1 leading-tight">Depósito Campinas</p>
-                        <p class="text-[10px] font-bold text-slate-400 mb-4 flex items-start gap-1 bg-slate-900/50 p-2 rounded-lg border border-slate-700"><i class='bx bx-map-pin text-sm text-red-500'></i> Rodovia Anhanguera, Km 98</p>
-                        
-                        <button id="btnCheguei" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-[10px] shadow-lg active:scale-95 transition-all tracking-wider flex items-center justify-center gap-2">Registrar Descarga <i class='bx bx-right-arrow-alt text-lg'></i></button>
-                    </div>
+        <form onsubmit="fazerLogin(event)">
+            <div class="mb-3 text-start">
+                <label class="form-label text-white-50 fw-bold small text-uppercase">Usuário da Oficina</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-white-50"><i class="bi bi-person"></i></span>
+                    <input type="text" class="form-control" id="usr" required placeholder="Digite o seu utilizador">
                 </div>
             </div>
+            <div class="mb-4 text-start">
+                <label class="form-label text-white-50 fw-bold small text-uppercase">Senha de Acesso</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-white-50"><i class="bi bi-key"></i></span>
+                    <input type="password" class="form-control" id="pwd" required placeholder="••••••••">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 shadow" id="btnAcesso">ENTRAR NO SISTEMA</button>
+        </form>
+        <div class="mt-4 pt-3 border-top border-secondary">
+            <small class="text-white-50 fw-bold">Powered by thIAguinho Soluções</small>
         </div>
     </div>
-
-    <!-- MODAL: BAIXA NO CANHOTO (IDs Originais: conf-recebedor, conf-obs) -->
-    <div id="modal-confirmar-entrega" class="modal hidden-view z-[100000]">
-        <div class="modal-content-dark w-full mx-auto pb-6 rounded-t-3xl border-t-2 border-slate-700 bg-slate-900 p-6">
-            <h2 class="font-black text-lg text-white mb-4 flex items-center gap-2 border-b border-slate-800 pb-3 uppercase tracking-tighter"><i class='bx bx-check-shield text-green-500 text-xl'></i> Assinatura Digital</h2>
-            <form id="formConfirm" onsubmit="return false;">
-                <label class="block text-[9px] font-black text-slate-400 uppercase ml-1 mb-1">Nome / RG do Recebedor</label>
-                <input type="text" id="conf-recebedor" placeholder="Ex: João Portaria..." required class="w-full p-3.5 rounded-xl bg-slate-800 text-white border border-slate-600 outline-none font-bold text-xs mb-3 focus:border-green-500 transition-colors">
-                
-                <label class="block text-[9px] font-black text-slate-400 uppercase ml-1 mb-1">Ocorrências na Descarga?</label>
-                <textarea id="conf-obs" placeholder="Faltou item? Avaria? Tudo OK?" required class="w-full p-3.5 rounded-xl bg-slate-800 text-white border border-slate-600 resize-none outline-none font-medium text-xs h-24 focus:border-green-500 transition-colors"></textarea>
-                
-                <button type="button" id="btn-confirmar-baixa" class="w-full bg-green-600 text-white py-3.5 rounded-xl font-black uppercase text-[10px] shadow-lg flex justify-center items-center gap-2 mt-4 tracking-widest transition-all active:scale-95">
-                    <i class='bx bx-cloud-upload text-sm'></i> Salvar e Baixar NFe no ERP
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- MODAL: RELATÓRIOS DO GESTOR (FECHAMENTO)   -->
-    <!-- Lógicas reais extraídas do app.js original -->
-    <!-- ========================================== -->
-    <div id="modal-relatorios" class="modal hidden-view z-[100000]">
-        <div class="modal-content h-[85dvh] rounded-t-3xl">
-            <div class="bg-white border-b border-slate-200 p-4 flex justify-between items-center shrink-0">
-                <div>
-                    <h2 class="font-black text-sm text-slate-800 uppercase tracking-tight flex items-center gap-1.5"><i class='bx bx-line-chart text-blue-600 text-lg'></i> Dash. Financeiro</h2>
-                </div>
-            </div>
-            
-            <div class="p-4 bg-slate-50 flex-grow overflow-y-auto" id="relatoriosScrollArea">
-                <!-- Visão Geral -->
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-3 border-l-4 border-l-green-500 mb-3">
-                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-green-600"><i class='bx bx-money text-xl'></i></div>
-                    <div>
-                        <p class="text-[8px] font-black text-slate-400 uppercase mb-0.5 tracking-widest">Faturamento da Operação</p>
-                        <p class="text-xl font-black text-slate-800 tracking-tighter">R$ 3.200,00</p>
-                    </div>
-                </div>
-
-                <!-- Lógicas Extraídas do App.js (Ranking e Despesas) -->
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-3">
-                    <h4 class="font-black text-slate-800 uppercase text-[9px] mb-3 border-b border-slate-100 pb-2 flex items-center gap-1.5"><i class='bx bx-money text-red-500'></i> Despesas Globais (Frota)</h4>
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center p-2.5 bg-red-50 rounded-lg border border-red-100">
-                            <div><p class="font-black text-[10px] text-slate-800">Custo Base do Frete</p><p class="text-[7px] font-bold text-red-500 uppercase mt-0.5">Viagem SJRP -> SP</p></div>
-                            <p class="font-black text-red-600 text-[10px]">- R$ 850,00</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-blue-50 p-4 rounded-xl shadow-sm border border-blue-200 flex items-center justify-between">
-                    <div>
-                        <p class="text-[9px] font-black text-blue-600 uppercase mb-0.5 tracking-widest">Lucro Líquido Gerado</p>
-                        <p class="text-2xl font-black text-blue-900 tracking-tighter">R$ 2.350,00</p>
-                    </div>
-                    <i class='bx bx-trending-up text-4xl text-blue-300'></i>
-                </div>
-            </div>
-            
-            <div class="bg-white p-3 border-t border-slate-200 shrink-0">
-                <button class="w-full bg-slate-900 text-white py-3 rounded-lg font-black uppercase text-[10px] shadow-lg"><i class='bx bxs-file-pdf text-red-500'></i> Exportar PDF Automático</button>
-            </div>
-        </div>
-    </div>
-
-</div> <!-- Final do Simulator Container -->
 
     <script>
-        // =====================================================================
-        // FUNÇÕES UTILITÁRIAS E ANTI-CRASH GLOBAIS
-        // =====================================================================
-        const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-        const cursor = document.getElementById('ghost-cursor');
+        const firebaseConfig = { apiKey: "AIzaSyAq6gEJlUGuzJmrNf-lVY0cqdOWsJ9xNeo", authDomain: "evolution-179d0.firebaseapp.com", projectId: "evolution-179d0", storageBucket: "evolution-179d0.firebasestorage.app", messagingSenderId: "349908951188", appId: "1:349908951188:web:457832d484a83f45b19481" };
+        firebase.initializeApp(firebaseConfig); const db = firebase.firestore();
 
-        function safeClass(id, action, className) {
-            const el = document.getElementById(id);
-            if(el) el.classList[action](className);
-        }
-        function safeText(id, text) {
-            const el = document.getElementById(id);
-            if(el) el.innerText = text;
-        }
-        function safeHTML(id, html) {
-            const el = document.getElementById(id);
-            if(el) el.innerHTML = html;
+        function showToast(msg, type='error') {
+            const bg = type==='error'?'bg-danger':'bg-success';
+            const t = document.createElement('div');
+            t.innerHTML = `<div class="toast align-items-center text-white ${bg} border-0 show p-3 mt-2 shadow-lg rounded" role="alert"><div class="d-flex"><div class="toast-body fw-bold">${msg}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div></div>`;
+            document.getElementById('toastContainer').appendChild(t.firstChild);
+            setTimeout(() => document.getElementById('toastContainer').firstChild?.remove(), 4000);
         }
 
-        // =====================================================================
-        // MOTORES DE ANIMAÇÃO MOBILE E SCROLL
-        // =====================================================================
-        async function slowScrollTo(container, targetScrollTop, durationMs) {
-            if(!container) return;
-            const start = container.scrollTop;
-            const change = targetScrollTop - start;
-            const startTime = performance.now();
-            return new Promise(resolve => {
-                function animateScroll(currentTime) {
-                    const elapsed = currentTime - startTime;
-                    const progress = Math.min(elapsed / durationMs, 1);
-                    const ease = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-                    container.scrollTop = start + change * ease;
-                    if (progress < 1) requestAnimationFrame(animateScroll);
-                    else resolve();
+        async function fazerLogin(e) {
+            e.preventDefault();
+            const usr = document.getElementById('usr').value.trim();
+            const pwd = document.getElementById('pwd').value.trim();
+            const btn = document.getElementById('btnAcesso');
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Autenticando...';
+            btn.disabled = true;
+
+            try {
+                const snapshot = await db.collection('oficinas').where('usuario', '==', usr).get();
+                if(snapshot.empty) { showToast('Usuário não localizado na plataforma.'); } 
+                else {
+                    const doc = snapshot.docs[0];
+                    const dados = doc.data();
+                    
+                    if(dados.senha !== pwd) { showToast('Senha incorreta.'); } 
+                    else if(dados.status === 'Bloqueado') { showToast('Licença Bloqueada. Contacte a thIAguinho Soluções.'); } 
+                    else {
+                        sessionStorage.setItem('evo_tenant_id', doc.id);
+                        sessionStorage.setItem('evo_tenant_nome', dados.nomeFantasia);
+                        sessionStorage.setItem('evo_tenant_mods', JSON.stringify(dados.modulos || {}));
+                        window.location.href = 'admin.html';
+                    }
                 }
-                requestAnimationFrame(animateScroll);
-            });
-        }
-
-        async function moveCursor(sel, offX=0, offY=0) {
-            try {
-                const el = document.querySelector(sel);
-                if(!el) return;
-                
-                // Trata o scroll suave das áreas grandes
-                const roteirizadorScroll = document.getElementById('roteirizadorScrollArea');
-                const relatoriosScroll = document.getElementById('relatoriosScrollArea');
-                const adminScroll = document.getElementById('adminScrollArea');
-
-                if (roteirizadorScroll && roteirizadorScroll.contains(el)) {
-                    roteirizadorScroll.scrollTo({ top: el.offsetTop - 50, behavior: 'smooth' });
-                } else if (relatoriosScroll && relatoriosScroll.contains(el)) {
-                    relatoriosScroll.scrollTo({ top: el.offsetTop - 50, behavior: 'smooth' });
-                } else if (adminScroll && adminScroll.contains(el)) {
-                    adminScroll.scrollTo({ top: el.offsetTop - 50, behavior: 'smooth' });
-                } else if (el.scrollIntoView) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-                
-                await sleep(500); 
-                const rect = el.getBoundingClientRect();
-                
-                cursor.style.top = (rect.top + rect.height/2 + offY) + 'px';
-                cursor.style.left = (rect.left + rect.width/2 + offX) + 'px';
-                await sleep(600); 
-            } catch(e) { console.error("Erro no moveCursor:", e); }
-        }
-
-        async function clickAction(sel) {
-            try {
-                cursor.classList.add('cursor-click-effect');
-                const el = document.querySelector(sel);
-                if(el) { if(el.tagName === 'SELECT') el.focus(); else el.click(); }
-                await sleep(350);
-                cursor.classList.remove('cursor-click-effect');
-            } catch(e) { console.error("Erro no clickAction:", e); }
-        }
-
-        async function typeAction(sel, text, dark=false) {
-            try {
-                const el = document.querySelector(sel);
-                if(!el) return;
-                el.value = '';
-                el.classList.add(dark ? 'typing-focus-dark' : 'typing-focus');
-                for(let c of text) { el.value += c; el.dispatchEvent(new Event('input')); await sleep(20 + Math.random() * 20); }
-                await sleep(300);
-                el.classList.remove(dark ? 'typing-focus-dark' : 'typing-focus');
-            } catch(e) { console.error("Erro no typeAction:", e); }
-        }
-
-        function showCaption(text, durationMs = 3500) {
-            return new Promise(async (resolve) => {
-                try {
-                    const cont = document.getElementById('tour-caption-container');
-                    safeText('caption-text', text);
-                    cont.style.opacity = 1; 
-                    cont.style.transform = 'translateY(0)';
-                    await sleep(durationMs);
-                    cont.style.opacity = 0; 
-                    cont.style.transform = 'translateY(-20px)';
-                    await sleep(400);
-                    resolve();
-                } catch(e) { resolve(); }
-            });
-        }
-
-        async function showToast(title, msg) {
-            const toast = document.getElementById('toast-notification');
-            if(toast) {
-                safeText('toast-title', title);
-                safeText('toast-msg', msg);
-                toast.classList.add('show');
-                await sleep(2500);
-                toast.classList.remove('show');
-            }
-        }
-
-        async function transicaoNuvem(titulo, subtitulo) {
-            try {
-                const trans = document.getElementById('transition-overlay');
-                if(trans) {
-                    safeText('transition-title', titulo);
-                    safeText('transition-subtitle', subtitulo);
-                    trans.classList.remove('pointer-events-none'); 
-                    trans.classList.add('opacity-100');
-                    await sleep(2500);
-                    trans.classList.remove('opacity-100'); 
-                    trans.classList.add('pointer-events-none');
-                }
-            } catch(e) { console.error("Erro transicaoNuvem:", e); }
-        }
-
-        // =====================================================================
-        // A JORNADA DE VENDAS MASTER: O ROTEIRIZADOR DE LUCRO (MOBILE)
-        // =====================================================================
-        async function iniciarTour() {
-            try {
-                document.getElementById('start-screen').style.display = 'none';
-                cursor.style.opacity = 1;
-
-                // 1. LOGIN
-                await showCaption("O Gestor acessa o ERP pelo celular para organizar a logística de hoje.", 3000);
-                await moveCursor('#userSelect'); await clickAction('#userSelect'); document.getElementById('userSelect').value = 'admin'; await sleep(300);
-                await moveCursor('#passwordInput'); await typeAction('#passwordInput', 'admin123');
-                await moveCursor('#loginBtn'); await clickAction('#loginBtn');
-                
-                safeClass('userScreen', 'add', 'hidden-view');
-                safeClass('app-admin', 'remove', 'hidden-view');
-                await sleep(1000);
-
-                // 2. ROTEIRIZADOR IA (A MÁGICA: SJRP -> SP)
-                const scrollRoteirizador = document.getElementById('adminScrollArea');
-                
-                await showCaption("A Função de Ouro: O Gestor acessa o Planejador IA-Log para criar a rota de viagem.", 4000);
-                
-                await showCaption("O mapa traça a Rota Original: Rio Preto ➔ São Paulo. O Custo do frete base é R$ 850.", 4500);
-                await moveCursor('#rota-destino'); await typeAction('#rota-destino', 'São Paulo, SP');
-                await moveCursor('#btn-tracar-rota'); await clickAction('#btn-tracar-rota');
-                
-                // Anima primeira rota e rola pro mapa
-                safeClass('path-original', 'remove', 'hidden-view');
-                safeClass('wp-origem', 'remove', 'hidden-view');
-                safeClass('wp-destino', 'remove', 'hidden-view');
-                safeText('stat-dist', '440 km');
-                safeText('stat-time', '5h 15m');
-                safeText('stat-cost', 'R$ 850,00');
-                
-                await slowScrollTo(scrollRoteirizador, 180, 1500); // Foca no Mapa
-                await sleep(2500);
-
-                // IA DETECTA CLIENTE
-                await showCaption("Atenção! A Inteligência Artificial detectou um cliente no corredor logístico da viagem.", 4500);
-                safeClass('wp-cliente-ia', 'remove', 'hidden-view');
-                safeClass('ia-alert-container', 'remove', 'hidden-view');
-                
-                await slowScrollTo(scrollRoteirizador, scrollRoteirizador.scrollHeight, 1500); // Rola p/ Alerta
-                await sleep(1500);
-
-                // NEGOCIAÇÃO
-                await showCaption("O cliente está inativo há mais de 30 dias. O Gestor envia uma oferta de reposição com Frete Grátis via WhatsApp.", 5000);
-                await moveCursor('#btn-whatsapp-ia'); await clickAction('#btn-whatsapp-ia');
-                
-                await showToast("WhatsApp Disparado", "A oferta foi enviada para Campinas.");
-                await sleep(2000);
-                await showToast("Resposta do Cliente", "'Ótimo! Pode mandar o pedido de R$ 3.200, vamos aproveitar o frete!'");
-                await sleep(1500);
-
-                // RECALCULO DE ROTA
-                await showCaption("Venda Fechada! Adicionamos o pedido na rota atual. A IA recalcula tudo em tempo real.", 4500);
-                safeClass('btn-whatsapp-ia', 'add', 'hidden-view');
-                safeClass('ia-success-container', 'remove', 'hidden-view');
-                
-                await moveCursor('#btn-recalcular-rota'); await clickAction('#btn-recalcular-rota');
-
-                // Animação Mapa
-                await slowScrollTo(scrollRoteirizador, 100, 1500); // Volta pro mapa
-                
-                const pathOriginal = document.getElementById('path-original');
-                if(pathOriginal) pathOriginal.style.display = 'none';
-                
-                safeClass('path-optimized', 'remove', 'hidden-view');
-                
-                const wpClientDot = document.querySelector('#wp-cliente-ia .waypoint-dot');
-                if(wpClientDot) {
-                    wpClientDot.classList.replace('wp-potential', 'wp-client');
-                    wpClientDot.innerHTML = '3';
-                }
-                
-                safeText('stat-dist', '465 km');
-                safeText('stat-time', '5h 45m');
-                safeText('stat-cost', 'LUCRO');
-                const statCost = document.getElementById('stat-cost');
-                if(statCost) statCost.className = 'text-sm font-black text-green-500';
-                
-                await sleep(2500);
-
-                // DESPACHO
-                await showCaption("O frete da viagem foi totalmente pago pelo lucro dessa venda extra! Agora, despachamos para a rua.", 5000);
-                await slowScrollTo(scrollRoteirizador, scrollRoteirizador.scrollHeight, 1500); 
-                
-                const btnDespachar = document.getElementById('btn-despachar');
-                if(btnDespachar) btnDespachar.removeAttribute('disabled');
-                
-                await moveCursor('#btn-despachar'); await clickAction('#btn-despachar');
-
-                // 3. A NUVEM
-                await transicaoNuvem("Sincronização 5G", "O App do Motorista recebe a rota otimizada...");
-                safeClass('app-admin', 'add', 'hidden-view');
-                safeClass('app-motorista', 'remove', 'hidden-view');
-                safeClass('app-motorista', 'add', 'flex'); // Ajuste grid mobile
-                await sleep(1500);
-
-                // 4. APP MOTORISTA NA RUA (BAIXA DIGITAL)
-                await showCaption("O Motorista usa o Maps pelo App. Ao chegar na entrega extra (Campinas), ele acessa o Canhoto.", 5000);
-                await moveCursor('#btnCheguei'); await clickAction('#btnCheguei');
-                safeClass('modal-confirmar-entrega', 'remove', 'hidden-view');
-                await sleep(800);
-
-                await showCaption("Ele preenche digitalmente o nome do recebedor e as ocorrências. Adeus perda de papéis.", 5000);
-                await moveCursor('#conf-recebedor'); await typeAction('#conf-recebedor', 'Roberto (Almoxarifado)', true);
-                await moveCursor('#conf-obs'); await typeAction('#conf-obs', 'Mercadoria conferida. 50 pacotes intactos.', true);
-
-                await moveCursor('#btn-confirmar-baixa'); await clickAction('#btn-confirmar-baixa');
-                safeClass('modal-confirmar-entrega', 'add', 'hidden-view');
-                
-                safeHTML('driver-current-stop', `
-                    <div class="bg-green-600 rounded-2xl p-6 text-center text-white shadow-2xl border-2 border-green-400">
-                        <i class='bx bx-check-shield text-6xl mb-2'></i>
-                        <h2 class="font-black text-xl uppercase tracking-tighter">Entrega Baixada!</h2>
-                        <p class="text-[10px] font-bold text-green-200 mt-1">Sincronizado com o ERP Base.</p>
-                    </div>`);
-                await sleep(2500);
-
-                // 5. RETORNO E RELATÓRIOS DO GESTOR
-                await transicaoNuvem("Operação Concluída", "Retornando ao Gestor...");
-                safeClass('app-motorista', 'remove', 'flex');
-                safeClass('app-motorista', 'add', 'hidden-view');
-                safeClass('app-admin', 'remove', 'hidden-view');
-                await sleep(1000);
-
-                await showCaption("Por fim, o Gestor acessa o Painel de Relatórios para verificar o fechamento da operação.", 4500);
-                
-                safeClass('modal-relatorios', 'remove', 'hidden-view');
-                await sleep(1500);
-                
-                const relScroll = document.getElementById('relatoriosScrollArea');
-                await showCaption("O sistema já cruzou a despesa do frete com a venda extra de oportunidade. Lucro máximo.", 4500);
-                await slowScrollTo(relScroll, relScroll?.scrollHeight || 1000, 3000);
-                await sleep(1500);
-                await slowScrollTo(relScroll, 0, 2000);
-                await sleep(1000);
-                
-                safeClass('modal-relatorios', 'add', 'hidden-view');
-
-                // CENA FINAL
-                cursor.style.opacity = 0;
-                const tourCaption = document.getElementById('tour-caption-container');
-                if(tourCaption) tourCaption.style.opacity = 0;
-                safeClass('final-screen', 'add', 'active');
-
-            } catch (err) {
-                console.error("Tour interrompido:", err);
-            }
+            } catch (err) { showToast('Erro Crítico: ' + err.message); }
+            btn.innerHTML = 'ENTRAR NO SISTEMA'; btn.disabled = false;
         }
     </script>
 </body>
